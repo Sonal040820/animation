@@ -10,7 +10,15 @@
       "source_url": "https://raw.githubusercontent.com/theminhnguyen/wonderdeck/2929925ae31411b94da54b395fbfb62abcf3f6ab/public/models/shino.vrm",
       "git_blob_sha1": "7f4bd4318f6f057ca038d79a17f3717e4f5a62ef",
       "bytes": 10108452,
-      "claimed_license": "CC0"
+      "claimed_license": "CC0",
+      "sha256": "4ef67b30a1867aee11727a3491e57fd8663b2f171e9bddf00a0c767703777883",
+      "verified_vrm0_permissions": {
+        "licenseName": "CC0",
+        "violentUssageName": "Allow",
+        "commercialUssageName": "Allow",
+        "allowedUserName": "Everyone"
+      },
+      "rights_approved": true
     },
     {
       "id": "vita",
@@ -18,7 +26,15 @@
       "source_url": "https://raw.githubusercontent.com/theminhnguyen/wonderdeck/2929925ae31411b94da54b395fbfb62abcf3f6ab/public/models/vita.vrm",
       "git_blob_sha1": "cb6a8a510821d6a94e5bf4c31ae76d79c2bfc020",
       "bytes": 9539380,
-      "claimed_license": "CC0"
+      "claimed_license": "CC0",
+      "sha256": "0905d95e2851a3227fa35ce48e1f36dc5ae6c10e1c4e3a8943c9e338885d0f7e",
+      "verified_vrm0_permissions": {
+        "licenseName": "CC0",
+        "violentUssageName": "Allow",
+        "commercialUssageName": "Allow",
+        "allowedUserName": "Everyone"
+      },
+      "rights_approved": true
     }
   ]
 }
