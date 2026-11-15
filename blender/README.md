@@ -26,6 +26,13 @@
 - scripts/: verified cloud installer, no-media environment probe, explicit future import and render entry points
 - tests/: no-scene Python unit tests
 
-Rigify and VRM are optional extensions, not silently installed. Their availability will be evaluated individually before importing real characters.
+**VRM v4.10.5/MToon is installed and verified** on the GitHub runner from a SHA-256-pinned release. No models were imported. **Rigify is deferred** because the public Blender Extensions listing has availability warnings; the existing VRM humanoid support and studio IK helpers do not require it.
 
 Official docs: https://www.blender.org/download/LTS/ , https://docs.blender.org/manual/en/4.5/advanced/command_line/arguments.html , https://docs.blender.org/manual/en/4.5/advanced/command_line/extension_arguments.html .
+
+## Verified extension integration
+
+- [Pinned VRM/MToon installer](scripts/install_vrm_extension.sh) and [non-rendering API probe](scripts/vrm_doctor.py): both passed on GitHub Actions.
+- [Manual future asset conversion](scripts/import_registered_asset.py): can import a legally approved model and save a new editable blend, but is never run by setup.
+- [Reusable Blender agent skill](skills/studio/SKILL.md): cinematography, body mechanics, asset rights, audio integration and safety checklist.
+- Approved assets remain at **zero**. The setup generated **zero** frames or scenes.
