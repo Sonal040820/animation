@@ -3,6 +3,9 @@ on:
   push:
     paths:
       - 'projects/storm-vs-ash/**'
+      - 'projects/storm-vs-ash-elite/**'
+      - 'scripts/generate-elite-audio.mjs'
+      - 'scripts/generate-elite-voices.mjs'
       - 'scripts/generate-duel-audio.mjs'
       - '.github/workflows/render.yml'
   workflow_dispatch:
@@ -10,7 +13,7 @@ on:
       project:
         description: 'Existing HyperFrames project directory'
         required: true
-        default: 'projects/storm-vs-ash'
+        default: 'projects/storm-vs-ash-elite'
         type: string
 permissions:
   contents: read
@@ -19,7 +22,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
-      PROJECT_DIR: ${{ github.event_name == 'workflow_dispatch' && inputs.project || 'projects/storm-vs-ash' }}
+      PROJECT_DIR: ${{ github.event_name == 'workflow_dispatch' && inputs.project || 'projects/storm-vs-ash-elite' }}
       HEYGEN_API_KEY: ${{ secrets.HEYGEN_API_KEY }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
@@ -47,6 +50,12 @@ jobs:
       - name: Synthesize original anime soundtrack and fight sounds
         if: env.PROJECT_DIR == 'projects/storm-vs-ash'
         run: node scripts/generate-duel-audio.mjs "$PROJECT_DIR/assets/audio"
+      - name: Synthesize original cinematic score and Foley for Elite Cut
+        if: env.PROJECT_DIR == 'projects/storm-vs-ash-elite'
+        run: node scripts/generate-elite-audio.mjs "$PROJECT_DIR/assets/audio"
+      - name: Generate character and narrator voices on runner
+        if: env.PROJECT_DIR == 'projects/storm-vs-ash-elite'
+        run: node scripts/generate-elite-voices.mjs "$PROJECT_DIR"
       - name: HyperFrames check
         run: |
           cd "$PROJECT_DIR"
@@ -55,7 +64,7 @@ jobs:
         continue-on-error: true
         run: |
           cd "$PROJECT_DIR"
-          ../../node_modules/.bin/hyperframes snapshot --at 0.2,2.6,4.9,7.3,10.7
+          ../../node_modules/.bin/hyperframes snapshot --at 0.7,3.9,6.1,10.53,16.73,20.2,22.1
       - name: Render to MP4
         run: |
           mkdir -p renders
@@ -66,6 +75,11 @@ jobs:
           ffprobe -v error -show_entries format=duration,size -of json renders/final.mp4 | tee renders/probe.json
           ffprobe -v error -select_streams a -show_entries stream=codec_type -of csv=p=0 renders/final.mp4 | grep -q audio
           ffmpeg -v error -i renders/final.mp4 -f null -
+          if [[ "$PROJECT_DIR" == "projects/storm-vs-ash-elite" ]]; then
+            ffprobe -v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate -of default=noprint_wrappers=1 renders/final.mp4 | tee renders/video-stream.txt
+            node -e 'const fs=require("fs"); const p=JSON.parse(fs.readFileSync("renders/probe.json"));if(!(p.format.duration>22.70&&p.format.duration<23.40))process.exit(1)'
+            cp "$PROJECT_DIR/assets/audio/voice-provenance.json" renders/voice-provenance.json
+          fi
       - name: Upload snapshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -73,6 +87,7 @@ jobs:
           name: anime-duel-snapshots
           path: |
             projects/storm-vs-ash/.hyperframes/artifacts/snapshots/
+            projects/storm-vs-ash-elite/.hyperframes/artifacts/snapshots/
             .hyperframes/artifacts/snapshots/
           if-no-files-found: ignore
           retention-days: 14
