@@ -1,0 +1,46 @@
+name: Environment setup
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'package.json'
+      - '.github/workflows/environment.yml'
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg espeak-ng
+      - name: Install pinned HyperFrames
+        run: npm ci
+      - name: Install official core agent skills
+        run: npx hyperframes skills update
+      - name: Provision headless Chrome
+        run: npx hyperframes browser ensure
+      - name: Verify environment
+        run: |
+          node --version
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
+          npx hyperframes --version
+          npx hyperframes skills check
+          npx hyperframes doctor --json | tee doctor.json
+      - name: Upload diagnostic report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyperframes-environment-diagnostics
+          path: doctor.json
+          if-no-files-found: ignore
+          retention-days: 14
