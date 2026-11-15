@@ -101,7 +101,7 @@ jobs:
           ffmpeg -hide_banner -loglevel error -y -i renders/unmastered.mp4 \
             -map 0:v:0 -map 0:a:0 -c:v copy \
             -af "loudnorm=I=-16:TP=-1.5:LRA=10" \
-            -c:a aac -b:a 256k -movflags +faststart renders/final.mp4
+            -c:a aac -ar 48000 -b:a 256k -t 23 -movflags +faststart renders/final.mp4
           rm renders/unmastered.mp4
       - name: Verify video and audible audio stream
         run: |
