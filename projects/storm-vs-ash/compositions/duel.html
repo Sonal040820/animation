@@ -1,0 +1,311 @@
+<template>
+<style>
+#root{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#070816;color:white;font-family:'Oswald',sans-serif;isolation:isolate}
+#frame{position:absolute;inset:0;overflow:hidden}
+.backdrop{position:absolute;inset:0;width:1080px;height:1920px}
+#cloud-near,#cloud-far{transform-origin:center}
+#red-haze,#blue-haze{position:absolute;top:770px;width:740px;height:850px;border-radius:50%;opacity:.55;filter:blur(85px);pointer-events:none}
+#blue-haze{left:-380px;background:radial-gradient(ellipse,#225ef7a0 0%,#222da64d 42%,transparent 70%)}
+#red-haze{right:-340px;background:radial-gradient(ellipse,#fd315099 0%,#b30b3855 45%,transparent 72%)}
+#fighter-stage{position:absolute;inset:0;transform-origin:50% 73%;will-change:transform;z-index:4}
+.fighter{position:absolute;width:320px;height:610px;will-change:transform;filter:drop-shadow(0 0 14px var(--accent)) drop-shadow(0 20px 12px #0009)}
+.fighter.azure{--accent:#50deff;--edge:#1e5687;--metal:#0d2341}
+.fighter.ash{--accent:#ff5873;--edge:#82223c;--metal:#421423}
+.fighter.ash>svg{transform:scaleX(-1)}
+.fighter .aura{position:absolute;left:-140px;top:-130px;width:600px;height:790px;border-radius:50%;background:radial-gradient(ellipse at 50% 50%,var(--accent) 0%,transparent 62%);opacity:.12;filter:blur(48px)}
+#speed-lines{position:absolute;inset:0;opacity:0;z-index:6;mix-blend-mode:screen;background:repeating-linear-gradient(172deg,transparent 0 50px,#bef6ff18 51px 54px,transparent 57px 104px),repeating-linear-gradient(10deg,transparent 0 64px,#ffb2bb1d 64px 67px,transparent 70px 143px)}
+#screen-flash{position:absolute;inset:0;background:#eefaff;opacity:0;z-index:15;pointer-events:none}
+#impact-halo{position:absolute;left:400px;top:970px;width:310px;height:310px;border-radius:100%;opacity:0;z-index:10;background:radial-gradient(circle,#fff 0%,#e2fafa 8%,#75dfff 26%,#ff507f 42%,transparent 70%);filter:blur(8px);mix-blend-mode:screen}
+#shock-ring{position:absolute;left:335px;top:905px;width:420px;height:420px;border:14px solid #f1ffff;border-radius:100%;box-shadow:0 0 40px #43d8ff,0 0 85px #f2547e,inset 0 0 45px #8cdfff;opacity:0;z-index:9}
+#bolts{position:absolute;inset:0;width:1080px;height:1920px;z-index:9;mix-blend-mode:screen;pointer-events:none}
+#bolt-azure,#bolt-ash,#burst-rays,#electric-field{opacity:0;transform-origin:540px 1150px}
+#cinematic-bars{position:absolute;inset:0;z-index:18;pointer-events:none;box-shadow:inset 0 0 180px 75px #0009}
+#ink-cut{position:absolute;inset:0;background:#080916;z-index:13;opacity:0}
+#final-type{position:absolute;left:100px;top:270px;width:880px;text-align:center;opacity:0;z-index:17;color:#eaf6ff;text-shadow:0 3px 0 #102f52,0 0 25px #68c8ff66;letter-spacing:9px;font-family:'Archivo Black',sans-serif;font-size:95px;line-height:1.12}
+#final-type em{font-style:normal;color:#ff6b87;text-shadow:0 0 25px #fc426b}
+#final-sub{display:block;font-family:'Space Mono',monospace;font-size:25px;letter-spacing:6px;margin-top:30px;color:#c5c8e6}
+#rain{position:absolute;inset:0;z-index:3;opacity:.45;background:repeating-linear-gradient(101deg,transparent 0 48px,#bac9ff15 48px 50px,transparent 52px 98px)}
+#floor-light{position:absolute;left:0;top:1420px;width:100%;height:360px;z-index:3;background:linear-gradient(to bottom,transparent, #08122a66 40%,#01030bcc 100%)}
+#blue-streak,#red-streak{position:absolute;top:1200px;width:650px;height:85px;z-index:7;opacity:0;filter:blur(10px);border-radius:100%;mix-blend-mode:screen}
+#blue-streak{left:70px;background:linear-gradient(90deg,transparent,#4adfff,#e3ffff);box-shadow:0 0 75px #36a3ff}
+#red-streak{left:420px;background:linear-gradient(90deg,#fff4f5,#ff5377,transparent);box-shadow:0 0 75px #eb295e}
+#wind-dust{position:absolute;left:0;top:1290px;width:1080px;height:430px;z-index:6;opacity:0;background:radial-gradient(ellipse at 50% 70%,#c2d4f455,transparent 62%);filter:blur(42px)}
+</style>
+<div id="root" data-composition-id="duel" data-width="1080" data-height="1920">
+ <div id="frame" class="clip" data-start="0" data-duration="12" data-layout-ignore>
+  <svg class="backdrop" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg" aria-label="Purple storm cloud rooftop with crimson eclipse">
+    <defs>
+      <radialGradient id="sky-fill" cx="54%" cy="34%" r="72%"><stop offset="0" stop-color="#402044"/><stop offset=".44" stop-color="#1c153a"/><stop offset="1" stop-color="#040916"/></radialGradient>
+      <radialGradient id="moon-fill"><stop offset="0" stop-color="#ffada8"/><stop offset=".60" stop-color="#f56073"/><stop offset="1" stop-color="#790b31"/></radialGradient>
+      <linearGradient id="floor-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#242940"/><stop offset=".1" stop-color="#101829"/><stop offset="1" stop-color="#02030d"/></linearGradient>
+      <filter id="moon-blur"><feGaussianBlur stdDeviation="35"/></filter>
+    </defs>
+    <rect x="0" y="0" width="1080" height="1920" fill="url(#sky-fill)"/>
+    <g id="stars" fill="#c1c9ec" opacity=".6">
+      <circle cx="110" cy="198" r="2"/><circle cx="222" cy="290" r="1.5"/><circle cx="800" cy="220" r="3"/><circle cx="930" cy="410" r="2"/><circle cx="58" cy="618" r="2"/><circle cx="974" cy="700" r="1.5"/><circle cx="411" cy="130" r="1.6"/><circle cx="645" cy="280" r="2"/>
+    </g>
+    <circle cx="545" cy="558" r="268" fill="#ff405c" opacity=".24" filter="url(#moon-blur)"/>
+    <circle id="eclipse-moon" cx="545" cy="558" r="235" fill="url(#moon-fill)" opacity=".96"/>
+    <circle cx="532" cy="537" r="178" fill="#300e30" opacity=".85"/>
+    <path d="M60 400 C260 310 340 420 525 370 S805 300 1060 420" fill="none" stroke="#ff94a3" stroke-width="4" opacity=".17"/>
+    <g id="cloud-far" fill="#16112c" opacity=".85">
+     <path d="M-220 480 Q-70 410 40 451 Q220 325 377 423 Q546 375 695 443 Q898 320 1160 431 L1200 580 L-220 580 Z"/>
+     <path d="M-100 790 Q150 690 275 746 Q470 672 550 735 Q700 640 920 744 L1200 704 L1210 870 L-100 870 Z"/>
+    </g>
+    <g id="cloud-near" fill="#070c25" opacity=".80">
+      <path d="M-150 950 Q210 760 485 912 Q700 838 1090 916 L1250 1080 L-160 1060 Z"/>
+    </g>
+    <g fill="#070c1b">
+      <path d="M0 1240 L75 1210 L75 1020 L120 1020 L120 1180 L150 1180 L150 990 L195 990 L195 1205 L230 1205 L230 1085 L288 1085 L288 1210 L345 1180 L345 1000 L425 1000 L425 1230 L485 1230 L485 1050 L550 1050 L550 1180 L605 1195 L605 920 L665 920 L665 1240 L715 1240 L715 1035 L784 1035 L784 1170 L822 1170 L822 980 L867 980 L867 1210 L900 1210 L900 1085 L987 1085 L987 1270 L1080 1230 L1080 1560 L0 1560 Z"/>
+      <rect x="124" y="1283" width="74" height="194"/><rect x="512" y="1210" width="80" height="270"/>
+    </g>
+    <g fill="#dc84a2" opacity=".45">
+      <rect x="165" y="1090" width="4" height="17"/><rect x="175" y="1090" width="4" height="17"/><rect x="370" y="1070" width="5" height="19"/><rect x="390" y="1110" width="5" height="19"/><rect x="637" y="970" width="6" height="23"/><rect x="739" y="1120" width="5" height="13"/><rect x="851" y="1090" width="4" height="21"/><rect x="952" y="1150" width="6" height="17"/>
+    </g>
+    <path d="M0 1456 L1080 1456 L1080 1920 L0 1920 Z" fill="url(#floor-fill)"/>
+    <path d="M0 1460 L1080 1460" stroke="#8f9de0" stroke-width="6" opacity=".75"/>
+    <g stroke="#54648d" stroke-width="3" opacity=".33">
+      <path d="M0 1560 L1080 1560 M0 1690 L1080 1690 M0 1870 L1080 1870 M150 1460 L-300 1920 M360 1460 L170 1920 M720 1460 L910 1920 M920 1460 L1400 1920"/>
+    </g>
+    <path d="M0 1438 L220 1420 L225 1455 L0 1480 M860 1455 L870 1424 L1080 1448 L1080 1480" fill="#0a0b18" stroke="#242e51" stroke-width="5"/>
+    <path d="M35 1515 L265 1515 M790 1515 L1055 1515" stroke="#8b335e" stroke-width="5" opacity=".55"/>
+  </svg>
+  <div id="blue-haze"></div><div id="red-haze"></div>
+  <div id="floor-light"></div>
+  <div id="rain"></div>
+  <div id="fighter-stage">
+<div id="azure-fighter" class="fighter azure" style="left:66px;top:965px">
+  <div id="azure-aura" class="aura"></div>
+  <svg viewBox="0 0 320 610" aria-label="azure anime fighter" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="azure-coat" x1="0" y1="0" x2=".8" y2="1">
+        <stop offset="0" stop-color="#33364b"/><stop offset=".44" stop-color="#161929"/><stop offset="1" stop-color="#090d18"/>
+      </linearGradient>
+      <linearGradient id="azure-metal" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="var(--edge)"/><stop offset=".5" stop-color="#22253e"/><stop offset="1" stop-color="#080a15"/>
+      </linearGradient>
+    </defs>
+    <ellipse cx="166" cy="589" rx="118" ry="13" fill="#010208" opacity=".65"/>
+    <g id="azure-scarf">
+      <path d="M125 220 Q96 240 68 270 L6 298 L76 292 L124 266 Z" fill="var(--accent)" opacity=".82"/>
+      <path d="M128 234 L82 290 L31 323 L101 310 L145 267 Z" fill="#0d152c" stroke="var(--accent)" stroke-width="5"/>
+    </g>
+    <g id="azure-back-leg">
+      <path d="M156 384 L209 389 L235 489 L220 555 L180 551 L181 489 Z" fill="url(#azure-coat)" stroke="#050714" stroke-width="11" stroke-linejoin="round"/>
+      <path d="M180 537 L220 535 L255 564 L252 586 L177 584 Z" fill="#0a1021" stroke="var(--accent)" stroke-width="4"/>
+    </g>
+    <g id="azure-back-arm">
+      <path d="M115 248 L84 282 L65 380 L86 410 L121 378 L133 312 Z" fill="#181a2c" stroke="#050812" stroke-width="10"/>
+      <path d="M63 368 L93 369 L101 404 L77 431 L48 408 Z" fill="var(--metal)" stroke="var(--accent)" stroke-width="5"/>
+    </g>
+    <g id="azure-cape">
+      <path d="M120 226 L212 230 L273 456 L223 421 L244 507 L180 443 L108 522 L130 411 L77 470 Z" fill="url(#azure-coat)" stroke="var(--edge)" stroke-width="5" stroke-linejoin="round" opacity=".9"/>
+      <path d="M122 239 L119 396 L95 470 M211 240 L228 408 L247 457" fill="none" stroke="var(--accent)" stroke-width="4" opacity=".6"/>
+    </g>
+    <g id="azure-body">
+      <path d="M124 209 L206 205 L251 258 L223 396 L151 417 L92 331 Z" fill="url(#azure-coat)" stroke="#070913" stroke-width="12" stroke-linejoin="round"/>
+      <path d="M131 225 L179 238 L213 220 L220 272 L185 357 L132 320 Z" fill="var(--metal)" stroke="var(--edge)" stroke-width="5"/>
+      <path d="M123 275 L179 309 L208 253 L221 306 L181 364 L129 329 Z" fill="#080a17" stroke="var(--accent)" stroke-width="5"/>
+      <path d="M93 332 L225 353 L225 379 L145 410 L102 377 Z" fill="#090c19" stroke="var(--accent)" stroke-width="7"/>
+      <path d="M177 372 L206 382 L198 453 L165 487 Z" fill="var(--accent)" opacity=".9"/>
+      <path d="M124 251 L103 304 L128 313" fill="none" stroke="var(--accent)" stroke-width="5"/>
+    </g>
+    <g id="azure-front-leg">
+      <path d="M126 387 L181 396 L166 488 L150 554 L107 557 L117 480 Z" fill="url(#azure-metal)" stroke="#050713" stroke-width="10" stroke-linejoin="round"/>
+      <path d="M111 541 L155 540 L170 579 L139 592 L65 585 L70 563 Z" fill="#080e20" stroke="var(--accent)" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M117 452 L166 462" stroke="var(--accent)" stroke-width="6" opacity=".9"/>
+    </g>
+    <g id="azure-head">
+      <path d="M126 113 L204 107 L228 156 L206 215 L169 237 L120 208 L112 161 Z" fill="#22263c" stroke="#070817" stroke-width="11"/>
+      <path d="M116 152 L130 195 L173 212 L211 182 L222 150 L203 202 L166 231 L120 200 Z" fill="#080a16"/>
+      <path d="M101 151 L112 102 L92 91 L130 91 L134 57 L158 84 L188 39 L191 89 L237 69 L223 113 L262 116 L230 159 L223 147 L209 119 L185 137 L157 126 L121 152 Z" fill="#0a0b19" stroke="var(--edge)" stroke-width="7" stroke-linejoin="round"/>
+      <path d="M110 129 L130 99 L144 105 L159 77 L170 104 L189 62 L194 113 L224 102" fill="none" stroke="var(--accent)" stroke-width="6" opacity=".75"/>
+      <path d="M126 165 L171 158 L160 175 L125 180 Z" fill="var(--accent)" filter="url(#notused)" opacity=".98"/>
+      <path d="M177 159 L216 154 L198 173 L177 174 Z" fill="var(--accent)"/>
+      <path d="M133 186 L198 185 L188 205 L152 213 Z" fill="#070b18"/>
+      <path d="M152 215 L185 220" stroke="var(--accent)" stroke-width="4" opacity=".45"/>
+    </g>
+    <g id="azure-front-arm">
+      <path d="M224 238 L259 272 L279 355 L248 392 L214 365 L207 292 Z" fill="url(#azure-metal)" stroke="#070913" stroke-width="11" stroke-linejoin="round"/>
+      <path d="M241 334 L274 339 L291 378 L272 410 L235 399 L227 370 Z" fill="#11152a" stroke="var(--accent)" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M247 372 L286 374 M249 386 L280 386" stroke="var(--accent)" stroke-width="4"/>
+      <path d="M210 244 L244 254 L252 296 L225 300 Z" fill="#34354a" stroke="var(--accent)" stroke-width="5"/>
+    </g>
+    <path d="M133 155 L150 156 M188 151 L211 149" stroke="#f8fbff" stroke-width="2" opacity=".75"/>
+  </svg>
+</div>
+<div id="ash-fighter" class="fighter ash" style="left:689px;top:965px">
+  <div id="ash-aura" class="aura"></div>
+  <svg viewBox="0 0 320 610" aria-label="ash anime fighter" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="ash-coat" x1="0" y1="0" x2=".8" y2="1">
+        <stop offset="0" stop-color="#33364b"/><stop offset=".44" stop-color="#161929"/><stop offset="1" stop-color="#090d18"/>
+      </linearGradient>
+      <linearGradient id="ash-metal" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="var(--edge)"/><stop offset=".5" stop-color="#22253e"/><stop offset="1" stop-color="#080a15"/>
+      </linearGradient>
+    </defs>
+    <ellipse cx="166" cy="589" rx="118" ry="13" fill="#010208" opacity=".65"/>
+    <g id="ash-scarf">
+      <path d="M125 220 Q96 240 68 270 L6 298 L76 292 L124 266 Z" fill="var(--accent)" opacity=".82"/>
+      <path d="M128 234 L82 290 L31 323 L101 310 L145 267 Z" fill="#0d152c" stroke="var(--accent)" stroke-width="5"/>
+    </g>
+    <g id="ash-back-leg">
+      <path d="M156 384 L209 389 L235 489 L220 555 L180 551 L181 489 Z" fill="url(#ash-coat)" stroke="#050714" stroke-width="11" stroke-linejoin="round"/>
+      <path d="M180 537 L220 535 L255 564 L252 586 L177 584 Z" fill="#0a1021" stroke="var(--accent)" stroke-width="4"/>
+    </g>
+    <g id="ash-back-arm">
+      <path d="M115 248 L84 282 L65 380 L86 410 L121 378 L133 312 Z" fill="#181a2c" stroke="#050812" stroke-width="10"/>
+      <path d="M63 368 L93 369 L101 404 L77 431 L48 408 Z" fill="var(--metal)" stroke="var(--accent)" stroke-width="5"/>
+    </g>
+    <g id="ash-cape">
+      <path d="M120 226 L212 230 L273 456 L223 421 L244 507 L180 443 L108 522 L130 411 L77 470 Z" fill="url(#ash-coat)" stroke="var(--edge)" stroke-width="5" stroke-linejoin="round" opacity=".9"/>
+      <path d="M122 239 L119 396 L95 470 M211 240 L228 408 L247 457" fill="none" stroke="var(--accent)" stroke-width="4" opacity=".6"/>
+    </g>
+    <g id="ash-body">
+      <path d="M124 209 L206 205 L251 258 L223 396 L151 417 L92 331 Z" fill="url(#ash-coat)" stroke="#070913" stroke-width="12" stroke-linejoin="round"/>
+      <path d="M131 225 L179 238 L213 220 L220 272 L185 357 L132 320 Z" fill="var(--metal)" stroke="var(--edge)" stroke-width="5"/>
+      <path d="M123 275 L179 309 L208 253 L221 306 L181 364 L129 329 Z" fill="#080a17" stroke="var(--accent)" stroke-width="5"/>
+      <path d="M93 332 L225 353 L225 379 L145 410 L102 377 Z" fill="#090c19" stroke="var(--accent)" stroke-width="7"/>
+      <path d="M177 372 L206 382 L198 453 L165 487 Z" fill="var(--accent)" opacity=".9"/>
+      <path d="M124 251 L103 304 L128 313" fill="none" stroke="var(--accent)" stroke-width="5"/>
+    </g>
+    <g id="ash-front-leg">
+      <path d="M126 387 L181 396 L166 488 L150 554 L107 557 L117 480 Z" fill="url(#ash-metal)" stroke="#050713" stroke-width="10" stroke-linejoin="round"/>
+      <path d="M111 541 L155 540 L170 579 L139 592 L65 585 L70 563 Z" fill="#080e20" stroke="var(--accent)" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M117 452 L166 462" stroke="var(--accent)" stroke-width="6" opacity=".9"/>
+    </g>
+    <g id="ash-head">
+      <path d="M126 113 L204 107 L228 156 L206 215 L169 237 L120 208 L112 161 Z" fill="#22263c" stroke="#070817" stroke-width="11"/>
+      <path d="M116 152 L130 195 L173 212 L211 182 L222 150 L203 202 L166 231 L120 200 Z" fill="#080a16"/>
+      <path d="M101 151 L112 102 L92 91 L130 91 L134 57 L158 84 L188 39 L191 89 L237 69 L223 113 L262 116 L230 159 L223 147 L209 119 L185 137 L157 126 L121 152 Z" fill="#0a0b19" stroke="var(--edge)" stroke-width="7" stroke-linejoin="round"/>
+      <path d="M110 129 L130 99 L144 105 L159 77 L170 104 L189 62 L194 113 L224 102" fill="none" stroke="var(--accent)" stroke-width="6" opacity=".75"/>
+      <path d="M126 165 L171 158 L160 175 L125 180 Z" fill="var(--accent)" filter="url(#notused)" opacity=".98"/>
+      <path d="M177 159 L216 154 L198 173 L177 174 Z" fill="var(--accent)"/>
+      <path d="M133 186 L198 185 L188 205 L152 213 Z" fill="#070b18"/>
+      <path d="M152 215 L185 220" stroke="var(--accent)" stroke-width="4" opacity=".45"/>
+    </g>
+    <g id="ash-front-arm">
+      <path d="M224 238 L259 272 L279 355 L248 392 L214 365 L207 292 Z" fill="url(#ash-metal)" stroke="#070913" stroke-width="11" stroke-linejoin="round"/>
+      <path d="M241 334 L274 339 L291 378 L272 410 L235 399 L227 370 Z" fill="#11152a" stroke="var(--accent)" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M247 372 L286 374 M249 386 L280 386" stroke="var(--accent)" stroke-width="4"/>
+      <path d="M210 244 L244 254 L252 296 L225 300 Z" fill="#34354a" stroke="var(--accent)" stroke-width="5"/>
+    </g>
+    <path d="M133 155 L150 156 M188 151 L211 149" stroke="#f8fbff" stroke-width="2" opacity=".75"/>
+  </svg>
+</div></div>
+  <div id="blue-streak"></div><div id="red-streak"></div>
+  <div id="speed-lines"></div><div id="wind-dust"></div>
+  <div id="shock-ring"></div><div id="impact-halo"></div>
+  <svg id="bolts" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g id="electric-field" fill="none" stroke="#bceaff" stroke-width="7" stroke-linejoin="bevel" filter="drop-shadow(0 0 15px #45dfff)">
+      <path d="M542 1100 L423 879 L525 921 L472 760 L650 960 L594 946 L666 1180"/>
+      <path d="M525 1130 L745 998 L639 1021 L802 909 L733 1060 L810 1087"/>
+    </g>
+    <g id="bolt-azure" stroke="#a6faff" stroke-linecap="round" fill="none">
+      <path d="M12 1120 L310 1085 L470 1190 L675 920" stroke-width="36" opacity=".62"/>
+      <path d="M18 1135 L330 1110 L470 1200 L664 934" stroke-width="9"/>
+    </g>
+    <g id="bolt-ash" stroke="#ff758d" stroke-linecap="round" fill="none">
+      <path d="M1055 1094 L800 1050 L590 1210 L410 961" stroke-width="35" opacity=".68"/>
+      <path d="M1040 1087 L799 1050 L593 1205 L417 969" stroke-width="9"/>
+    </g>
+    <g id="burst-rays" stroke-linecap="round" stroke="#eafbff">
+      <path d="M540 1160 L540 330" stroke-width="29"/><path d="M540 1160 L1065 700" stroke-width="20"/><path d="M540 1160 L1010 1520" stroke-width="23"/><path d="M540 1160 L280 1830" stroke-width="23"/><path d="M540 1160 L42 1350" stroke-width="20"/><path d="M540 1160 L30 630" stroke-width="22"/>
+      <path d="M540 1160 L880 240 M540 1160 L1060 1180 M540 1160 L130 260" stroke="#ff4d7d" stroke-width="14"/>
+    </g>
+  </svg>
+  <div id="ink-cut"></div><div id="screen-flash"></div>
+  <div id="final-type">STORM <em>×</em> ASH<span id="final-sub">ONE SKY. TWO WARRIORS.</span></div>
+  <div id="cinematic-bars"></div>
+ </div>
+</div>
+<script>
+window.__timelines = window.__timelines || {};
+const tl=gsap.timeline({paused:true});
+// Film-wide motion, always seekable, never dependent on previous frames.
+tl.fromTo("#cloud-far",{x:0},{x:-130,duration:12,ease:"none"},0);
+tl.fromTo("#cloud-near",{x:0},{x:170,duration:12,ease:"none"},0);
+tl.fromTo("#rain",{opacity:.28},{opacity:.52,duration:7,ease:"sine.inOut"},0);
+tl.fromTo("#eclipse-moon",{opacity:.95},{opacity:.70,duration:8,ease:"sine.inOut"},0);
+tl.fromTo("#fighter-stage",{scale:1,y:0},{scale:1.11,y:-60,duration:1.7,ease:"power2.inOut"},0);
+tl.fromTo("#azure-head",{rotation:-5,transformOrigin:"170px 170px"},{rotation:4,duration:1.2,ease:"sine.inOut"},.1);
+tl.fromTo("#ash-head",{rotation:4,transformOrigin:"170px 170px"},{rotation:-4,duration:1.2,ease:"sine.inOut"},.15);
+tl.fromTo("#azure-front-arm",{rotation:0,transformOrigin:"220px 250px"},{rotation:-42,duration:.28,ease:"power3.out"},1.65);
+tl.fromTo("#ash-front-arm",{rotation:0,transformOrigin:"220px 250px"},{rotation:-32,duration:.25,ease:"power3.out"},1.78);
+tl.fromTo("#azure-aura",{opacity:.12,scale:.9},{opacity:.48,scale:1.25,duration:.6,ease:"power2.out"},1.5);
+tl.fromTo("#blue-streak",{opacity:0,scaleX:.25,transformOrigin:"left center"},{opacity:.84,scaleX:1.3,duration:.23,ease:"power4.out"},2.12);
+tl.to("#blue-streak",{opacity:0,duration:.22},2.4);
+tl.fromTo("#speed-lines",{opacity:0},{opacity:.8,duration:.12},2.17);
+tl.to("#speed-lines",{opacity:0,duration:.22},2.55);
+// Azure launches. Ash counters; two silhouettes meet centre-frame.
+tl.fromTo("#azure-fighter",{x:0,y:0,rotation:0},{x:405,y:-50,rotation:-13,duration:.35,ease:"power4.in"},2.17);
+tl.fromTo("#ash-fighter",{x:0,y:0,rotation:0},{x:-245,y:-25,rotation:11,duration:.30,ease:"power4.in"},2.27);
+tl.fromTo("#fighter-stage",{scale:1.11,y:-60},{scale:1.27,y:-125,duration:.3,ease:"power3.in"},2.38);
+// First contact: stop action for a brief readable hit, burst + flash.
+tl.fromTo("#impact-halo",{opacity:0,scale:.2},{opacity:1,scale:1.55,duration:.14,ease:"power4.out"},2.55);
+tl.to("#impact-halo",{opacity:0,scale:2.1,duration:.32,ease:"power2.out"},2.70);
+tl.fromTo("#shock-ring",{opacity:0,scale:.18},{opacity:.92,scale:2.15,duration:.32,ease:"power4.out"},2.57);
+tl.to("#shock-ring",{opacity:0,duration:.28},2.85);
+tl.fromTo("#screen-flash",{opacity:0},{opacity:.86,duration:.06,ease:"none"},2.59);
+tl.to("#screen-flash",{opacity:0,duration:.22},2.65);
+tl.fromTo("#bolt-azure",{opacity:0},{opacity:.95,duration:.10},2.54);
+tl.to("#bolt-azure",{opacity:0,duration:.22},2.70);
+// Knock back and pivot.
+tl.to("#fighter-stage",{scale:1.05,y:-35,duration:.44,ease:"power2.out"},2.9);
+tl.to("#azure-fighter",{x:100,y:35,rotation:-19,duration:.43,ease:"power4.out"},2.90);
+tl.to("#ash-fighter",{x:65,y:15,rotation:15,duration:.42,ease:"power4.out"},2.90);
+tl.to("#azure-front-arm",{rotation:20,duration:.25},3.23);
+tl.to("#ash-front-arm",{rotation:-70,duration:.28},3.40);
+// Crimson's ferocious reverse dash.
+tl.fromTo("#red-streak",{opacity:0,scaleX:.25,transformOrigin:"right center"},{opacity:1,scaleX:1.4,duration:.25,ease:"power3.out"},3.74);
+tl.to("#red-streak",{opacity:0,duration:.18},4.15);
+tl.to("#speed-lines",{opacity:.74,duration:.07},3.8);
+tl.to("#speed-lines",{opacity:0,duration:.22},4.05);
+tl.to("#ash-fighter",{x:-375,y:-70,rotation:-11,duration:.41,ease:"power4.in"},3.72);
+tl.to("#azure-fighter",{x:115,y:-45,rotation:9,duration:.32,ease:"power3.in"},3.86);
+tl.to("#fighter-stage",{scale:1.26,y:-130,duration:.34,ease:"power2.inOut"},4.02);
+tl.fromTo("#bolt-ash",{opacity:0},{opacity:1,duration:.10},4.87);
+tl.to("#bolt-ash",{opacity:0,duration:.30},5.08);
+tl.fromTo("#impact-halo",{opacity:0,scale:.1},{opacity:1,scale:1.28,duration:.16},4.9);
+tl.to("#impact-halo",{opacity:0,scale:1.9,duration:.25},5.07);
+tl.fromTo("#screen-flash",{opacity:0},{opacity:.94,duration:.05},4.93);
+tl.to("#screen-flash",{opacity:0,duration:.19},4.98);
+tl.fromTo("#shock-ring",{opacity:0,scale:.1},{opacity:.72,scale:2.9,duration:.40,ease:"power3.out"},4.94);
+tl.to("#shock-ring",{opacity:0,duration:.18},5.28);
+// Both gather energy for the final exchange.
+tl.to("#azure-fighter",{x:-12,y:10,rotation:0,duration:.5,ease:"power3.out"},5.24);
+tl.to("#ash-fighter",{x:25,y:10,rotation:0,duration:.5,ease:"power3.out"},5.24);
+tl.to("#fighter-stage",{scale:1.04,y:-45,duration:.48,ease:"power3.out"},5.24);
+tl.to("#azure-front-arm",{rotation:-55,duration:.6,ease:"power2.inOut"},5.86);
+tl.to("#ash-front-arm",{rotation:-62,duration:.6,ease:"power2.inOut"},5.86);
+tl.to("#azure-aura",{opacity:.74,scale:1.38,duration:.68,ease:"power2.in"},6.1);
+tl.fromTo("#ash-aura",{opacity:.12,scale:.9},{opacity:.75,scale:1.39,duration:.72,ease:"power2.in"},6.11);
+tl.fromTo("#electric-field",{opacity:0},{opacity:1,duration:.3,ease:"power3.in"},6.70);
+tl.to("#electric-field",{opacity:0,duration:.30},7.31);
+tl.to("#fighter-stage",{scale:1.22,y:-108,duration:.25,ease:"power3.in"},6.95);
+tl.to("#azure-fighter",{x:370,y:-100,rotation:-24,duration:.31,ease:"power4.in"},6.92);
+tl.to("#ash-fighter",{x:-270,y:-99,rotation:24,duration:.31,ease:"power4.in"},6.92);
+// Finishing blow, full-frame ink and light rather than an unreadable flurry.
+tl.fromTo("#burst-rays",{opacity:0,scale:.15},{opacity:1,scale:1.7,duration:.26,ease:"power4.out"},7.13);
+tl.to("#burst-rays",{opacity:0,duration:.36},7.43);
+tl.fromTo("#screen-flash",{opacity:0},{opacity:1,duration:.05},7.17);
+tl.to("#screen-flash",{opacity:0,duration:.65,ease:"power2.out"},7.22);
+tl.fromTo("#ink-cut",{opacity:0},{opacity:.62,duration:.13},7.24);
+tl.to("#ink-cut",{opacity:0,duration:.66},7.40);
+tl.fromTo("#wind-dust",{opacity:0,scale:.5},{opacity:.76,scale:1.6,duration:.65,ease:"power3.out"},7.26);
+tl.to("#wind-dust",{opacity:.22,duration:1.4},7.92);
+// Separate and return to earth.
+tl.to("#fighter-stage",{scale:1,y:0,duration:1.1,ease:"power2.out"},7.78);
+tl.to("#azure-fighter",{x:-5,y:100,rotation:-17,duration:.9,ease:"power3.out"},7.82);
+tl.to("#ash-fighter",{x:5,y:80,rotation:17,duration:.9,ease:"power3.out"},7.82);
+tl.to("#azure-front-arm",{rotation:36,duration:.65,ease:"power2.out"},8.2);
+tl.to("#ash-front-arm",{rotation:28,duration:.65,ease:"power2.out"},8.2);
+tl.to("#azure-aura",{opacity:.14,scale:1,duration:1.2},8.25);
+tl.to("#ash-aura",{opacity:.15,scale:1,duration:1.2},8.25);
+tl.to("#rain",{opacity:.24,duration:1},8.70);
+tl.fromTo("#final-type",{opacity:0,y:75,scale:.95},{opacity:1,y:0,scale:1,duration:.48,ease:"expo.out"},10.35);
+tl.to("#final-type",{opacity:.98,duration:1},10.90);
+window.__timelines.duel=tl;
+</script>
+</template>
