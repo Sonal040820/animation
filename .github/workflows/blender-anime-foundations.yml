@@ -17,7 +17,7 @@ jobs:
       - name: Provision and enforce embedded VRM model rights
         run: |
           python3 blender/scripts/provision_anime_vrm.py
-          python3 blender/scripts/validate_contracts.py --verify-files
+          python3 blender/scripts/validate_contracts.py --verify-files --asset-id sendagaya_shino --asset-id vita
       - name: Install headless Blender runtime libraries
         run: |
           sudo apt-get update
