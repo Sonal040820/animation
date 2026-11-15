@@ -66,7 +66,24 @@ jobs:
           if ! camber job create --engine base --gpu --size xsmall --num-nodes 1 \
             --path "$STASH_DIR/" --cmd "timeout 600s bash ./gpu_probe.sh" \
             > "$RUNNER_TEMP/camber-create-result" 2>&1; then
-            echo "CAMBER_GPU_SUBMISSION_FAILED; check account quota or permissions"
+            python3 - <<'PY'
+          import json,os,re
+          root=os.environ["RUNNER_TEMP"]
+          raw=open(os.path.join(root,"camber-create-result"),encoding="utf-8",errors="replace").read()
+          identity=json.load(open(os.path.join(root,"camber-identity.json"),encoding="utf-8"))
+          key=os.environ.get("CAMBER_API_KEY","")
+          if key: raw=raw.replace(key,"[SECRET]")
+          for field in ("username","unique_name","name","email","id","user_id","workspace"):
+              value=identity.get(field)
+              if isinstance(value,str) and len(value)>2:
+                  raw=raw.replace(value,"[ACCOUNT]")
+          raw=re.sub(r"stash://[^\s'\"\\]+","[STASH_PATH]",raw)
+          raw=re.sub(r"[\w.+-]+@[\w.-]+","[EMAIL]",raw)
+          raw=re.sub(r"(?i)(bearer\s+)[a-z0-9._=/-]+",r"\1[SECRET]",raw)
+          raw=re.sub(r"\b[a-zA-Z0-9_=-]{30,}\b","[REDACTED]",raw)
+          print("CAMBER_SUBMISSION_ERROR_REDACTED:",raw.strip()[:700] or "[empty response]")
+          PY
+            echo "CAMBER_GPU_SUBMISSION_FAILED"
             exit 1
           fi
           JOB_ID=$(python3 - <<'PY'
