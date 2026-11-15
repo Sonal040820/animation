@@ -1,0 +1,25 @@
+name: License and integrity check for male anime VRM bases
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'blender/scripts/audit_anime_males.py'
+      - '.github/workflows/anime-male-rights.yml'
+permissions:
+  contents: read
+jobs:
+  rights:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download immutable VRMs, verify source Git blob and embedded permissions
+        run: |
+          set -euo pipefail
+          python3 blender/scripts/audit_anime_males.py
+      - name: Archive public-only source hashes and rights
+        uses: actions/upload-artifact@v4
+        with:
+          name: male-vrm-public-rights-audit
+          path: diagnostics/anime-male-audit.json
+          retention-days: 7
