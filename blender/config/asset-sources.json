@@ -52,6 +52,38 @@
       "license": "per-asset",
       "kind": "models and materials",
       "automatic_download": false
+    },
+    {
+      "name": "Khronos glTF Sample Assets",
+      "url": "https://github.com/KhronosGroup/glTF-Sample-Assets",
+      "license": "per-model",
+      "kind": "Rigged animation test figures and glTF format reference assets",
+      "automatic_download": false,
+      "notes": "Use the pinned, checksum-verified RiggedFigure fixture; individual assets have different licenses."
+    },
+    {
+      "name": "Verified CC0 anime VRM source",
+      "url": "https://github.com/theminhnguyen/wonderdeck/tree/main/public/models",
+      "license": "per-embedded-VRM-metadata",
+      "kind": "Anime VRM avatars with MToon and humanoid skeletons",
+      "automatic_download": false,
+      "notes": "Shino and Vita verified as CC0 and commercial/violent-use allowed; exact upstream revisions+checksums locked in blender/fixtures. Regeneratable in GitHub Actions."
+    },
+    {
+      "name": "Blender Studio Rain rig",
+      "url": "https://studio.blender.org/characters/rain/v3/",
+      "license": "CC-BY-4.0",
+      "kind": "Professional stylized humanoid practice rig",
+      "automatic_download": false,
+      "notes": "Free, attribution required; 4.1+, custom rig UI may require Python auto-execution; not installed."
+    },
+    {
+      "name": "Blender Studio Einar rig",
+      "url": "https://studio.blender.org/characters/einar/v1/",
+      "license": "CC-BY-4.0",
+      "kind": "Professional detailed humanoid rig",
+      "automatic_download": false,
+      "notes": "Large asset, attribution required; check Blender 4.5 compatibility and custom scripts before importing."
     }
   ]
 }
