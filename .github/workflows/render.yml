@@ -1,0 +1,62 @@
+name: Render video
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: 'Existing HyperFrames project directory (e.g. projects/first-short)'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      PROJECT_DIR: ${{ inputs.project }}
+      HEYGEN_API_KEY: ${{ secrets.HEYGEN_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install rendering dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg espeak-ng
+          npm ci
+          npx hyperframes browser ensure
+      - name: Validate project directory
+        shell: bash
+        run: |
+          case "$PROJECT_DIR" in
+            projects/*) ;;
+            *) echo 'Project must be under projects/'; exit 1;;
+          esac
+          if [[ "$PROJECT_DIR" == *'..'* ]] || [[ ! -f "$PROJECT_DIR/index.html" ]]; then
+            echo 'Missing project index.html or unsafe project path'; exit 1
+          fi
+      - name: Validate project
+        working-directory: ${{ github.workspace }}
+        run: |
+          cd "$PROJECT_DIR"
+          ../../node_modules/.bin/hyperframes check --json
+      - name: Render to MP4
+        run: |
+          mkdir -p renders
+          ./node_modules/.bin/hyperframes render "$PROJECT_DIR" --quality delivery --output "$GITHUB_WORKSPACE/renders/final.mp4"
+      - name: Verify media
+        run: |
+          test -s renders/final.mp4
+          ffprobe -v error -show_entries format=duration,size -of json renders/final.mp4 | tee renders/probe.json
+      - name: Upload video
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyperframes-final-video
+          path: renders/
+          retention-days: 30
