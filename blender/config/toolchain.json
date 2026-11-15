@@ -40,7 +40,7 @@
       "source": "https://github.com/saturday06/VRM-Addon-for-Blender/releases/tag/v4.10.5",
       "download_url": "https://github.com/saturday06/VRM-Addon-for-Blender/releases/download/v4.10.5/VRM_Addon_for_Blender-Extension-4_10_5.zip",
       "sha256": "5f0dd6a277f33961cc453ca401d36ae99272f6bcd06994e8c375d2b922b44bf1",
-      "status": "pinned-integration-under-test"
+      "status": "verified-setup-github-actions"
     }
   }
 }
