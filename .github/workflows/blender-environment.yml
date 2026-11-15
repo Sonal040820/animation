@@ -3,7 +3,15 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'blender/**'
+      - 'blender/scripts/install_blender.sh'
+      - 'blender/scripts/install_vrm_extension.sh'
+      - 'blender/scripts/doctor.py'
+      - 'blender/scripts/vrm_doctor.py'
+      - 'blender/scripts/validate_contracts.py'
+      - 'blender/studio/**'
+      - 'blender/tests/**'
+      - 'blender/config/toolchain.json'
+      - 'blender/assets/registry.json'
       - '.github/workflows/blender-environment.yml'
 permissions:
   contents: read
