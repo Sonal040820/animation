@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Animation studio asset entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "kind",
+    "relative_path",
+    "sha256",
+    "source_url",
+    "license",
+    "rights_approved",
+    "redistribution_allowed"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{2,63}$"
+    },
+    "kind": {
+      "enum": [
+        "character",
+        "motion",
+        "environment",
+        "prop",
+        "texture",
+        "material",
+        "audio",
+        "reference",
+        "vfx"
+      ]
+    },
+    "relative_path": {
+      "type": "string",
+      "pattern": "^assets-local/[a-zA-Z0-9/_ .-]+$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{64}$"
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "license": {
+      "type": "string",
+      "minLength": 3
+    },
+    "license_evidence_url": {
+      "type": "string"
+    },
+    "creator": {
+      "type": "string"
+    },
+    "rights_approved": {
+      "type": "boolean"
+    },
+    "redistribution_allowed": {
+      "type": "boolean"
+    },
+    "commercial_use_allowed": {
+      "type": "boolean"
+    },
+    "violence_allowed": {
+      "type": "boolean"
+    },
+    "attribution": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}
