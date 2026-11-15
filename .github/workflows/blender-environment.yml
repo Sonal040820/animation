@@ -35,11 +35,19 @@ jobs:
           "$BIN" --background --factory-startup --disable-autoexec --python-exit-code 1 --python blender/scripts/doctor.py -- --output "$RUNNER_TEMP/blender-diagnostics.json"
           test -s "$RUNNER_TEMP/blender-diagnostics.json"
           cp "$RUNNER_TEMP/blender-diagnostics.json" blender-diagnostics.json
+      - name: Install checksum-pinned VRM/MToon format extension
+        run: bash blender/scripts/install_vrm_extension.sh
+      - name: Verify VRM Blender addon registration (NO models imported)
+        run: |
+          BIN="$GITHUB_WORKSPACE/.cache/blender/blender-4.5.16-linux-x64/blender"
+          "$BIN" --background --disable-autoexec --python-exit-code 1 --python blender/scripts/vrm_doctor.py | tee blender-vrm-diagnostics.txt
       - name: Archive environment diagnostics (JSON only)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: blender-no-render-diagnostics
-          path: blender-diagnostics.json
+          path: |
+            blender-diagnostics.json
+            blender-vrm-diagnostics.txt
           if-no-files-found: ignore
           retention-days: 14
