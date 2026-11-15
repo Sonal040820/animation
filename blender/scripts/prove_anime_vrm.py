@@ -11,6 +11,8 @@ sys.path.insert(0,str(ROOT/"blender"))
 from studio.contracts import load_json,approved_asset,ContractError
 from studio.assets import import_registered_asset
 from studio.render import configure_scene
+from studio.vrm_humanoid import semantic_bone_map
+from studio.rig import validate_humanoid_map
 from mathutils import Vector
 import bpy
 
@@ -31,6 +33,9 @@ def show_actor(asset_id,x):
     meshes=[o for o in objs if o.type=="MESH"]
     armatures=[o for o in objs if o.type=="ARMATURE"]
     if len(armatures)<1 or len(meshes)<1:raise ContractError("No skinned humanoid imported "+asset_id)
+    mapping=semantic_bone_map(approved_asset(
+        load_json(ROOT/"blender/assets/registry.json"),asset_id,ROOT))
+    humanoid=validate_humanoid_map(armatures[0],mapping)
     bones=sum(len(o.data.bones) for o in armatures)
     if bones<15:raise ContractError("Unexpectedly incomplete anime humanoid skeleton "+asset_id)
     low,hi=bounds(objs)
@@ -44,7 +49,7 @@ def show_actor(asset_id,x):
     root.scale=(scale,scale,scale)
     root.location=(x-scale*(hi.x+low.x)/2, -scale*(hi.y+low.y)/2, -scale*low.z)
     return {"id":asset_id,"objects":len(objs),"mesh_count":len(meshes),
-            "armature_count":len(armatures),"bone_count":bones,
+            "armature_count":len(armatures),"bone_count":bones,"verified_humanoid_mapping":humanoid,
             "height_before":round(h,4),"height_after":2.15,
             "blend_root_name":root.name,"material_count":sum(len(m.data.materials) for m in meshes),
             "shape_key_count":sum(len(m.data.shape_keys.key_blocks) if m.data.shape_keys else 0 for m in meshes)}
