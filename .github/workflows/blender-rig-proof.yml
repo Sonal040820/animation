@@ -5,7 +5,7 @@ on:
     paths:
       - 'blender/scripts/prove_character_pipeline.py'
       - 'blender/scripts/provision_fixture.py'
-      - 'blender/fixtures/**'
+      - 'blender/fixtures/rigged-figure.json'
       - '.github/workflows/blender-rig-proof.yml'
 permissions:
   contents: read
