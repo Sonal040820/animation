@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "blender": {
+    "version": "4.5.16",
+    "channel": "LTS",
+    "platform": "linux-x64",
+    "archive": "blender-4.5.16-linux-x64.tar.xz",
+    "url": "https://download.blender.org/release/Blender4.5/blender-4.5.16-linux-x64.tar.xz",
+    "checksums_url": "https://download.blender.org/release/Blender4.5/blender-4.5.16.sha256",
+    "required_major": 4,
+    "required_minor": 5
+  },
+  "render_profiles": {
+    "preview": {
+      "engine": "CYCLES",
+      "samples": 8,
+      "resolution_percentage": 35
+    },
+    "final": {
+      "engine": "CYCLES",
+      "samples": 64,
+      "resolution_percentage": 100
+    }
+  },
+  "delivery": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 24,
+    "image_format": "PNG",
+    "audio_sample_rate": 48000
+  },
+  "optional_addons": {
+    "rigify": {
+      "source": "https://extensions.blender.org/add-ons/rigify/",
+      "status": "not-installed"
+    },
+    "vrm": {
+      "source": "https://extensions.blender.org/add-ons/vrm/",
+      "status": "not-installed"
+    }
+  }
+}
