@@ -90,25 +90,45 @@ def import_actor(workspace:Path,asset_id:str,label:str,side:int):
         root.keyframe_insert("rotation_euler",frame=frame)
     bpy.context.scene.frame_set(1)
     bpy.context.view_layer.update()
-    # IK controls use real anatomical VRM bone names, not guesses.
-    hand_name=bone_map["right_hand" if side==1 else "left_hand"]
-    hand=rig.pose.bones[hand_name]
-    original=rig.matrix_world@hand.tail
-    htarget=make_target(label+"_StrikeHandIK",original)
-    add_existing_ik_target(rig,end_bone=hand_name,target=htarget,chain_count=3)
-    # Goals trace anticipation -> acceleration -> contact -> recoil and settle.
-    goal=Vector((-side*.14,-.24,1.60))
-    anticipation=original+Vector((-side*.12,.10,-.14))
-    near=original.lerp(goal,.45)
-    near.z=max(near.z,1.58)
-    retreat=goal+Vector((side*.56,.28,-.14))
-    resting=original+Vector((side*.18,-.06,-.04))
-    for frame,point in [
-        (1,original),(8,anticipation),(13,anticipation),
-        (19,near),(25,goal),(27,goal),(30,retreat),
-        (37,retreat),(48,resting)]:
-        htarget.location=point
+    # Rebuild both arms into a guard stance instead of preserving VRM T-pose.
+    # World-space IK markers are derived from the actual imported chest bone.
+    hand_semantic="right_hand" if side==1 else "left_hand"
+    guard_semantic="left_hand" if side==1 else "right_hand"
+    chest_world=rig.matrix_world@rig.pose.bones[bone_map["chest"]].head
+    strike_bone=bone_map[hand_semantic]
+    other_bone=bone_map[guard_semantic]
+    initial_strike=rig.matrix_world@rig.pose.bones[strike_bone].tail
+    initial_guard=rig.matrix_world@rig.pose.bones[other_bone].tail
+    htarget=make_target(label+"_StrikeHandIK",initial_strike)
+    gtarget=make_target(label+"_OffHandGuardIK",initial_guard)
+    add_existing_ik_target(rig,end_bone=strike_bone,target=htarget,chain_count=3)
+    add_existing_ik_target(rig,end_bone=other_bone,target=gtarget,chain_count=3)
+    # Elbows are lowered and both hands pulled forward. No original A/T pose remains.
+    guard_start=chest_world+Vector((-side*.19,-.44,-.02))
+    offhand_start=chest_world+Vector((side*.30,-.33,-.24))
+    goal=Vector((-side*.14,-.22,1.63))
+    retraction=Vector((-side*.72,-.48,1.57))
+    # Absolute world-space targets follow the body's lunging translation.
+    for frame,p in [
+        (1,guard_start),
+        (8,guard_start+Vector((side*.02,-.03,-.09))),
+        (14,guard_start+Vector((side*.14,-.16,-.12))),
+        (20,guard_start.lerp(goal,.62)),
+        (25,goal),(27,goal),
+        (31,retraction),
+        (38,retraction+Vector((side*.13,-.03,-.08))),
+        (48,guard_start+Vector((side*.54,-.04,0)))]:
+        htarget.location=p
         htarget.keyframe_insert("location",frame=frame)
+    for frame,p in [
+        (1,offhand_start),
+        (8,offhand_start+Vector((0,-.03,.06))),
+        (20,offhand_start+Vector((side*.54,-.08,.16))),
+        (27,offhand_start+Vector((side*.69,-.12,.15))),
+        (33,offhand_start+Vector((side*.41,-.01,-.05))),
+        (48,offhand_start+Vector((side*.52,0,0)))]:
+        gtarget.location=p
+        gtarget.keyframe_insert("location",frame=frame)
     ftargets=[]
     for footindex,key in enumerate(("left_foot","right_foot")):
         pb=rig.pose.bones[bone_map[key]]
