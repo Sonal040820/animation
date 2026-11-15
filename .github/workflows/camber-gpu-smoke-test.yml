@@ -1,157 +1,166 @@
-name: Camber GPU smoke test
+name: Camber GPU / Blender acceptance
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'blender/camber/requests/gpu-probe.txt'
 
 permissions:
   contents: read
 
 concurrency:
-  group: camber-gpu-smoke-test
-  cancel-in-progress: true
+  group: camber-gpu-acceptance
+  cancel-in-progress: false
 
 jobs:
-  gpu-smoke-test:
+  smoke:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
-
+    timeout-minutes: 35
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-
-      - name: Install Camber CLI
+      - name: Install Camber CLI without API token
         run: |
-          curl -sL https://cli.cambercloud.com/install-v2.sh | bash
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 2 \
+            https://cli.cambercloud.com/install-v2.sh --output "$RUNNER_TEMP/install-camber.sh"
+          bash "$RUNNER_TEMP/install-camber.sh" >/dev/null
           echo "$HOME/.camber/bin" >> "$GITHUB_PATH"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-      - name: Verify CLI + auth
+      - name: Authenticate and stage probe (no identity artifact)
         env:
           CAMBER_API_KEY: ${{ secrets.CAMBER_API_KEY }}
         run: |
           set -euo pipefail
-          if [[ -z "$CAMBER_API_KEY" ]]; then
-            echo "Camber API key secret is missing" >&2
-            exit 1
-          fi
-          camber version
-          camber me --output json > "$RUNNER_TEMP/camber-me.json"
-          echo "Camber authentication passed; account details not logged or uploaded."
-
-      - name: Prepare smoke test payload
-        run: |
-          mkdir -p camber-smoke-test
-
-          cat > camber-smoke-test/blender_gpu_probe.py <<'PY'
-          import json
-          import os
-          import subprocess
-          import sys
-
-          result = {
-              "nvidia_smi": None,
-              "blender_version": None,
-              "gpu_detected_in_blender": None,
-          }
-
-          try:
-              smi = subprocess.check_output(["nvidia-smi"], stderr=subprocess.STDOUT, text=True)
-              result["nvidia_smi"] = smi
-          except Exception as e:
-              result["nvidia_smi"] = f"ERROR: {e}"
-
-          try:
-              ver = subprocess.check_output(["blender", "--version"], stderr=subprocess.STDOUT, text=True)
-              result["blender_version"] = ver
-          except Exception as e:
-              result["blender_version"] = f"ERROR: {e}"
-
-          probe_script = r'''
-          import bpy, json
-          out = {"engine": bpy.context.scene.render.engine, "cycles_devices": []}
-          try:
-              prefs = bpy.context.preferences
-              cprefs = prefs.addons["cycles"].preferences
-              for backend in ["CUDA", "OPTIX", "HIP", "ONEAPI", "METAL"]:
-                  try:
-                      cprefs.compute_device_type = backend
-                      cprefs.get_devices()
-                      devs = []
-                      for group in cprefs.devices:
-                          try:
-                              devs.append({
-                                  "name": getattr(group, "name", None),
-                                  "type": getattr(group, "type", None),
-                                  "use": getattr(group, "use", None),
-                              })
-                          except Exception:
-                              pass
-                      if devs:
-                          out["cycles_devices"].append({"backend": backend, "devices": devs})
-                  except Exception:
-                      pass
-          except Exception as e:
-              out["error"] = str(e)
-          print(json.dumps(out))
-          '''
-          with open("blender_probe_inner.py", "w", encoding="utf-8") as f:
-              f.write(probe_script)
-
-          try:
-              probe = subprocess.check_output(
-                  ["blender", "--background", "--factory-startup", "--python", "blender_probe_inner.py"],
-                  stderr=subprocess.STDOUT,
-                  text=True
-              )
-              result["gpu_detected_in_blender"] = probe
-          except Exception as e:
-              result["gpu_detected_in_blender"] = f"ERROR: {e}"
-
-          with open("gpu-smoke-result.json", "w", encoding="utf-8") as f:
-              json.dump(result, f, indent=2)
-          print("GPU_SMOKE_TEST_DONE")
-          PY
-
-      - name: Create stash directory and stage probe
-        env:
-          CAMBER_API_KEY: ${{ secrets.CAMBER_API_KEY }}
-        run: |
-          set -euo pipefail
-          USERNAME=$(python - <<'PY'
-          import json, os
-          with open(os.path.join(os.environ["RUNNER_TEMP"], "camber-me.json"), encoding="utf-8") as f:
-              data = json.load(f)
+          [[ -n "$CAMBER_API_KEY" ]] || { echo "CAMBER_AUTH_REQUIRED"; exit 1; }
+          camber me --output json > "$RUNNER_TEMP/camber-identity.json" 2>/dev/null
+          USERNAME=$(python3 - <<'PY'
+          import json,os
+          with open(os.path.join(os.environ["RUNNER_TEMP"],"camber-identity.json"), encoding="utf-8") as f:
+              data=json.load(f)
           print(data.get("username") or data.get("unique_name") or data.get("name") or "")
           PY
           )
-          if [[ -z "$USERNAME" ]]; then
-            echo "Camber account identifier was unavailable" >&2
+          [[ -n "$USERNAME" && "$USERNAME" =~ ^[a-zA-Z0-9_-]+$ ]] || {
+            echo "CAMBER_ACCOUNT_IDENTIFIER_UNAVAILABLE"; exit 1;
+          }
+          echo "::add-mask::$USERNAME"
+          STASH_DIR="stash://$USERNAME/kai-ren-gpu-smoke-${GITHUB_RUN_ID}"
+          echo "::add-mask::$STASH_DIR"
+          printf '%s\n' "$STASH_DIR" > "$RUNNER_TEMP/camber-stash-path"
+          camber stash mkdir "$STASH_DIR" >/dev/null 2>&1 || {
+            echo "CAMBER_STASH_MKDIR_FAILED"; exit 1;
+          }
+          camber stash cp blender/camber/gpu_probe.sh "$STASH_DIR/gpu_probe.sh" >/dev/null 2>&1
+          camber stash cp blender/camber/cycles_probe.py "$STASH_DIR/cycles_probe.py" >/dev/null 2>&1
+          echo "CAMBER_PROBE_STAGED"
+
+      - name: Allocate Xsmall GPU and run bounded Blender probe
+        env:
+          CAMBER_API_KEY: ${{ secrets.CAMBER_API_KEY }}
+        run: |
+          set -euo pipefail
+          STASH_DIR=$(cat "$RUNNER_TEMP/camber-stash-path")
+          if ! camber job create --engine base --gpu --size xsmall --num-nodes 1 \
+            --path "$STASH_DIR/" --cmd "timeout 600s bash ./gpu_probe.sh" \
+            > "$RUNNER_TEMP/camber-create-result" 2>&1; then
+            echo "CAMBER_GPU_SUBMISSION_FAILED; check account quota or permissions"
             exit 1
           fi
-          echo "::add-mask::$USERNAME"
-          STASH_DIR="stash://$USERNAME/blender-gpu-smoke-test"
-          camber stash mkdir "$STASH_DIR" >/dev/null 2>&1 || true
-          camber stash cp camber-smoke-test "$STASH_DIR/" -r >/dev/null
-          echo "Smoke-test code staged without disclosing account identifiers."
+          JOB_ID=$(python3 - <<'PY'
+          import re,os
+          s=open(os.path.join(os.environ["RUNNER_TEMP"],"camber-create-result"),encoding="utf-8").read()
+          m=re.search(r"Job\s*ID:\s*(\d+)",s,re.I)
+          print(m.group(1) if m else "")
+          PY
+          )
+          if [[ ! "$JOB_ID" =~ ^[0-9]+$ ]]; then
+            echo "CAMBER_JOB_ID_UNAVAILABLE; check Camber dashboard for submitted job"
+            exit 1
+          fi
+          echo "JOB_ID=$JOB_ID" >> "$GITHUB_ENV"
+          echo "CAMBER_GPU_JOB_SUBMITTED"
 
-      - name: Show job create help for debugging
+      - name: Wait for remote test completion
+        env:
+          CAMBER_API_KEY: ${{ secrets.CAMBER_API_KEY }}
         run: |
-          camber job create --help > camber-job-create-help.txt 2>&1 || true
-          camber job --help > camber-job-help.txt 2>&1 || true
+          set -euo pipefail
+          result="UNKNOWN"
+          for i in $(seq 1 105); do
+            if camber job get "$JOB_ID" --output json > "$RUNNER_TEMP/camber-job-status.json" 2>/dev/null; then
+              result=$(python3 - <<'PY'
+          import json,os
+          j=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"camber-job-status.json")))
+          if isinstance(j,dict):
+              obj=j.get("job") if isinstance(j.get("job"),dict) else j
+              status=obj.get("status",obj.get("state","UNKNOWN"))
+              if isinstance(status,dict): status=status.get("name",status.get("value","UNKNOWN"))
+              print(str(status).upper())
+          else: print("UNKNOWN")
+          PY
+              )
+              case "$result" in
+                COMPLETED|SUCCEEDED|SUCCESS) echo "CAMBER_REMOTE_JOB_COMPLETED"; break;;
+                FAILED|ERROR|CANCELLED|CANCELED|STOPPED|TIMED_OUT)
+                  echo "CAMBER_REMOTE_JOB_FAILED: $result"; exit 1;;
+              esac
+            fi
+            sleep 8
+          done
+          case "$result" in
+            COMPLETED|SUCCEEDED|SUCCESS) ;;
+            *) echo "CAMBER_JOB_STATUS_UNCONFIRMED; remote command self-times-out at 600 seconds"; exit 1;;
+          esac
 
-      - name: Stop here if job command syntax needs adjustment
+      - name: Verify GPU and actual Blender render through downloaded logs
+        env:
+          CAMBER_API_KEY: ${{ secrets.CAMBER_API_KEY }}
         run: |
-          echo "Next step is the only unverified part: exact Camber job submission syntax."
-          echo "This workflow has prepared everything up to job submission."
-          echo "Inspect camber-job-create-help.txt artifact/log output, then wire the final submit command."
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/job-logs"
+          if ! camber job logs "$JOB_ID" "$RUNNER_TEMP/job-logs" \
+              > "$RUNNER_TEMP/job-logs/download-output.txt" 2>&1; then
+            camber job log "$JOB_ID" "$RUNNER_TEMP/job-logs" \
+              > "$RUNNER_TEMP/job-logs/download-output.txt" 2>&1 || {
+              echo "CAMBER_LOG_DOWNLOAD_FAILED"; exit 1;
+            }
+          fi
+          grep -R -q -F 'GPU_ALLOC_PASS' "$RUNNER_TEMP/job-logs" || {
+            echo "GPU_ALLOCATION_NOT_PROVEN"; exit 1;
+          }
+          grep -R -q -F 'CYCLES_GPU_RENDER_PASS' "$RUNNER_TEMP/job-logs" || {
+            echo "BLENDER_GPU_RENDER_NOT_PROVEN"; exit 1;
+          }
+          grep -R -q -F 'GPU_PROBE_PASS' "$RUNNER_TEMP/job-logs" || {
+            echo "GPU_PROBE_INCOMPLETE"; exit 1;
+          }
+          echo "GPU_ALLOC_PASS"
+          echo "CYCLES_GPU_RENDER_PASS"
+          echo "GPU_PROBE_PASS"
+          printf 'GPU allocation: PASS\nBlender Cycles GPU render: PASS\nRemote probe limit: 600 seconds\n' > gpu-acceptance.txt
 
-      - name: Upload non-account CLI help only
+      - name: Upload only sanitized acceptance result
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: camber-gpu-smoke-test-preflight
-          retention-days: 1
+          name: camber-gpu-acceptance
+          path: gpu-acceptance.txt
+          retention-days: 3
           if-no-files-found: error
-          path: |
-            camber-job-create-help.txt
-            camber-job-help.txt
+
+      - name: Clean up temporary Camber inputs
+        if: always()
+        env:
+          CAMBER_API_KEY: ${{ secrets.CAMBER_API_KEY }}
+        run: |
+          set +e
+          if [[ -f "$RUNNER_TEMP/camber-stash-path" && -n "$CAMBER_API_KEY" ]]; then
+            STASH_DIR=$(cat "$RUNNER_TEMP/camber-stash-path")
+            if [[ "$STASH_DIR" == stash://*/kai-ren-gpu-smoke-${GITHUB_RUN_ID} ]]; then
+              camber stash rm -rf "$STASH_DIR" >/dev/null 2>&1 || true
+            fi
+          fi
+          echo "Stash cleanup attempted without exposing account paths"
