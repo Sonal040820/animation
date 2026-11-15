@@ -13,9 +13,10 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--registry", default=str(ROOT / "blender/assets/registry.json"))
     parser.add_argument("--project", help="Optional explicitly authored project manifest")
+    parser.add_argument("--verify-files", action="store_true", help="Verify registered local files against SHA-256")
     args = parser.parse_args()
     try:
-        assets = validate_asset_registry(load_json(args.registry), workspace=ROOT)
+        assets = validate_asset_registry(load_json(args.registry), workspace=ROOT, verify_files=args.verify_files)
         summary = {"status": "ok", "registered_assets": len(assets), "approved_assets": sum(a["rights_approved"] for a in assets)}
         if args.project:
             summary["production"] = validate_production(load_json(args.project), load_json(args.registry))
