@@ -1,0 +1,60 @@
+name: Camber connectivity (no compute charges)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: camber-connectivity
+  cancel-in-progress: true
+jobs:
+  verify-cli:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Confirm secret is configured without exposing value
+        env:
+          CAMBER_API_KEY: ${{ secrets.CAMBER_API_KEY }}
+        run: |
+          if [[ -z "$CAMBER_API_KEY" ]]; then
+            echo 'CAMBER_API_KEY is missing; add it to repository Actions secrets.' >&2
+            exit 1
+          fi
+          echo 'CAMBER_API_KEY is present; value never printed.'
+      - name: Install official Camber CLI
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --location --retry 2 https://cli.cambercloud.com/install-v2.sh --output "$RUNNER_TEMP/install-camber.sh"
+          bash "$RUNNER_TEMP/install-camber.sh"
+          echo "$HOME/.camber/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Check API token authentication without printing identity
+        shell: bash
+        env:
+          CAMBER_API_KEY: ${{ secrets.CAMBER_API_KEY }}
+        run: |
+          set -euo pipefail
+          CAMBER_BIN="$(command -v camber || true)"
+          if [[ -z "$CAMBER_BIN" ]]; then
+            CAMBER_BIN="$(find "$HOME" -maxdepth 5 -type f -name camber -perm -u+x -print -quit)"
+          fi
+          if [[ -z "$CAMBER_BIN" ]]; then
+            echo 'Camber CLI not found after official installation' >&2
+            exit 1
+          fi
+          "$CAMBER_BIN" version
+          if "$CAMBER_BIN" me --output json > "$RUNNER_TEMP/camber-identity.json" 2> "$RUNNER_TEMP/camber-auth-error.log"; then
+            echo 'Camber API authentication: successful.'
+          else
+            echo 'Camber API authentication failed. Review token permissions/expiry inside Camber.' >&2
+            exit 1
+          fi
+          # All help commands are local CLI metadata checks: NO GPU job starts.
+          if "$CAMBER_BIN" job create --help > "$RUNNER_TEMP/camber-job-help.txt" 2>&1; then
+            echo 'Camber job submission interface: available.'
+          else
+            echo 'The current CLI has a different job interface; no submission attempted.'
+          fi
+          if "$CAMBER_BIN" stash --help > "$RUNNER_TEMP/camber-stash-help.txt" 2>&1; then
+            echo 'Camber Stash CLI interface: available.'
+          fi
+          echo 'No compute instance launched; no assets uploaded; no jobs submitted.'
