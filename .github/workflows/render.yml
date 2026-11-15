@@ -94,10 +94,15 @@ jobs:
         run: |
           cd "$PROJECT_DIR"
           ../../node_modules/.bin/hyperframes snapshot --at 0.7,3.9,6.1,10.53,16.73,20.2,22.1
-      - name: Render to MP4
+      - name: Render to MP4 and master audio
         run: |
           mkdir -p renders
-          ./node_modules/.bin/hyperframes render "$PROJECT_DIR" --quality delivery --output "$GITHUB_WORKSPACE/renders/final.mp4"
+          ./node_modules/.bin/hyperframes render "$PROJECT_DIR" --quality delivery --output "$GITHUB_WORKSPACE/renders/unmastered.mp4"
+          ffmpeg -hide_banner -loglevel error -y -i renders/unmastered.mp4 \
+            -map 0:v:0 -map 0:a:0 -c:v copy \
+            -af "loudnorm=I=-16:TP=-1.5:LRA=10" \
+            -c:a aac -b:a 256k -movflags +faststart renders/final.mp4
+          rm renders/unmastered.mp4
       - name: Verify video and audible audio stream
         run: |
           test -s renders/final.mp4
