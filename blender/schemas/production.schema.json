@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Animation studio production manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "slug",
+    "fps",
+    "width",
+    "height",
+    "shots",
+    "asset_ids"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{2,63}$"
+    },
+    "fps": {
+      "type": "integer",
+      "enum": [
+        24,
+        25,
+        30,
+        60
+      ]
+    },
+    "width": {
+      "type": "integer",
+      "minimum": 128,
+      "maximum": 7680
+    },
+    "height": {
+      "type": "integer",
+      "minimum": 128,
+      "maximum": 4320
+    },
+    "shots": {
+      "type": "array",
+      "items": {
+        "$ref": "shot.schema.json"
+      }
+    },
+    "asset_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "sound": {
+      "type": "object"
+    },
+    "color": {
+      "type": "object"
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}
