@@ -30,3 +30,13 @@ Do not treat references as executable libraries. Prefer installing official skil
 - The Kokoro ONNX Python helper generates voices without credentials; the Node postprocessor aligns/normalizes their reserved slots and records provenance. The GitHub runner downloads/cache model weights; no install on the user's workstation.
 - The procedural character rig uses two-bone IK plus authored poses and parametric ballistic fragments. Avoid claims of simulated physical dynamics, cinematic photorealism or production-studio hand-drawn anime quality that the rendered frames do not demonstrate.
 - Prefer running actual frame/audio inspection on the completed workflow artifacts, not judging from source code.
+
+## Blender (infrastructure ready, animation NOT generated)
+
+For all Blender work, read [the reusable studio skill](blender/skills/studio/SKILL.md), [the production contract](blender/PRODUCTION.md) and [the license-gated registry](blender/assets/registry.json).
+
+- Blender 4.5.16 LTS and VRM/MToon 4.10.5 are verified on GitHub-hosted Linux. Only the static environment probe was run; no character/model/scene/frame was produced.
+- Blender environment setup is safe to run automatically. Blender rendering is **manual-only** and refuses assets without an approved license, local file and matching SHA-256.
+- Existing HyperFrames projects and Kokoro voices remain the working film/audio pipeline. Retain them.
+- No GPU service, external licensed asset bundle, Rigify extension or cloud storage provider is connected without separate authorization; don't claim these are present.
+- User's instruction for this phase: build and verify infrastructure **only**. Do not create new animations or media until a later explicit request.
