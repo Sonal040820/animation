@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "origin": "https://github.com/theminhnguyen/wonderdeck/blob/main/public/models/README.md",
+  "pinned_revision": "2929925ae31411b94da54b395fbfb62abcf3f6ab",
+  "purpose": "Evaluate actual anime-style VRM assets for commercial fight use; no models approved until embedded rights checked",
+  "models": [
+    {
+      "id": "sendagaya_shino",
+      "path": "assets-local/candidates/shino.vrm",
+      "source_url": "https://raw.githubusercontent.com/theminhnguyen/wonderdeck/2929925ae31411b94da54b395fbfb62abcf3f6ab/public/models/shino.vrm",
+      "git_blob_sha1": "7f4bd4318f6f057ca038d79a17f3717e4f5a62ef",
+      "bytes": 10108452,
+      "claimed_license": "CC0"
+    },
+    {
+      "id": "vita",
+      "path": "assets-local/candidates/vita.vrm",
+      "source_url": "https://raw.githubusercontent.com/theminhnguyen/wonderdeck/2929925ae31411b94da54b395fbfb62abcf3f6ab/public/models/vita.vrm",
+      "git_blob_sha1": "cb6a8a510821d6a94e5bf4c31ae76d79c2bfc020",
+      "bytes": 9539380,
+      "claimed_license": "CC0"
+    }
+  ]
+}
