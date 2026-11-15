@@ -1,6 +1,6 @@
 # AI Animation Studio
 
-A GitHub-hosted, HyperFrames-based production workspace for **editable animation with dialogue, music, sound effects and MP4 delivery**. Creative scene production has not started.
+A GitHub-hosted, HyperFrames-based production workspace for **editable animation with dialogue, music, sound effects and MP4 delivery**. Original films already exist; the newly added Blender subsystem is setup-only.
 
 ## Status
 
@@ -54,3 +54,14 @@ The newer film is in [projects/storm-vs-ash-elite](projects/storm-vs-ash-elite).
 **Reproducibility:** The runner installs Node, FFmpeg, Python and Kokoro ONNX, caches the freely licensed CPU voice model, generates all audio locally, validates the HyperFrames composition, captures storyboard frames, renders the MP4 and then masters the mix with an FFmpeg -16 LUFS target/-1.5dBTP ceiling. Download **hyperframes-final-video** under the successful run's GitHub Actions artifacts.
 
 **Final verified 23.0-second delivery:** [successful workflow 43739268340](https://github.com/Sonal040820/animation/actions/runs/43739268340), producing 1080×1920 H.264 at 24fps with 48kHz stereo AAC, loudness mastering, six local Kokoro ONNX performances, a procedural score and timed SFX. The complete MP4 is stored as **hyperframes-final-video** under that workflow's Artifacts. It is not committed as a regular Git file. The technical smoke/decode check passed; visual quality remains a stylized procedural 2D anime-inspired film, not production-studio hand-drawn sakuga.
+
+## Blender cloud production environment
+
+**Verified on GitHub Actions:** Blender 4.5.16 LTS, Cycles CPU, glTF/FBX/OBJ/USD/Alembic importers, and VRM/MToon extension 4.10.5 from a SHA-256-pinned official maintainer release. Nine no-media metadata tests passed. The setup generated zero scenes and zero rendered frames.
+
+- [Studio guide](blender/README.md) and [production contract](blender/PRODUCTION.md)
+- [Reusable AI coding-agent skill](blender/skills/studio/SKILL.md)
+- [Successful environment and VRM check](https://github.com/Sonal040820/animation/actions/runs/43748055755)
+- [Manual-only Blender rendering workflow](.github/workflows/blender-render.yml)
+
+The Blender asset registry is intentionally empty. We have **not** acquired character models, connected private storage, allocated GPU resources, subscribed to services or started any new animation. Rigify is deferred pending approved extension availability. You do not need a local Blender install.
