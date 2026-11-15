@@ -10,6 +10,9 @@ def configure_scene(scene, profile: str, toolchain: dict):
     if profile not in profiles:
         raise ContractError("Unknown render profile")
     cfg = profiles[profile]
+    if cfg["engine"] == "CYCLES":
+        import bpy
+        bpy.ops.preferences.addon_enable(module="cycles")
     scene.render.engine = cfg["engine"]
     scene.cycles.device = "CPU"
     scene.cycles.samples = int(cfg["samples"])
