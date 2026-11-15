@@ -93,16 +93,16 @@ function bone(a,e,b,width,col,rim,accent){
 function char(who,t,ghost=false,dt=0){
  const kai=who==="kai",accent=kai?C.blue:C.red;
  const x=interp(xpaths[who],t-dt),P=evalPose(who,t-dt),speed=vd(who,t-dt);
- const f=kai?1:-1,rootY=1308+P.crouch;
+ const f=kai?1:-1,scale=1.17,rootY=1484-174*scale+P.crouch*scale;
  const isAir=(t>15.35&&t<16.76)?24*Math.sin(Math.PI*(t-15.35)/1.41):0;
- const yy=rootY-isAir;
+ const yy=rootY-isAir*scale;
  ctx.save();
  if(ghost){ctx.globalAlpha=.13;ctx.globalCompositeOperation="lighter";}
  const groundY=1484;
  ellipse(x,groundY+4,80+Math.abs(speed)*.014,15,"#02040d",ghost?.12:.60);
- ctx.translate(x,yy);ctx.scale(f,1);
+ ctx.translate(x,yy);ctx.scale(f*scale,scale);
  if(ghost)ctx.shadowColor=accent;
- ctx.shadowBlur=ghost?38:10;ctx.shadowColor=accent;
+ ctx.shadowBlur=ghost?28:3;ctx.shadowColor=accent;
  // Internal body inertia and weight shift; left-right foot lengths preserved.
  const lean=P.lean;const sway=.3*s(t,1.2+(kai?.03:0));
  const hipL={x:-26,y:0},hipR={x:26,y:0};
@@ -111,9 +111,9 @@ function char(who,t,ghost=false,dt=0){
  // Correct vertical planting for the wide shots; kick leg is intentionally free.
  if(P.fr[1]>90)footR.y=174-P.crouch+isAir;
  if(P.fl[1]>90)footL.y=174-P.crouch+isAir;
- const kneeL=twoBone(hipL,footL,91,112,-1),kneeR=twoBone(hipR,footR,91,112,1);
- bone(hipL,kneeL,footL,30,"#1d263c","#3a4860",accent);
- bone(hipR,kneeR,footR,32,"#171c33","#3b4259",accent);
+ const kneeL=twoBone(hipL,footL,91,112,1),kneeR=twoBone(hipR,footR,91,112,-1);
+ bone(hipL,kneeL,footL,30,"#1d263c","#3a4860",null);
+ bone(hipR,kneeR,footR,32,"#171c33","#3b4259",null);
  pathPoly([[footL.x-25,footL.y-1],[footL.x+15,footL.y-7],[footL.x+33,footL.y+10],[footL.x+30,footL.y+21],[footL.x-30,footL.y+21]],"#090e1c",accent,3.5);
  pathPoly([[footR.x-25,footR.y-1],[footR.x+14,footR.y-5],[footR.x+33,footR.y+11],[footR.x+30,footR.y+22],[footR.x-28,footR.y+20]],"#090e1c",accent,3.5);
  ctx.shadowBlur=0;
@@ -147,17 +147,41 @@ function char(who,t,ghost=false,dt=0){
  pathPoly([[sx-28,shY-22],[sx+37,shY-23],[sx+23,shY+19],[sx-28,shY+21]],"#070d1b",accent,4);
  const faceX=headX,faceY=shY-79+P.head*11;
  ctx.save();ctx.translate(faceX,faceY);ctx.rotate(P.head);
- pathPoly([[-46,-52],[-15,-81],[35,-69],[49,-42],[43,27],[18,62],[-28,47],[-47,17]],"#1c263a","#070913",10);
- pathPoly([[28,-52],[47,-30],[41,30],[21,59],[15,26]],"#0d172d");
- pathPoly([[-45,-54],[-30,-95],[-8,-81],[12,-112],[25,-86],[56,-89],[45,-51],[66,-36],[37,-31],[17,-49],[-12,-33],[-40,-22]],"#071224","#020711",8);
- ctx.shadowBlur=7;ctx.shadowColor=accent;
- pathPoly([[-35,-20],[-8,-22],[-17,-10],[-36,-8]],accent);
- pathPoly([[9,-23],[34,-24],[27,-11],[6,-10]],accent);
- ctx.shadowBlur=0;
- lin(-11,12,18,13,"#d2b9c3",2,.43);
+ const skin=kai?"#c2a0a0":"#c7978b";
+ const shade=kai?"#876b81":"#805b65";
+ // Anatomical face and cheek structure with sharp inked cel boundaries.
+ pathPoly([[-43,-53],[-17,-80],[32,-67],[46,-38],[42,18],[25,51],[7,66],[-30,45],[-46,10]],skin,"#090c1d",8);
+ pathPoly([[17,-66],[42,-40],[40,20],[23,49],[7,66],[9,25]],shade);
+ pathPoly([[-40,-2],[-26,35],[-4,55],[-29,45]],"#d7b6ac");
+ pathPoly([[-49,-6],[-61,-12],[-58,13],[-43,20]],skin,"#141127",4);
+ pathPoly([[42,-7],[57,-13],[53,14],[43,18]],shade,"#141127",4);
+ // Deliberately imperfect layered hair tufts and sideburns.
+ pathPoly([[-50,-50],[-34,-94],[-17,-82],[8,-112],[23,-90],[53,-103],[42,-65],[70,-60],[43,-38],
+          [28,-56],[12,-43],[1,-63],[-19,-42],[-44,-31]],kai?"#111b2d":"#221326","#060a16",7);
+ pathPoly([[-40,-71],[-23,-101],[-18,-65],[-38,-41]],kai?"#2c405d":"#543045");
+ pathPoly([[-3,-92],[13,-114],[25,-88],[13,-57]],kai?"#23334b":"#4a2937");
+ pathPoly([[31,-88],[54,-101],[46,-61],[36,-48]],kai?"#30354b":"#582b44");
+ pathPoly([[-47,-33],[-36,-50],[-31,-4]],"#111b2e");
+ pathPoly([[46,-29],[36,-42],[38,12]],kai?"#17243a":"#3c1f34");
+ // Eyebrows track upper eye lids, a slight asymmetry gives acting.
+ lin(-33,-18,-7,-22,"#161525",5);
+ lin(10,-22,34,-17,"#181426",5);
+ // Actual sclera / irises with anime-angled eyes, not rectangle lights.
+ pathPoly([[-35,-10],[-5,-12],[-9,1],[-32,2]],"#f4ebe5","#161421",3);
+ pathPoly([[8,-12],[36,-10],[30,2],[12,0]],"#f0e6e6","#151522",3);
+ ellipse(-19,-5,6,8,kai?"#178da6":"#be365d");
+ ellipse(23,-5,6,8,kai?"#178da6":"#be365d");
+ ellipse(-18,-8,2.2,2.3,"#f8ffff");ellipse(23,-9,2,2,"#fff9fa");
+ lin(-35,-11,-5,-14,"#171322",3.4);lin(9,-14,38,-10,"#171322",3.4);
+ // Nose ridge and grounded mouth acting.
+ lin(-3,6,-7,19,shade,2.2,.8);
+ lin(-9,20,2,22,"#724d58",2.3);
  const speaking=(kai&&((t>2.59&&t<3.68)||(t>11.42&&t<12.5)))||(!kai&&((t>3.81&&t<4.65)||(t>12.6&&t<13.70)));
- if(speaking&&Math.floor(t*11)%2===0)lin(-8,29,15,28,"#0b0615",6,.92);
- else lin(-7,30,16,30,"#814955",2);
+ if(speaking&&Math.floor(t*11)%2===0){
+  pathPoly([[-13,37],[18,37],[12,45],[-9,43]],"#3f202b");
+  lin(-9,40,12,40,"#d8b9b2",1.6,.88);
+ } else {lin(-12,37,17,36,"#663b4a",2.5);}
+ lin(-18,43,5,50,shade,1.3,.6);
  ctx.restore();
  // Scarf is a multi-section tether; waves lag the collar velocity.
  const flow=-99-Math.min(122,Math.abs(speed)*.12)-P.sash*1.4;
@@ -271,13 +295,13 @@ function envFX(t){
 function look(t){
  const cuts=[
  [0,2.12,540,1102,1.00],
- [2.12,3.64,255,1120,2.10],
- [3.64,4.73,827,1123,2.10],
+ [2.12,3.64,255,1020,2.78],
+ [3.64,4.73,827,1020,2.78],
  [4.73,6.92,540,1100,1.08],
  [6.92,7.95,555,1150,1.35],
  [7.95,11.29,540,1100,1.04],
- [11.29,12.57,415,1120,1.95],
- [12.57,13.70,688,1123,1.95],
+ [11.29,12.57,415,1020,2.50],
+ [12.57,13.70,688,1020,2.50],
  [13.70,15.03,540,1095,1.05],
  [15.03,17.30,540,1090,1.05],
  [17.30,19.15,540,1070,1.02],
@@ -320,7 +344,7 @@ function caption(t){
 }
 function screen(t){
  // One-frame cel impact: invert through a white plate with black angular slashes.
- for(const [hit,power] of [[6.08,.62],[10.53,.56],[16.73,1]]){
+ for(const [hit,power] of [[6.08,.27],[10.53,.34],[16.73,.83]]){
   const dt=Math.abs(t-hit);
   if(dt<1/24){
    ctx.save();ctx.globalAlpha=power*(1-dt*20);
@@ -332,7 +356,7 @@ function screen(t){
  }
  // Chord and muzzle bloom after contact; never after all motion.
  const bright=(hit)=>{const dt=t-hit;return dt>=0&&dt<.3?Math.exp(-dt*17):0;};
- const a=.40*bright(6.08)+.48*bright(10.53)+.85*bright(16.73);
+ const a=.12*bright(6.08)+.20*bright(10.53)+.66*bright(16.73);
  if(a>0){ctx.save();ctx.globalAlpha=a;ctx.fillStyle="#e9faff";ctx.fillRect(0,0,W,H);ctx.restore();}
  // Film-frame fine ink / light noise, deterministic across time.
  const fi=Math.floor(t*12);
