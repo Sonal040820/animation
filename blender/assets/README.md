@@ -12,3 +12,9 @@ This folder deliberately contains **zero third-party asset bytes**. GitHub is a 
 Recommended CC0 asset sources: Poly Haven, ambientCG, and individual Kenney packs. Character sources: Blender Studio or explicitly permitted VRoid and artist-authored avatars; preserve exact per-model terms. Mixamo motion usage likewise follows Adobe's terms. Blendkit permissions depend on each asset.
 
 No copyrighted franchise characters, scraped media, paid downloads or models with unknown permission are automatically acquired by this setup.
+
+## Verified current assets
+
+The current registry has a licensed Khronos Rigged Figure fixture (CC BY 4.0), and the CC0 Sendagaya Shino and Vita anime VRM models. For both VRMs, the pipeline checks the actual embedded metadata: use by anyone, commercial permission, violent-use permission, and CC0 status. Source files are SHA256-pinned and downloaded to a temporary gitignored directory, not distributed through Git source.
+
+[Full audit, render artifacts and next milestone](../ASSET_STATUS.md)
