@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'blender/fixtures/**'
+      - 'blender/fixtures/rigged-figure.json'
       - 'blender/scripts/provision_fixture.py'
       - '.github/workflows/blender-fixture-check.yml'
 permissions:
