@@ -64,6 +64,29 @@ def import_actor(workspace:Path,asset_id:str,label:str,side:int):
     objects=[bpy.data.objects[n] for n in names if n in bpy.data.objects]
     armatures=[o for o in objects if o.type=="ARMATURE"]
     if not armatures: raise ContractError("No imported rig for "+label)
+    # Preserve skin/face/toon eyes but recolor separable hair/outfit meshes
+    # where source objects expose standard VRoid Tops/Hair component names.
+    palette=(.014,.035,.13) if label=="Kai" else (.13,.026,.018)
+    costume=bpy.data.materials.new(label+"_BattlePalette")
+    costume.diffuse_color=(*palette,1)
+    costume.use_nodes=True
+    cloth=costume.node_tree.nodes.get("Principled BSDF")
+    cloth.inputs["Base Color"].default_value=(*palette,1)
+    cloth.inputs["Metallic"].default_value=.16
+    cloth.inputs["Roughness"].default_value=.55
+    ice=bpy.data.materials.new(label+"_SilverHair")
+    ice.diffuse_color=(.75,.89,1.0,1)
+    ice.use_nodes=True
+    hair_shader=ice.node_tree.nodes.get("Principled BSDF")
+    hair_shader.inputs["Base Color"].default_value=(.75,.89,1,1)
+    hair_shader.inputs["Roughness"].default_value=.35
+    for obj in objects:
+        if obj.type!="MESH": continue
+        tag=obj.name.lower()
+        chosen=costume if ("tops" in tag or "hoodie" in tag) else (ice if label=="Kai" and "hair" in tag else None)
+        if chosen is not None and obj.data.materials:
+            for slot in obj.material_slots:slot.material=chosen
+
     rig=armatures[0]
     validate_humanoid_map(rig,bone_map)
     low,high=actor_bounds(objects)
