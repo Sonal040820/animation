@@ -64,4 +64,11 @@ The newer film is in [projects/storm-vs-ash-elite](projects/storm-vs-ash-elite).
 - [Successful environment and VRM check](https://github.com/Sonal040820/animation/actions/runs/43748055755)
 - [Manual-only Blender rendering workflow](.github/workflows/blender-render.yml)
 
-The Blender asset registry is intentionally empty. We have **not** acquired character models, connected private storage, allocated GPU resources, subscribed to services or started any new animation. Rigify is deferred pending approved extension availability. You do not need a local Blender install.
+The Blender asset registry now contains three verified technical assets: a CC BY rigged mannequin and two CC0 anime VRM characters whose embedded metadata permits commercial and violent use. We have executed real 3D tests, but NOT produced a new Kai/Ren fight in Blender. Private storage, GPUs, paid accounts, Rigify and original character customization remain outside the setup. No local Blender installation is necessary.
+
+## 3D character foundation milestones
+
+- [Technical 24-frame two-actor Blender render](https://github.com/Sonal040820/animation/actions/runs/43749479522): actual 3D skinned rig, camera, lighting, CPU Cycles, MP4, 19 bones per actor.
+- [Licensed anime VRM models + real character preview renders](https://github.com/Sonal040820/animation/actions/runs/43750803107): 148-bone and 155-bone anime avatars, 42 facial shape keys each, all 17 necessary humanoid semantic joints validated, saved 41 MB editable Blender asset library.
+- [Anime asset provenance and use permissions](blender/ASSET_STATUS.md): CC0 and embedded commercial/violent-use permission checked independently, source files pinned to Git commits and SHA256.
+- These two anime designs are existing licensed third-party characters, NOT original Kai/Ren designs. The next production step is actual character customization and choreographed contact motion before rendering a new film.
