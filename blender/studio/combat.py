@@ -75,15 +75,17 @@ def import_actor(workspace:Path,asset_id:str,label:str,side:int):
             obj.parent=root
     s=2.10/(high.z-low.z)
     root.scale=(s,s,s)
-    stage_x=-side*1.90
+    stage_x=-side*2.05
     root.location=(stage_x-s*(high.x+low.x)/2,-s*(high.y+low.y)/2,-s*low.z)
     root.rotation_euler.z=side*.72
     bpy.context.view_layer.update()
+    # Close the contact gap using measurable approach velocity. The fight now
+    # has planted anticipation, explosive stride, air collision, then landing.
     for frame,offset,lift,yaw in [
-        (1,0,0,.72),(7,.02,-.06,.70),(13,.27,-.09,.79),
-        (20,.69,.04,1.02),(26,.84,.07,1.11),
-        (29,.82,.04,1.08),(34,.70,-.04,.80),
-        (42,.56,0,.72),(48,.54,0,.71)]:
+        (1,0,0,.72),(7,.01,-.055,.70),(13,.16,-.13,.80),
+        (20,.90,.03,1.00),(25,1.39,.20,1.12),(27,1.50,.27,1.16),
+        (29,1.36,.31,1.04),(34,1.08,.12,.81),
+        (41,.88,0,.72),(48,.83,0,.70)]:
         root.location=(stage_x+side*offset-s*(high.x+low.x)/2,-s*(high.y+low.y)/2,-s*low.z+lift)
         root.rotation_euler.z=side*yaw
         root.keyframe_insert("location",frame=frame)
@@ -135,13 +137,17 @@ def import_actor(workspace:Path,asset_id:str,label:str,side:int):
         base=rig.matrix_world@pb.tail
         ft=make_target(label+"_"+key+"_Plant",base)
         add_existing_ik_target(rig,end_bone=bone_map[key],target=ft,chain_count=3)
-        shift=side*(.62 if footindex==0 else .45)
-        for frame,p in [(1,base),(12,base),
-                        (17,base+Vector((shift,0,.21))),
-                        (21,base+Vector((shift,0,0))),
-                        (27,base+Vector((shift,0,0))),
-                        (33,base+Vector((side*.36,0,.02))),
-                        (48,base+Vector((side*.42,0,0)))]:
+        shift=side*(1.12 if footindex==0 else .96)
+        for frame,p in [
+            (1,base),(12,base),
+            (16,base+Vector((shift*.40,0,.16))),
+            (21,base+Vector((shift,0,0))),
+            (25,base+Vector((shift,0,.19))),
+            (29,base+Vector((shift,0,.29))),
+            (35,base+Vector((side*.86,0,.08))),
+            (40,base+Vector((side*.79,0,0))),
+            (48,base+Vector((side*.77,0,0)))]:
+
             ft.location=p;ft.keyframe_insert("location",frame=frame)
         ftargets.append(ft)
     # Pose bone rotation adds secondary spine/head anticipation and recoil.
