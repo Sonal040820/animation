@@ -1,0 +1,19 @@
+{
+  "name": "animation-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "GitHub-hosted HyperFrames video and audio rendering",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "hf:doctor": "hyperframes doctor --json",
+    "hf:skills": "hyperframes skills update",
+    "hf:check": "hyperframes check --json",
+    "hf:render": "hyperframes render --quality delivery"
+  },
+  "devDependencies": {
+    "hyperframes": "0.9.52"
+  }
+}
