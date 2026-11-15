@@ -1,0 +1,203 @@
+{
+  "title": "STORM x ASH - ELITE CUT - Audio Cue Sheet",
+  "duration": 23,
+  "fps": 24,
+  "dialogue": [
+    {
+      "id": "narrator_open",
+      "speaker": "Narrator",
+      "at": 0.43,
+      "slot": 1.65,
+      "voice": "bf_emma",
+      "speed": 0.96,
+      "text": "The night held its breath."
+    },
+    {
+      "id": "kai_warning",
+      "speaker": "Kai",
+      "at": 2.59,
+      "slot": 1.18,
+      "voice": "am_michael",
+      "speed": 0.96,
+      "text": "Walk away, Ren."
+    },
+    {
+      "id": "ren_challenge",
+      "speaker": "Ren",
+      "at": 3.81,
+      "slot": 0.85,
+      "voice": "am_adam",
+      "speed": 0.94,
+      "text": "Make me."
+    },
+    {
+      "id": "kai_question",
+      "speaker": "Kai",
+      "at": 11.42,
+      "slot": 1.14,
+      "voice": "am_michael",
+      "speed": 0.99,
+      "text": "Still holding back?"
+    },
+    {
+      "id": "ren_answer",
+      "speaker": "Ren",
+      "at": 12.6,
+      "slot": 1.11,
+      "voice": "am_adam",
+      "speed": 0.98,
+      "text": "So are you."
+    },
+    {
+      "id": "narrator_close",
+      "speaker": "Narrator",
+      "at": 19.18,
+      "slot": 1.72,
+      "voice": "bf_emma",
+      "speed": 0.92,
+      "text": "And neither one fell."
+    }
+  ],
+  "sfx": [
+    {
+      "id": "cloth",
+      "at": 1.63,
+      "gain": 0.17
+    },
+    {
+      "id": "step",
+      "at": 3.65,
+      "gain": 0.2
+    },
+    {
+      "id": "step",
+      "at": 5.12,
+      "gain": 0.75
+    },
+    {
+      "id": "dash",
+      "at": 5.28,
+      "gain": 0.58
+    },
+    {
+      "id": "guard",
+      "at": 6.08,
+      "gain": 0.95
+    },
+    {
+      "id": "cloth",
+      "at": 7.16,
+      "gain": 0.24
+    },
+    {
+      "id": "dash",
+      "at": 7.62,
+      "gain": 0.55
+    },
+    {
+      "id": "kick",
+      "at": 8.11,
+      "gain": 0.76
+    },
+    {
+      "id": "step",
+      "at": 9.24,
+      "gain": 0.78
+    },
+    {
+      "id": "dash",
+      "at": 10.19,
+      "gain": 0.61
+    },
+    {
+      "id": "punch",
+      "at": 10.53,
+      "gain": 0.94
+    },
+    {
+      "id": "charge",
+      "at": 13.88,
+      "gain": 0.5
+    },
+    {
+      "id": "step",
+      "at": 15.18,
+      "gain": 0.74
+    },
+    {
+      "id": "step",
+      "at": 15.38,
+      "gain": 0.7
+    },
+    {
+      "id": "finisher",
+      "at": 16.73,
+      "gain": 1
+    },
+    {
+      "id": "debris",
+      "at": 17.22,
+      "gain": 0.48
+    },
+    {
+      "id": "scrape",
+      "at": 18.22,
+      "gain": 0.55
+    },
+    {
+      "id": "scrape",
+      "at": 18.43,
+      "gain": 0.55
+    },
+    {
+      "id": "breath",
+      "at": 20.14,
+      "gain": 0.32
+    },
+    {
+      "id": "sting",
+      "at": 21.03,
+      "gain": 0.72
+    }
+  ],
+  "music": {
+    "src": "score.wav",
+    "gain": 0.56,
+    "duck": [
+      {
+        "start": 0.33,
+        "end": 2.22,
+        "level": 0.38
+      },
+      {
+        "start": 2.49,
+        "end": 3.79,
+        "level": 0.32
+      },
+      {
+        "start": 3.74,
+        "end": 4.72,
+        "level": 0.33
+      },
+      {
+        "start": 11.28,
+        "end": 12.62,
+        "level": 0.28
+      },
+      {
+        "start": 12.51,
+        "end": 13.87,
+        "level": 0.29
+      },
+      {
+        "start": 19.05,
+        "end": 21.03,
+        "level": 0.32
+      }
+    ],
+    "impactMute": {
+      "at": 16.73,
+      "duration": 0.13
+    }
+  }
+}
