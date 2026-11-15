@@ -18,6 +18,7 @@ const C={ink:"#070c1c",slate:"#1d213c",night:"#07091e",moon:"#e4637b",blue:"#59e
 const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const mix=(a,b,u)=>a+(b-a)*u;
 const sm=u=>{u=clamp(u);return u*u*(3-2*u);};
+const frac=x=>x-Math.floor(x);
 const s=(t,f,p=0)=>Math.sin(t*TAU*f+p);
 const hash=(n)=>{let x=Math.imul(n+908172,1103515245);x^=x>>>13;x=Math.imul(x,0x85ebca6b);x^=x>>>16;return (x>>>0)/4294967295;};
 const pts=(n,x=0,y=0)=>{const out=[];for(let i=0;i<n;i++)out.push({x:hash(i*19+24)*W+x,y:hash(i*37+199)*H+y,u:hash(i*81+1),v:hash(i*67+12)});return out;};
