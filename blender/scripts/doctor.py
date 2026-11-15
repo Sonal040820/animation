@@ -34,7 +34,11 @@ def main():
     if version != expected:
         raise RuntimeError(f"Blender version mismatch: expected {expected}, found {version}")
     assets = validate_asset_registry(load_json(ROOT / "blender/assets/registry.json"), workspace=ROOT)
-    engines = [item.identifier for item in bpy.context.scene.render.bl_rna.properties["engine"].enum_items]
+    # Cycles is supplied as a registered add-on, so the static enum does NOT list it.
+    # Test by enabling the bundled add-on and assigning the actual engine ID.
+    bpy.ops.preferences.addon_enable(module="cycles")
+    bpy.context.scene.render.engine = "CYCLES"
+    engines = [bpy.context.scene.render.engine]
     importers = {
         "gltf": operator_available(bpy.ops.import_scene.gltf),
         "fbx": operator_available(bpy.ops.import_scene.fbx),
