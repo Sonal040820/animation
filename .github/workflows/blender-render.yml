@@ -1,0 +1,80 @@
+name: Blender shot render (MANUAL ONLY)
+on:
+  workflow_dispatch:
+    inputs:
+      asset_id:
+        description: 'Rights-approved existing .blend asset ID from blender/assets/registry.json'
+        type: string
+        required: true
+      start_frame:
+        description: 'First inclusive frame; at least 1'
+        type: number
+        required: true
+      end_frame:
+        description: 'Last inclusive frame; up to 240 frames per job'
+        type: number
+        required: true
+      profile:
+        description: 'CPU Cycles quality preset'
+        type: choice
+        options:
+          - preview
+          - final
+        required: true
+        default: preview
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      ASSET_ID: ${{ inputs.asset_id }}
+      START_FRAME: ${{ inputs.start_frame }}
+      END_FRAME: ${{ inputs.end_frame }}
+      PROFILE: ${{ inputs.profile }}
+      PRIVATE_ASSET_ZIP_URL: ${{ secrets.BLENDER_PRIVATE_ASSET_ZIP_URL }}
+      PRIVATE_ASSET_ZIP_SHA256: ${{ secrets.BLENDER_PRIVATE_ASSET_ZIP_SHA256 }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Optional private asset provision (not configured by default)
+        shell: bash
+        run: |
+          if [[ -n "$PRIVATE_ASSET_ZIP_URL" ]]; then
+            if [[ ! "$PRIVATE_ASSET_ZIP_SHA256" =~ ^[a-fA-F0-9]{64}$ ]]; then
+              echo 'Valid BLENDER_PRIVATE_ASSET_ZIP_SHA256 secret is required' >&2; exit 1
+            fi
+            curl --fail --location --retry 2 --connect-timeout 20 "$PRIVATE_ASSET_ZIP_URL" --output "$RUNNER_TEMP/assets.zip"
+            echo "$PRIVATE_ASSET_ZIP_SHA256  $RUNNER_TEMP/assets.zip" | sha256sum -c -
+            python3 blender/scripts/unpack_assets.py --zip "$RUNNER_TEMP/assets.zip"
+          else
+            echo 'No private asset store configured. Only existing approved local assets can render.'
+          fi
+      - name: Enforce asset source, rights and SHA-256
+        run: python3 blender/scripts/validate_contracts.py --verify-files
+      - name: Install headless rendering dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ca-certificates curl xz-utils libx11-6 libxi6 libxrender1 libxrandr2 libxfixes3 libxkbcommon0 libgl1 libegl1 libsm6 libxext6 libxxf86vm1 ffmpeg
+      - uses: actions/cache@v4
+        with:
+          path: .cache/blender/blender-4.5.16-linux-x64
+          key: blender-linux-x64-4.5.16-runtime-v1
+      - name: Install pinned Blender
+        run: bash blender/scripts/install_blender.sh
+      - name: Render only the explicitly selected approved .blend
+        shell: bash
+        run: |
+          BIN="$GITHUB_WORKSPACE/.cache/blender/blender-4.5.16-linux-x64/blender"
+          "$BIN" --background --factory-startup --disable-autoexec --python-exit-code 1 --python blender/scripts/render_registered_asset.py -- --asset-id "$ASSET_ID" --profile "$PROFILE" --start "$START_FRAME" --end "$END_FRAME" --output-dir "renders/blender/$ASSET_ID"
+      - name: Make silent picture preview (dialogue/music handled in future finishing)
+        shell: bash
+        run: |
+          ffmpeg -hide_banner -loglevel error -y -framerate 24 -start_number "$START_FRAME" -i "renders/blender/$ASSET_ID/frame_%05d.png" -c:v libx264 -preset medium -crf 19 -pix_fmt yuv420p -movflags +faststart "renders/blender/$ASSET_ID/picture.mp4"
+      - name: Upload explicitly requested shot frames and picture preview
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blender-shot-render
+          path: renders/blender/
+          retention-days: 14
