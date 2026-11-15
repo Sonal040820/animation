@@ -35,8 +35,14 @@ Do not treat references as executable libraries. Prefer installing official skil
 
 For all Blender work, read [the reusable studio skill](blender/skills/studio/SKILL.md), [the production contract](blender/PRODUCTION.md) and [the license-gated registry](blender/assets/registry.json).
 
-- Blender 4.5.16 LTS and VRM/MToon 4.10.5 are verified on GitHub-hosted Linux. Only the static environment probe was run; no character/model/scene/frame was produced.
+- Blender 4.5.16 LTS and VRM/MToon 4.10.5 are verified on GitHub-hosted Linux. The environment checks, Khronos 24-frame rig proof and licensed anime-VRM previews have been completed. No original Kai/Ren film was created in Blender.
 - Blender environment setup is safe to run automatically. Blender rendering is **manual-only** and refuses assets without an approved license, local file and matching SHA-256.
 - Existing HyperFrames projects and Kokoro voices remain the working film/audio pipeline. Retain them.
 - No GPU service, external licensed asset bundle, Rigify extension or cloud storage provider is connected without separate authorization; don't claim these are present.
-- User's instruction for this phase: build and verify infrastructure **only**. Do not create new animations or media until a later explicit request.
+- The user later authorized completing the next development steps; technical 3D integration tests and licensed character-foundation previews were made. Future original Kai/Ren character design or fight film should still be treated as a separate creative production milestone.
+
+## Validated reference actors and rig pipeline
+
+See [Blender asset status](blender/ASSET_STATUS.md). The Blender runner can provision a pinned 19-bone Khronos fixture and render 24 frames, or provision CC0 anime VRMs with 148/155 bones and 42 facial shape keys per avatar. Actual 17-channel humanoid bone-name matching passed. Import sources and embedded violent-use permissions are checked, and models are never pushed as unlicensed Git files.
+
+The current avatars are **existing** anime character designs and are NOT the original male Kai and Ren. They require distinct new character customization and authentic contact choreography before use in a creative film. No GPU, external cloud storage, or Rigify currently connected.
