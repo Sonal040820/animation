@@ -1,0 +1,19 @@
+{
+  "pinned_revision": "e16eb187100149a315ad92c3c9968f1d5baa6c7d",
+  "models": [
+    {
+      "id": "vroid_hair_sample_male",
+      "path": "vroid/beta/HairSample_Male.vrm",
+      "bytes": 18481892,
+      "git_blob_sha1": "46e8c583ce5df3b8ee167141b59ba3ad583a2687",
+      "source_url": "https://raw.githubusercontent.com/madjin/vrm-samples/e16eb187100149a315ad92c3c9968f1d5baa6c7d/vroid/beta/HairSample_Male.vrm"
+    },
+    {
+      "id": "vroid_sakurada_fumiriya",
+      "path": "vroid/beta/Sakurada_Fumiriya.vrm",
+      "bytes": 19342280,
+      "git_blob_sha1": "99839f8daf465bab05ac0ca7959373468bb9ce35",
+      "source_url": "https://raw.githubusercontent.com/madjin/vrm-samples/e16eb187100149a315ad92c3c9968f1d5baa6c7d/vroid/beta/Sakurada_Fumiriya.vrm"
+    }
+  ]
+}
