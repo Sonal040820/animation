@@ -10,3 +10,21 @@ output/
 *.wav
 *.mp3
 .DS_Store
+
+# Blender studio transient/cache and license-restricted media
+.cache/
+assets-local/
+*.blend
+*.blend1
+*.blend2
+*.blend@
+*.exr
+*.hdr
+*.fbx
+*.vrm
+*.glb
+*.gltf
+*.usdc
+*.abc
+__pycache__/
+*.pyc
