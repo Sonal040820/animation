@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Animation studio shot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "start_frame",
+    "end_frame",
+    "scene_asset",
+    "camera",
+    "description",
+    "audio_cue_ids"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{2,63}$"
+    },
+    "start_frame": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "end_frame": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "scene_asset": {
+      "type": "string",
+      "minLength": 1
+    },
+    "camera": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "lens_mm": {
+      "type": "number",
+      "minimum": 10,
+      "maximum": 400
+    },
+    "audio_cue_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "animation_action_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}
