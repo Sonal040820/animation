@@ -28,3 +28,6 @@ assets-local/
 *.abc
 __pycache__/
 *.pyc
+
+# GitHub runner diagnostic output
+diagnostics/
