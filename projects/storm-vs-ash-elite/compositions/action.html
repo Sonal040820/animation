@@ -243,6 +243,32 @@ function bg(t){
  ellipse(interp(xpaths.kai,t),1502,120,13,"#27bfff",.15);
  ellipse(interp(xpaths.ren,t),1502,120,13,"#ff456d",.12);
 }
+function speedFX(t){
+ // Manga-style lines are reserved for actual acceleration, not sustained idle motion.
+ const bursts=[
+  {a:5.20,b:5.94,dir:1,col:"#82e7ff"},
+  {a:7.70,b:8.37,dir:-1,col:"#ff7f9e"},
+  {a:10.18,b:10.61,dir:1,col:"#c7ebff"},
+  {a:15.18,b:16.71,dir:0,col:"#f8e9fd"}
+ ];
+ const b=bursts.find(q=>t>=q.a&&t<=q.b);
+ if(!b)return;
+ const u=clamp((t-b.a)/(b.b-b.a));
+ const power=Math.sin(PI*u)**.75;
+ ctx.save();ctx.globalCompositeOperation="screen";ctx.globalAlpha=.32*power;
+ for(let i=0;i<46;i++){
+  const y=490+hash(i*37+122)*1010;
+  const x=40+hash(i*61+73)*980;
+  const len=90+hash(i*17+49)*290;
+  const dir=b.dir===0?(i%2?1:-1):b.dir;
+  lin(x-dir*len*.38,y+15,x+dir*len*.75,y-12,b.col,1.4+hash(i*7)*4,.35+hash(i*11)*.55);
+ }
+ // One or two long, directional motion planes communicate the sprint trajectory.
+ ctx.fillStyle=b.col;ctx.globalAlpha=.095*power;
+ const y=930+90*s(t,1.2);
+ pathPoly([[0,y],[1080,y-240],[1080,y-205],[0,y+33]],b.col);
+ ctx.restore();
+}
 function envFX(t){
  // During impacts, fragments travel from ground under actual gravitational acceleration.
  for(const moment of [6.08,10.53,16.73]){
@@ -373,6 +399,10 @@ function renderAt(raw){
  const action=[[5.1,6.3],[7.72,10.8],[15.0,18.9]].some(r=>t>=r[0]&&t<=r[1]);
  const tt=action?t:Math.floor(t*12)/12;
  const camera=look(t);
+ // Controlled optical tracking: the audience never loses the left/right combat axis.
+ if(t>5.18&&t<6.20){const u=sm((t-5.18)/1.02);camera.x=525+85*u;camera.z=1.05+.10*Math.sin(PI*u);}
+ if(t>7.68&&t<8.52){const u=sm((t-7.68)/.84);camera.x=570-85*u;camera.z=1.08+.07*Math.sin(PI*u);}
+ if(t>15.18&&t<16.72){const u=sm((t-15.18)/1.54);camera.z=1.04+.19*u;camera.y=1095-38*u;}
  const shake=[[6.08,6],[10.53,7],[16.73,15]].reduce((v,[hit,mag])=>{
   const dt=t-hit;return v+(dt>0&&dt<.7?Math.exp(-dt*12)*mag:0);
  },0);
@@ -382,10 +412,12 @@ function renderAt(raw){
  ctx.scale(camera.z,camera.z);ctx.translate(-camera.x,-camera.y);
  bg(t);
  // Impact center ground and character order are stable across camera cuts.
- if(t>5.25&&t<5.87){ctx.save();ctx.globalAlpha=.09;char("kai",t,true,.10);ctx.restore();}
- if(t>15.22&&t<16.70){ctx.save();ctx.globalAlpha=.19;char("kai",t,true,.09);char("ren",t,true,.11);ctx.restore();}
+ if(t>5.24&&t<5.89)char("kai",t,true,.10);
+ if(t>7.75&&t<8.40)char("ren",t,true,.095);
+ if(t>10.20&&t<10.63)char("kai",t,true,.07);
+ if(t>15.22&&t<16.70){char("kai",t,true,.09);char("ren",t,true,.11);}
  char("kai",tt);char("ren",tt);
- envFX(t);ctx.restore();
+ speedFX(t);envFX(t);ctx.restore();
  title(t);caption(t);screen(t);
 }
 window.addEventListener("hf-seek",function(e){
