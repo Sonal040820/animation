@@ -1,10 +1,16 @@
 name: Render video
 on:
+  push:
+    paths:
+      - 'projects/storm-vs-ash/**'
+      - 'scripts/generate-duel-audio.mjs'
+      - '.github/workflows/render.yml'
   workflow_dispatch:
     inputs:
       project:
-        description: 'Existing HyperFrames project directory (e.g. projects/first-short)'
+        description: 'Existing HyperFrames project directory'
         required: true
+        default: 'projects/storm-vs-ash'
         type: string
 permissions:
   contents: read
@@ -13,7 +19,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
-      PROJECT_DIR: ${{ inputs.project }}
+      PROJECT_DIR: ${{ github.event_name == 'workflow_dispatch' && inputs.project || 'projects/storm-vs-ash' }}
       HEYGEN_API_KEY: ${{ secrets.HEYGEN_API_KEY }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
@@ -38,19 +44,39 @@ jobs:
           if [[ "$PROJECT_DIR" == *'..'* ]] || [[ ! -f "$PROJECT_DIR/index.html" ]]; then
             echo 'Missing project index.html or unsafe project path'; exit 1
           fi
-      - name: Validate project
+      - name: Synthesize original anime soundtrack and fight sounds
+        if: env.PROJECT_DIR == 'projects/storm-vs-ash'
+        run: node scripts/generate-duel-audio.mjs "$PROJECT_DIR/assets/audio"
+      - name: HyperFrames check
         run: |
           cd "$PROJECT_DIR"
           ../../node_modules/.bin/hyperframes check --json
+      - name: Export storyboard snapshots
+        continue-on-error: true
+        run: |
+          cd "$PROJECT_DIR"
+          ../../node_modules/.bin/hyperframes snapshot --at 0.2,2.6,4.9,7.3,10.7
       - name: Render to MP4
         run: |
           mkdir -p renders
           ./node_modules/.bin/hyperframes render "$PROJECT_DIR" --quality delivery --output "$GITHUB_WORKSPACE/renders/final.mp4"
-      - name: Verify media
+      - name: Verify video and audible audio stream
         run: |
           test -s renders/final.mp4
           ffprobe -v error -show_entries format=duration,size -of json renders/final.mp4 | tee renders/probe.json
-      - name: Upload video
+          ffprobe -v error -select_streams a -show_entries stream=codec_type -of csv=p=0 renders/final.mp4 | grep -q audio
+          ffmpeg -v error -i renders/final.mp4 -f null -
+      - name: Upload snapshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: anime-duel-snapshots
+          path: |
+            projects/storm-vs-ash/.hyperframes/artifacts/snapshots/
+            .hyperframes/artifacts/snapshots/
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Upload final video
         if: success()
         uses: actions/upload-artifact@v4
         with:
