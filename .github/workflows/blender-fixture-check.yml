@@ -1,0 +1,24 @@
+name: Blender test-asset provenance (no render)
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'blender/fixtures/**'
+      - 'blender/scripts/provision_fixture.py'
+      - '.github/workflows/blender-fixture-check.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify published asset license, pinned revision and binary digest
+        run: python3 blender/scripts/provision_fixture.py --output diagnostics/rigged-figure-provenance.json
+      - name: Save proof of asset identity (JSON only)
+        uses: actions/upload-artifact@v4
+        with:
+          name: rigged-figure-provenance
+          path: diagnostics/rigged-figure-provenance.json
+          retention-days: 14
