@@ -5,7 +5,7 @@
 - [Blender 4.5.16 + Cycles + VRM 4.10.5 environment](https://github.com/Sonal040820/animation/actions/runs/43748055755): passed.
 - [Khronos Rigged Figure proof](https://github.com/Sonal040820/animation/actions/runs/43749479522): two rigged instances, 19 bones each, actual 24-frame Cycles CPU render and MP4. CC BY 4.0 © Cesium. TECHNICAL FIXTURE ONLY.
 - [Anime VRM rights audit](https://github.com/Sonal040820/animation/actions/runs/43749960132): source Git blob SHA and SHA256 verified, real VRM embedded permissions confirm CC0, use by everyone, commercial use allowed, violence allowed.
-- [Anime foundation Blender import](https://github.com/Sonal040820/animation/actions/runs/43750368957): two true anime-styled avatars, three inspection renders, editable 41 MB Blender project.
+- [Anime foundation Blender import](https://github.com/Sonal040820/animation/actions/runs/43750803107): two true anime-styled avatars, three inspection renders, editable 41 MB Blender project, and complete 17/17 humanoid semantic mapping checked against each imported Blender armature.
 
 ## Approved asset registry
 
@@ -29,3 +29,9 @@ The anime avatars are existing third-party designs, NOT original male Kai or Ren
 Create original Kai/Ren character models with distinctive faces and costumes, verify true humanoid skeleton mapping and action retargeting, choreograph one strike-block-recovery sequence with measurable contact and foot locking, then render with existing Kokoro audio. Those are creative production tasks, not merely software setup.
 
 These tests establish actual 3D skinned imports and cloud rendering. They do not prove professional anime artwork or physics-based cinematic fight animation.
+
+## Latest CI acceptance
+
+- [Final Blender environment and 12 contract tests](https://github.com/Sonal040820/animation/actions/runs/43751013134): passed.
+- [Rig-proof regression after per-asset checksum fix](https://github.com/Sonal040820/animation/actions/runs/43750825902): passed.
+- [Licensed two-avatar VRM import + 17 human-bone semantic checks](https://github.com/Sonal040820/animation/actions/runs/43750803107): passed; download the editable .blend and stills from GitHub Artifacts.
