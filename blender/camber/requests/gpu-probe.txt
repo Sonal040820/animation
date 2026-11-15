@@ -2,3 +2,5 @@ GPU acceptance requested by authorized repository owner.
 Trigger: one-shot Xsmall NVIDIA GPU allocation and Blender Cycles 320x180 render.
 Max remote probe wall time: 600 seconds.
 No personal data or secrets are included in the GPU payload.
+
+Diagnostic-only retry: classify provider rejection with account fields redacted.
