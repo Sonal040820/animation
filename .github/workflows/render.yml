@@ -22,14 +22,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
-          cache-dependency-path: package-lock.json
       - name: Install rendering dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg espeak-ng
-          npm ci
-          npx hyperframes browser ensure
+          npm install --no-package-lock --ignore-scripts
+          ./node_modules/.bin/hyperframes browser ensure
       - name: Validate project directory
         shell: bash
         run: |
@@ -41,7 +39,6 @@ jobs:
             echo 'Missing project index.html or unsafe project path'; exit 1
           fi
       - name: Validate project
-        working-directory: ${{ github.workspace }}
         run: |
           cd "$PROJECT_DIR"
           ../../node_modules/.bin/hyperframes check --json
