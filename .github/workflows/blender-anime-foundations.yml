@@ -1,0 +1,52 @@
+name: Blender licensed anime foundations import
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'blender/scripts/prove_anime_vrm.py'
+      - 'blender/scripts/provision_anime_vrm.py'
+      - '.github/workflows/blender-anime-foundations.yml'
+permissions:
+  contents: read
+jobs:
+  anime-foundations:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - name: Provision and enforce embedded VRM model rights
+        run: |
+          python3 blender/scripts/provision_anime_vrm.py
+          python3 blender/scripts/validate_contracts.py --verify-files
+      - name: Install headless Blender runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ca-certificates curl xz-utils libx11-6 libxi6 libxrender1 libxrandr2 libxfixes3 libxkbcommon0 libgl1 libegl1 libsm6 libxext6 libxxf86vm1
+      - uses: actions/cache@v4
+        with:
+          path: .cache/blender/blender-4.5.16-linux-x64
+          key: blender-linux-x64-4.5.16-runtime-v1
+      - name: Install and verify Blender release
+        run: bash blender/scripts/install_blender.sh
+      - name: Install pinned VRM/MToon extension
+        run: bash blender/scripts/install_vrm_extension.sh
+      - name: Import two genuine anime avatars and render inspectable foundations
+        run: |
+          BIN="$GITHUB_WORKSPACE/.cache/blender/blender-4.5.16-linux-x64/blender"
+          "$BIN" --background --factory-startup --disable-autoexec --python-exit-code 1 --python blender/scripts/prove_anime_vrm.py
+          test -s renders/anime-foundations/import-report.json
+          test -s renders/anime-foundations/licensed_anime_foundations.blend
+      - name: Deliver reusable licensed asset library and three previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blender-licensed-anime-foundations
+          path: |
+            diagnostics/anime-vrm-provision.json
+            renders/anime-foundations/import-report.json
+            renders/anime-foundations/both.png
+            renders/anime-foundations/shino.png
+            renders/anime-foundations/vita.png
+            renders/anime-foundations/licensed_anime_foundations.blend
+          if-no-files-found: ignore
+          retention-days: 30
