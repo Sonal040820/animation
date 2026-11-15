@@ -1,0 +1,156 @@
+name: Camber GPU smoke test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: camber-gpu-smoke-test
+  cancel-in-progress: true
+
+jobs:
+  gpu-smoke-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CAMBER_API_KEY: ${{ secrets.CAMBER_API_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify secret exists
+        run: |
+          if [[ -z "$CAMBER_API_KEY" ]]; then
+            echo "CAMBER_API_KEY missing" >&2
+            exit 1
+          fi
+          echo "CAMBER_API_KEY present"
+
+      - name: Install Camber CLI
+        run: |
+          curl -sL https://cli.cambercloud.com/install-v2.sh | bash
+          echo "$HOME/.camber/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Verify CLI + auth
+        run: |
+          set -euo pipefail
+          camber version
+          camber me --output json > camber-me.json
+          camber team list --output json > camber-team-list.json || true
+
+      - name: Prepare smoke test payload
+        run: |
+          mkdir -p camber-smoke-test
+
+          cat > camber-smoke-test/blender_gpu_probe.py <<'PY'
+          import json
+          import os
+          import subprocess
+          import sys
+
+          result = {
+              "nvidia_smi": None,
+              "blender_version": None,
+              "gpu_detected_in_blender": None,
+          }
+
+          try:
+              smi = subprocess.check_output(["nvidia-smi"], stderr=subprocess.STDOUT, text=True)
+              result["nvidia_smi"] = smi
+          except Exception as e:
+              result["nvidia_smi"] = f"ERROR: {e}"
+
+          try:
+              ver = subprocess.check_output(["blender", "--version"], stderr=subprocess.STDOUT, text=True)
+              result["blender_version"] = ver
+          except Exception as e:
+              result["blender_version"] = f"ERROR: {e}"
+
+          probe_script = r'''
+          import bpy, json
+          out = {"engine": bpy.context.scene.render.engine, "cycles_devices": []}
+          try:
+              prefs = bpy.context.preferences
+              cprefs = prefs.addons["cycles"].preferences
+              for backend in ["CUDA", "OPTIX", "HIP", "ONEAPI", "METAL"]:
+                  try:
+                      cprefs.compute_device_type = backend
+                      cprefs.get_devices()
+                      devs = []
+                      for group in cprefs.devices:
+                          try:
+                              devs.append({
+                                  "name": getattr(group, "name", None),
+                                  "type": getattr(group, "type", None),
+                                  "use": getattr(group, "use", None),
+                              })
+                          except Exception:
+                              pass
+                      if devs:
+                          out["cycles_devices"].append({"backend": backend, "devices": devs})
+                  except Exception:
+                      pass
+          except Exception as e:
+              out["error"] = str(e)
+          print(json.dumps(out))
+          '''
+          with open("blender_probe_inner.py", "w", encoding="utf-8") as f:
+              f.write(probe_script)
+
+          try:
+              probe = subprocess.check_output(
+                  ["blender", "--background", "--factory-startup", "--python", "blender_probe_inner.py"],
+                  stderr=subprocess.STDOUT,
+                  text=True
+              )
+              result["gpu_detected_in_blender"] = probe
+          except Exception as e:
+              result["gpu_detected_in_blender"] = f"ERROR: {e}"
+
+          with open("gpu-smoke-result.json", "w", encoding="utf-8") as f:
+              json.dump(result, f, indent=2)
+          print("GPU_SMOKE_TEST_DONE")
+          PY
+
+      - name: Create stash directory
+        run: |
+          set -euo pipefail
+          USERNAME=$(python - <<'PY'
+          import json
+          with open("camber-me.json","r",encoding="utf-8") as f:
+              data=json.load(f)
+          print(data.get("username") or data.get("unique_name") or data.get("name") or "")
+          PY
+          )
+          if [[ -z "$USERNAME" ]]; then
+            echo "Could not determine Camber username from camber-me.json" >&2
+            exit 1
+          fi
+          echo "CAMBER_USERNAME=$USERNAME" >> "$GITHUB_ENV"
+          camber stash mkdir "stash://$USERNAME/blender-gpu-smoke-test" || true
+          camber stash cp camber-smoke-test "stash://$USERNAME/blender-gpu-smoke-test/" -r
+
+      - name: Show job create help for debugging
+        run: |
+          camber job create --help > camber-job-create-help.txt 2>&1 || true
+          camber job --help > camber-job-help.txt 2>&1 || true
+
+      - name: Stop here if job command syntax needs adjustment
+        run: |
+          echo "Next step is the only unverified part: exact Camber job submission syntax."
+          echo "This workflow has prepared everything up to job submission."
+          echo "Inspect camber-job-create-help.txt artifact/log output, then wire the final submit command."
+
+      - name: Upload diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: camber-gpu-smoke-test-preflight
+          path: |
+            camber-me.json
+            camber-team-list.json
+            camber-job-create-help.txt
+            camber-job-help.txt
