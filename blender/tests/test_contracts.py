@@ -17,9 +17,11 @@ class ContractTests(unittest.TestCase):
     def test_registry_contains_only_reviewed_fixture_metadata(self):
         registry = load_json(ROOT / "blender/assets/registry.json")
         assets = validate_asset_registry(registry, workspace=ROOT)
-        self.assertEqual({a["id"] for a in assets}, {"khronos_rigged_figure", "sendagaya_shino", "vita"})
+        self.assertEqual({a["id"] for a in assets}, {"khronos_rigged_figure", "sendagaya_shino", "vita", "vroid_hair_sample_male", "vroid_sakurada_fumiriya"})
         self.assertEqual(next(a for a in assets if a["id"] == "khronos_rigged_figure")["sha256"], "d6be85417d3e256861ee733eea6916093a7af7c79c16366181fd8abcaeb38cf5")
         self.assertTrue(all(a["rights_approved"] for a in assets))
+        self.assertTrue(all(a["commercial_use_allowed"] and a["violence_allowed"] for a in assets))
+        self.assertEqual({a["license"] for a in assets if a["id"].startswith("vroid_")}, {"CC0-1.0"})
 
     def test_schema_documents_parse(self):
         for name in ("asset", "shot", "production"):
