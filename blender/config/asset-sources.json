@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "name": "Poly Haven",
+      "url": "https://polyhaven.com/",
+      "license": "CC0-1.0",
+      "kind": "HDRIs, textures, 3D models",
+      "automatic_download": false,
+      "license_evidence": "https://polyhaven.com/license"
+    },
+    {
+      "name": "ambientCG",
+      "url": "https://ambientcg.com/",
+      "license": "CC0-1.0",
+      "kind": "materials, textures, models",
+      "automatic_download": false,
+      "license_evidence": "https://docs.ambientcg.com/license/"
+    },
+    {
+      "name": "Kenney",
+      "url": "https://kenney.nl/assets",
+      "license": "CC0-1.0",
+      "kind": "modular props, 3D models, SFX",
+      "automatic_download": false,
+      "license_evidence": "https://kenney.nl/support"
+    },
+    {
+      "name": "Blender Studio",
+      "url": "https://studio.blender.org/characters/",
+      "license": "per-asset",
+      "kind": "rigs and sample characters",
+      "automatic_download": false
+    },
+    {
+      "name": "Mixamo",
+      "url": "https://www.mixamo.com/",
+      "license": "provider-specific",
+      "kind": "humanoid motion references",
+      "automatic_download": false
+    },
+    {
+      "name": "VRoid Hub",
+      "url": "https://hub.vroid.com/",
+      "license": "per-character",
+      "kind": "anime VRM characters, check violent-use and redistribution terms",
+      "automatic_download": false
+    },
+    {
+      "name": "Blendkit",
+      "url": "https://www.blenderkit.com/",
+      "license": "per-asset",
+      "kind": "models and materials",
+      "automatic_download": false
+    }
+  ]
+}
