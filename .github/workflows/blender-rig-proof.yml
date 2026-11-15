@@ -1,0 +1,56 @@
+name: Blender 3D character pipeline proof
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'blender/scripts/prove_character_pipeline.py'
+      - 'blender/scripts/provision_fixture.py'
+      - 'blender/fixtures/**'
+      - '.github/workflows/blender-rig-proof.yml'
+permissions:
+  contents: read
+jobs:
+  character-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify source license and fetch pinned rigged test actor
+        run: |
+          python3 blender/scripts/provision_fixture.py --output diagnostics/rigged-figure-provenance.json
+          python3 blender/scripts/validate_contracts.py --verify-files
+      - name: Install headless Cycles CPU dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ca-certificates curl xz-utils libx11-6 libxi6 libxrender1 libxrandr2 libxfixes3 libxkbcommon0 libgl1 libegl1 libsm6 libxext6 libxxf86vm1 ffmpeg
+      - uses: actions/cache@v4
+        with:
+          path: .cache/blender/blender-4.5.16-linux-x64
+          key: blender-linux-x64-4.5.16-runtime-v1
+      - name: Install official checksum-verified Blender
+        run: bash blender/scripts/install_blender.sh
+      - name: Import two licensed skinned characters and render 24-frame QA clip
+        run: |
+          BIN="$GITHUB_WORKSPACE/.cache/blender/blender-4.5.16-linux-x64/blender"
+          "$BIN" --background --factory-startup --disable-autoexec --python-exit-code 1 --python blender/scripts/prove_character_pipeline.py
+      - name: Encode and validate 1-second technical preview
+        run: |
+          test "$(find renders/technical-rig-proof -maxdepth 1 -type f -name 'frame_*.png' | wc -l)" -eq 24
+          ffmpeg -hide_banner -loglevel error -y -framerate 24 -start_number 1 -i renders/technical-rig-proof/frame_%04d.png -c:v libx264 -pix_fmt yuv420p -preset medium -crf 19 -movflags +faststart renders/technical-rig-proof/preview.mp4
+          ffprobe -v error -show_entries format=duration,size -of json renders/technical-rig-proof/preview.mp4 | tee renders/technical-rig-proof/media-check.json
+          test -s renders/technical-rig-proof/proof.json
+      - name: Upload licensed model rig/render technical proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blender-rig-and-camera-technical-proof
+          path: |
+            diagnostics/rigged-figure-provenance.json
+            renders/technical-rig-proof/proof.json
+            renders/technical-rig-proof/media-check.json
+            renders/technical-rig-proof/preview.mp4
+            renders/technical-rig-proof/frame_0001.png
+            renders/technical-rig-proof/frame_0012.png
+            renders/technical-rig-proof/frame_0024.png
+          if-no-files-found: ignore
+          retention-days: 14
