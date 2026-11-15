@@ -12,10 +12,14 @@ for (const line of cues.dialogue) {
  const dest=path.join(OUT,line.id+".wav");
  const raw=path.join(OUT,line.id+".raw.wav");
  const phrase=line.text;
- let engine="Kokoro";
- const result=run(path.join(process.cwd(),"node_modules/.bin/hyperframes"),[
-   "tts",phrase,"--voice",line.voice,"--speed",String(line.speed),"-o",raw
- ]);
+ let engine="Kokoro ONNX";
+ let result={status:0,stderr:"",stdout:""};
+ if(!fs.existsSync(raw)||fs.statSync(raw).size<2000){
+  engine="HyperFrames Kokoro";
+  result=run(path.join(process.cwd(),"node_modules/.bin/hyperframes"),[
+    "tts",phrase,"--voice",line.voice,"--speed",String(line.speed),"-o",raw
+  ]);
+ }
  if(result.status!==0||!fs.existsSync(raw)||fs.statSync(raw).size<2000){
   console.warn("Kokoro synthesis unavailable for "+line.id+": "+String(result.stderr||result.stdout||"no diagnostic").slice(0,850));
   engine="eSpeak-NG FALLBACK";
