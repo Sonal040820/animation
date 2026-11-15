@@ -16,6 +16,38 @@
       "violence_allowed": true,
       "attribution": "Rigged Figure © 2017 Cesium (CC BY 4.0), sourced from Khronos glTF Sample Assets; technical demonstration",
       "notes": "Simple rigged test figure only; license is checked for technical use and footage. Not suitable as a finished anime hero."
+    },
+    {
+      "id": "sendagaya_shino",
+      "kind": "character",
+      "relative_path": "assets-local/candidates/shino.vrm",
+      "sha256": "4ef67b30a1867aee11727a3491e57fd8663b2f171e9bddf00a0c767703777883",
+      "source_url": "https://raw.githubusercontent.com/theminhnguyen/wonderdeck/2929925ae31411b94da54b395fbfb62abcf3f6ab/public/models/shino.vrm",
+      "license": "CC0-1.0",
+      "license_evidence_url": "https://github.com/theminhnguyen/wonderdeck/blob/main/public/models/README.md",
+      "creator": "Sendagaya Shino rights-holder (per original VRM metadata)",
+      "rights_approved": true,
+      "redistribution_allowed": true,
+      "commercial_use_allowed": true,
+      "violence_allowed": true,
+      "attribution": "CC0 avatar sendagaya_shino; source: wonderdeck public/models; imported and modified for technical testing",
+      "notes": "Anime avatar foundation only. Verified embedded VRM0 rights on GitHub; exact source bytes pinned. May not be falsely presented as exclusive original Kai/Ren artwork."
+    },
+    {
+      "id": "vita",
+      "kind": "character",
+      "relative_path": "assets-local/candidates/vita.vrm",
+      "sha256": "0905d95e2851a3227fa35ce48e1f36dc5ae6c10e1c4e3a8943c9e338885d0f7e",
+      "source_url": "https://raw.githubusercontent.com/theminhnguyen/wonderdeck/2929925ae31411b94da54b395fbfb62abcf3f6ab/public/models/vita.vrm",
+      "license": "CC0-1.0",
+      "license_evidence_url": "https://github.com/theminhnguyen/wonderdeck/blob/main/public/models/README.md",
+      "creator": "Vita rights-holder (per original VRM metadata)",
+      "rights_approved": true,
+      "redistribution_allowed": true,
+      "commercial_use_allowed": true,
+      "violence_allowed": true,
+      "attribution": "CC0 avatar vita; source: wonderdeck public/models; imported and modified for technical testing",
+      "notes": "Anime avatar foundation only. Verified embedded VRM0 rights on GitHub; exact source bytes pinned. May not be falsely presented as exclusive original Kai/Ren artwork."
     }
   ]
 }
