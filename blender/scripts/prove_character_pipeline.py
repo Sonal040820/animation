@@ -102,10 +102,7 @@ def fixture_actor(name, palette, x_at_start, x_at_end):
     group.keyframe_insert(data_path="location", frame=1)
     group.location.x = x_at_end - scale*x_center
     group.keyframe_insert(data_path="location", frame=24)
-    if group.animation_data and group.animation_data.action:
-        for fcurve in group.animation_data.action.fcurves:
-            for p in fcurve.keyframe_points:
-                p.interpolation = "BEZIER"
+    # Do not traverse bpy Action.fcurves: Blender 4.5 layered actions use channel bags.
     # We keep the source rig's embedded skeletal actions; the actor root
     # animation is only a positional/IK integration smoke test.
     return {"name": name, "objects": len(objects), "meshes": len(meshes),
