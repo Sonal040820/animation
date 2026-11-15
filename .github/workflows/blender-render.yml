@@ -51,7 +51,7 @@ jobs:
             echo 'No private asset store configured. Only existing approved local assets can render.'
           fi
       - name: Enforce asset source, rights and SHA-256
-        run: python3 blender/scripts/validate_contracts.py --verify-files
+        run: python3 blender/scripts/validate_contracts.py --verify-files --asset-id "$ASSET_ID"
       - name: Install headless rendering dependencies
         run: |
           sudo apt-get update
