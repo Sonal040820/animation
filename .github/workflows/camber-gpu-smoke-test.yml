@@ -2,9 +2,6 @@ name: Camber GPU / Blender acceptance
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'blender/camber/requests/gpu-probe.txt'
 
 permissions:
   contents: read
