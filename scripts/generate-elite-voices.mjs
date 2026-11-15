@@ -17,6 +17,7 @@ for (const line of cues.dialogue) {
    "tts",phrase,"--voice",line.voice,"--speed",String(line.speed),"-o",raw
  ]);
  if(result.status!==0||!fs.existsSync(raw)||fs.statSync(raw).size<2000){
+  console.warn("Kokoro synthesis unavailable for "+line.id+": "+String(result.stderr||result.stdout||"no diagnostic").slice(0,850));
   engine="eSpeak-NG FALLBACK";
   const voice=line.speaker==="Narrator"?"en-gb+f3":line.speaker==="Kai"?"en-us+m3":"en-us+m2";
   const pace=line.speaker==="Ren"?"148":"135";
