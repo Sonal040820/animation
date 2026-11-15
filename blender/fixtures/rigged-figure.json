@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "khronos_rigged_figure",
+  "purpose": "technical-rigging-test-not-an-anime-character",
+  "asset_kind": "character",
+  "filename": "RiggedFigure.glb",
+  "relative_path": "assets-local/fixtures/RiggedFigure.glb",
+  "source_url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/8f492390ddc7a2ae221a1369ef560589cf8c70fb/Models/RiggedFigure/glTF-Binary/RiggedFigure.glb",
+  "source_commit": "8f492390ddc7a2ae221a1369ef560589cf8c70fb",
+  "git_blob_sha1": "c505a33dfa5ba84bd5f3dd0a85f74ee4c9978322",
+  "sha256": null,
+  "size_bytes": 50116,
+  "license": "CC-BY-4.0",
+  "license_evidence_url": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/main/Models/RiggedFigure/README.md",
+  "creator": "Cesium",
+  "attribution": "Rigged Figure © 2017 Cesium (CC BY 4.0), sourced from Khronos glTF Sample Assets; technical demonstration",
+  "rights_approved": true,
+  "commercial_use_allowed": true,
+  "redistribution_allowed": true,
+  "violence_allowed": true,
+  "notes": "Simple rigged test figure only; license is checked for technical use and footage. Not suitable as a finished anime hero."
+}
