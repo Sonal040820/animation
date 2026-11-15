@@ -18,7 +18,7 @@ jobs:
       - name: Verify source license and fetch pinned rigged test actor
         run: |
           python3 blender/scripts/provision_fixture.py --output diagnostics/rigged-figure-provenance.json
-          python3 blender/scripts/validate_contracts.py --verify-files
+          python3 blender/scripts/validate_contracts.py --verify-files --asset-id khronos_rigged_figure
       - name: Install headless Cycles CPU dependencies
         run: |
           sudo apt-get update
