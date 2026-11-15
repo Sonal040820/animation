@@ -14,7 +14,7 @@ A GitHub-hosted, HyperFrames-based production workspace for **editable animation
 ## Run remotely (no local installation)
 
 1. The environment setup has already been verified; rerun **Actions → Environment setup** only when dependencies change.
-2. Push changes to `projects/storm-vs-ash/`, its soundtrack generator, or the render workflow to automatically run the **Render video** workflow. For another committed project, manually dispatch **Render video** with that project's path.
+2. Push changes to `projects/storm-vs-ash-elite/` (or the earlier `projects/storm-vs-ash/`), soundtrack scripts, or the render workflow to automatically run the **Render video** workflow. For another committed project, manually dispatch **Render video** with that project's path.
 3. From a successful run, download the artifact named **hyperframes-final-video**. Each job creates a new temporary runner and installs needed dependencies.
 
 ## How animations are authored
@@ -42,3 +42,15 @@ Sources: [HyperFrames README](https://github.com/heygen-com/hyperframes), [skill
 The pilot film is in [projects/storm-vs-ash](projects/storm-vs-ash). It is a 12-second, 1080×1920, 30 fps neon cel-shaded anime-inspired rooftop duel between two original vector fighters. Action and camera animation are driven by a seekable GSAP timeline in the HyperFrames composition; the score and effects are synthesized deterministically by [scripts/generate-duel-audio.mjs](scripts/generate-duel-audio.mjs). No third-party audio files or commercial service credentials are required.
 
 A full-resolution MP4 with H.264/AAC streams was generated, decoded, and validated in [successful render 43734320264](https://github.com/Sonal040820/animation/actions/runs/43734320264). Download **hyperframes-final-video** from the run's Artifacts section. This is a 2D-vector anime-inspired proof of concept, **not** full character-by-character traditional anime animation. The CI test verifies technical delivery; artistic review is a separate step.
+
+## Second film: STORM × ASH — Elite Cut (23 seconds)
+
+The newer film is in [projects/storm-vs-ash-elite](projects/storm-vs-ash-elite). Its [23-second shooting screenplay](projects/storm-vs-ash-elite/SCREENPLAY.md) specifies every second of the action, dialogue, shots, sound and fight geography. [AUDIO_CUES.json](projects/storm-vs-ash-elite/AUDIO_CUES.json) binds six directed dialogue passages and twenty Foley/transient cues to exact timestamps.
+
+**Rendering:** 1080 × 1920 (9:16), 24 fps, HyperFrames 0.9.52, headless Chromium/Canvas2D seekable visual composition, H.264 video + mixed AAC audio. The characters use two-bone inverse kinematics, planted-leg targets, stylized weight shifts, deterministic ballistic debris, delayed scarf/cape movement, stylized impact frames, camera tracking and action-specific motion lines. This is **2D hand-programmed anime-inspired motion graphics, not fully hand-drawn sakuga, a full skeletal-dynamics physics solver or generative-video-model cinema**.
+
+**Sound:** Fully original stereo procedural instrumental score, ambience, landing, dash, impact, cloth, charge and debris synthesized by [scripts/generate-elite-audio.mjs](scripts/generate-elite-audio.mjs). Narrator, Kai and Ren voices are synthesized on the runner using [Kokoro ONNX](scripts/kokoro-generate-elite.py) with distinct English voices, aligned and dynamically compressed by [scripts/generate-elite-voices.mjs](scripts/generate-elite-voices.mjs). The voice engine and time-stretch ratios are recorded in each render artifact. Optional paid third-party generation is **not** enabled.
+
+**Reproducibility:** The runner installs Node, FFmpeg, Python and Kokoro ONNX, caches the freely licensed CPU voice model, generates all audio locally, validates the HyperFrames composition, captures storyboard frames, renders the MP4 and then masters the mix with an FFmpeg -16 LUFS target/-1.5dBTP ceiling. Download **hyperframes-final-video** under the successful run's GitHub Actions artifacts.
+
+Earlier full-duration H.264/AAC test: [run 43738048261](https://github.com/Sonal040820/animation/actions/runs/43738048261). Latest edits may have a newer run; [see Actions](https://github.com/Sonal040820/animation/actions).
