@@ -1,0 +1,79 @@
+name: Kai–Ren first-scene CPU previsualization
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'blender/scripts/kai_ren_shot01.py'
+      - '.github/workflows/kai-ren-shot01.yml'
+permissions:
+  contents: read
+concurrency:
+  group: kai-ren-shot01
+  cancel-in-progress: true
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python source syntax and no-token sanity checks
+        run: |
+          set -euo pipefail
+          python3 -m py_compile blender/scripts/kai_ren_shot01.py
+          if grep -E -n 'CAMBER_API_KEY|(^|[^A-Z_])TOKEN=|secret[s]?\.' blender/scripts/kai_ren_shot01.py; then
+            echo 'Unexpected credential-related source in scene script'
+            exit 1
+          fi
+      - name: Install headless Blender runtime and ffmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates curl xz-utils libx11-6 libxi6 libxrender1 libxrandr2 \
+            libxfixes3 libxkbcommon0 libgl1 libegl1 libsm6 libxext6 libxxf86vm1 ffmpeg
+      - uses: actions/cache@v4
+        with:
+          path: .cache/blender/blender-4.5.16-linux-x64
+          key: blender-linux-x64-4.5.16-runtime-v1
+      - name: Install official checksum-verified Blender 4.5.16
+        run: bash blender/scripts/install_blender.sh
+      - name: Render original procedurally animated Kai–Ren shot
+        timeout-minutes: 75
+        run: |
+          set -euo pipefail
+          BIN="$GITHUB_WORKSPACE/.cache/blender/blender-4.5.16-linux-x64/blender"
+          "$BIN" --background --factory-startup --disable-autoexec --python-exit-code 1 \
+            --python blender/scripts/kai_ren_shot01.py
+          test -s renders/kai-ren/shot-01/kai_ren_shot_01.blend
+          test "$(find renders/kai-ren/shot-01 -maxdepth 1 -name 'frame_*.png' | wc -l)" -eq 24
+      - name: Encode movie and validate frame delivery
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -y -framerate 24 -start_number 1 \
+            -i renders/kai-ren/shot-01/frame_%04d.png \
+            -c:v libx264 -crf 19 -pix_fmt yuv420p -movflags +faststart \
+            renders/kai-ren/shot-01/kai_ren_preview.mp4
+          test -s renders/kai-ren/shot-01/kai_ren_preview.mp4
+          ffprobe -v error -show_entries stream=codec_name,width,height,duration -of json \
+            renders/kai-ren/shot-01/kai_ren_preview.mp4 \
+            > renders/kai-ren/shot-01/media-check.json
+          python3 - <<'PY'
+          import json
+          info=json.load(open('renders/kai-ren/shot-01/media-check.json'))
+          assert any(s['codec_name']=='h264' and s['width']==640 and s['height']==360 for s in info['streams'])
+          print("KAI_REN_MP4_VALIDATED")
+          PY
+      - name: Deliver playable shot, editable scene and film evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kai-ren-first-shot-01
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            renders/kai-ren/shot-01/kai_ren_preview.mp4
+            renders/kai-ren/shot-01/kai_ren_shot_01.blend
+            renders/kai-ren/shot-01/frame_0001.png
+            renders/kai-ren/shot-01/frame_0012.png
+            renders/kai-ren/shot-01/frame_0024.png
+            renders/kai-ren/shot-01/shot.json
+            renders/kai-ren/shot-01/media-check.json
