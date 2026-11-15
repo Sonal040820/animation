@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.hyperframes/
+.media/
+renders/
+output/
+*.mp4
+*.wav
+*.mp3
+.DS_Store
