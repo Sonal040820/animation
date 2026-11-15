@@ -23,10 +23,11 @@ jobs:
           python3 -m py_compile \
             blender/studio/combat.py \
             blender/scripts/kai_ren_elite01.py \
-            blender/scripts/kai_ren_audio.py
-          python3 blender/scripts/provision_anime_vrm.py > /dev/null
+            blender/scripts/kai_ren_audio.py \
+            blender/scripts/provision_anime_males.py
+          python3 blender/scripts/provision_anime_males.py > /dev/null
           python3 blender/scripts/validate_contracts.py --verify-files \
-            --asset-id sendagaya_shino --asset-id vita > /dev/null
+            --asset-id vroid_hair_sample_male --asset-id vroid_sakurada_fumiriya > /dev/null
           echo "LICENSED_AVATAR_SOURCE_AND_SHA256_PASS"
       - name: Install headless render dependencies
         run: |
