@@ -227,7 +227,7 @@ for radius,mat in ((.90,BLUE),(1.12,GOLD),(.54,IMPACT)):
     pts=[(radius*math.cos(i*2*math.pi/100),radius*math.sin(i*2*math.pi/100),.028)
          for i in range(100)]
     ring=polyline("Impact_Ground_Ring_%.2f"%radius,pts,mat,.019,True)
-    key_scale(ring,[(1,.001),(23,.001),(27,.45),(30,1.4),(35,2.6),(43,4),(48,4.5)])
+    key_scale(ring,[(1,.001),(23,.001),(27,.45),(30,1.0),(35,1.8),(43,2.8),(48,3.1)])
 
 for i in range(34):
     theta=(i/34)*2*math.pi
@@ -286,6 +286,9 @@ except Exception as e:
 
 scene.frame_set(26)
 metrics=contact_metrics(fighters,26)
+print("KAI_REN_MEASURED_CONTACT="+str(metrics["hand_distance_m"]),flush=True)
+if metrics["hand_distance_m"] > .80:
+    raise RuntimeError("Contact choreography failed: hands remain too far apart. Revise root movement before rendering.")
 scene.frame_set(1)
 # The primary artifact keeps its editable rig actions and procedural environment.
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT/"kai_ren_elite_01.blend"),check_existing=False)
