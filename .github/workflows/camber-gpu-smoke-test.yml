@@ -14,20 +14,11 @@ jobs:
   gpu-smoke-test:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-    env:
-      CAMBER_API_KEY: ${{ secrets.CAMBER_API_KEY }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Verify secret exists
-        run: |
-          if [[ -z "$CAMBER_API_KEY" ]]; then
-            echo "CAMBER_API_KEY missing" >&2
-            exit 1
-          fi
-          echo "CAMBER_API_KEY present"
 
       - name: Install Camber CLI
         run: |
@@ -36,11 +27,17 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Verify CLI + auth
+        env:
+          CAMBER_API_KEY: ${{ secrets.CAMBER_API_KEY }}
         run: |
           set -euo pipefail
+          if [[ -z "$CAMBER_API_KEY" ]]; then
+            echo "Camber API key secret is missing" >&2
+            exit 1
+          fi
           camber version
-          camber me --output json > camber-me.json
-          camber team list --output json > camber-team-list.json || true
+          camber me --output json > "$RUNNER_TEMP/camber-me.json"
+          echo "Camber authentication passed; account details not logged or uploaded."
 
       - name: Prepare smoke test payload
         run: |
@@ -116,23 +113,27 @@ jobs:
           print("GPU_SMOKE_TEST_DONE")
           PY
 
-      - name: Create stash directory
+      - name: Create stash directory and stage probe
+        env:
+          CAMBER_API_KEY: ${{ secrets.CAMBER_API_KEY }}
         run: |
           set -euo pipefail
           USERNAME=$(python - <<'PY'
-          import json
-          with open("camber-me.json","r",encoding="utf-8") as f:
-              data=json.load(f)
+          import json, os
+          with open(os.path.join(os.environ["RUNNER_TEMP"], "camber-me.json"), encoding="utf-8") as f:
+              data = json.load(f)
           print(data.get("username") or data.get("unique_name") or data.get("name") or "")
           PY
           )
           if [[ -z "$USERNAME" ]]; then
-            echo "Could not determine Camber username from camber-me.json" >&2
+            echo "Camber account identifier was unavailable" >&2
             exit 1
           fi
-          echo "CAMBER_USERNAME=$USERNAME" >> "$GITHUB_ENV"
-          camber stash mkdir "stash://$USERNAME/blender-gpu-smoke-test" || true
-          camber stash cp camber-smoke-test "stash://$USERNAME/blender-gpu-smoke-test/" -r
+          echo "::add-mask::$USERNAME"
+          STASH_DIR="stash://$USERNAME/blender-gpu-smoke-test"
+          camber stash mkdir "$STASH_DIR" >/dev/null 2>&1 || true
+          camber stash cp camber-smoke-test "$STASH_DIR/" -r >/dev/null
+          echo "Smoke-test code staged without disclosing account identifiers."
 
       - name: Show job create help for debugging
         run: |
@@ -145,12 +146,12 @@ jobs:
           echo "This workflow has prepared everything up to job submission."
           echo "Inspect camber-job-create-help.txt artifact/log output, then wire the final submit command."
 
-      - name: Upload diagnostics
+      - name: Upload non-account CLI help only
         uses: actions/upload-artifact@v4
         with:
           name: camber-gpu-smoke-test-preflight
+          retention-days: 1
+          if-no-files-found: error
           path: |
-            camber-me.json
-            camber-team-list.json
             camber-job-create-help.txt
             camber-job-help.txt
