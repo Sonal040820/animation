@@ -6,6 +6,7 @@ on:
       - 'projects/storm-vs-ash-elite/**'
       - 'scripts/generate-elite-audio.mjs'
       - 'scripts/generate-elite-voices.mjs'
+      - 'scripts/kokoro-generate-elite.py'
       - 'scripts/generate-duel-audio.mjs'
       - '.github/workflows/render.yml'
   workflow_dispatch:
@@ -53,7 +54,35 @@ jobs:
       - name: Synthesize original cinematic score and Foley for Elite Cut
         if: env.PROJECT_DIR == 'projects/storm-vs-ash-elite'
         run: node scripts/generate-elite-audio.mjs "$PROJECT_DIR/assets/audio"
-      - name: Generate character and narrator voices on runner
+      - uses: actions/setup-python@v5
+        if: env.PROJECT_DIR == 'projects/storm-vs-ash-elite'
+        with:
+          python-version: '3.12'
+      - name: Cache Kokoro ONNX model files
+        if: env.PROJECT_DIR == 'projects/storm-vs-ash-elite'
+        uses: actions/cache@v4
+        with:
+          path: .cache/kokoro
+          key: kokoro-v1.0-onnx-model-files-v1.1
+      - name: Synthesize natural narrator and character voices on CPU
+        if: env.PROJECT_DIR == 'projects/storm-vs-ash-elite'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python -m pip install --quiet kokoro-onnx soundfile
+          mkdir -p .cache/kokoro
+          if [[ ! -s .cache/kokoro/kokoro-v1.0.onnx ]]; then
+            curl -fL --retry 3 --connect-timeout 25 \
+              'https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/kokoro-v1.0.onnx' \
+              -o .cache/kokoro/kokoro-v1.0.onnx
+          fi
+          if [[ ! -s .cache/kokoro/voices-v1.0.bin ]]; then
+            curl -fL --retry 3 --connect-timeout 25 \
+              'https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/voices-v1.0.bin' \
+              -o .cache/kokoro/voices-v1.0.bin
+          fi
+          python scripts/kokoro-generate-elite.py "$PROJECT_DIR" .cache/kokoro
+      - name: Normalize dialogue audio and record voice provenance
         if: env.PROJECT_DIR == 'projects/storm-vs-ash-elite'
         run: node scripts/generate-elite-voices.mjs "$PROJECT_DIR"
       - name: HyperFrames check
