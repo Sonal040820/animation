@@ -1,0 +1,26 @@
+name: Blender anime VRM rights audit
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'blender/fixtures/anime-vrm-candidates.json'
+      - 'blender/scripts/inspect_vrm_rights.py'
+      - '.github/workflows/blender-anime-vrm-audit.yml'
+permissions:
+  contents: read
+jobs:
+  evaluate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect source authenticity and embedded avatar usage licenses
+        run: python3 blender/scripts/inspect_vrm_rights.py --report diagnostics/anime-vrm-rights.json
+      - name: Archive rights evaluation, no raw VRM assets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: anime-vrm-rights-audit
+          path: diagnostics/anime-vrm-rights.json
+          if-no-files-found: ignore
+          retention-days: 14
