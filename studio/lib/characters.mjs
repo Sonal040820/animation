@@ -30,9 +30,17 @@ export function drawCharacter(ctx,{x,y,scale=1,color='#65c4db',rig='block',expre
   const eyeY=expression==='scared'?-110:-112;
   ellipse(ctx,-12,eyeY+breath,expression==='scared'?4.8:3,expression==='scared'?6:3,'#17202d');
   ellipse(ctx,12,eyeY+breath,expression==='scared'?4.8:3,expression==='scared'?6:3,'#17202d');
-  const brow=expression==='angry'?6:expression==='scared'?-9:-4;
-  stroke(ctx,[-19,eyeY+brow+breath],[-6,eyeY-6+breath],2.2,'#27313d');
-  stroke(ctx,[6,eyeY-6+breath],[19,eyeY+brow+breath],2.2,'#27313d');
+  // Scared eyes lift the INNER brows (the reverse would read as angry).
+  if(expression==='scared'){
+    stroke(ctx,[-21,eyeY-8+breath],[-6,eyeY-15+breath],2.2,'#27313d');
+    stroke(ctx,[6,eyeY-15+breath],[21,eyeY-8+breath],2.2,'#27313d');
+    ellipse(ctx,-10.3,eyeY-2+breath,1.35,1.4,'#f8eee6');
+    ellipse(ctx,13.2,eyeY-2+breath,1.35,1.4,'#f8eee6');
+  }else{
+    const brow=expression==='angry'?6:-4;
+    stroke(ctx,[-19,eyeY+brow+breath],[-6,eyeY-6+breath],2.2,'#27313d');
+    stroke(ctx,[6,eyeY-6+breath],[19,eyeY+brow+breath],2.2,'#27313d');
+  }
   if(expression==='scared')ellipse(ctx,0,-93+breath,4,7,'#6f3c48');
   else if(expression==='happy')stroke(ctx,[-7,-93+breath],[7,-93+breath],2,'#6f3c48');
   else stroke(ctx,[-5,-92+breath],[5,-92+breath],1.5,'#6f3c48');
