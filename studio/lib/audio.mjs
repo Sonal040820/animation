@@ -315,12 +315,19 @@ export function mix(project, duration) {
   const voice = path.join(project.dir, 'timeline', 'voice.wav');
   const voicePresent = fs.existsSync(voice) && fs.statSync(voice).size > 100;
 
-  const cues = shots.flatMap(s =>
-    (s.sfx || []).map(c => ({
+  const cues = shots.flatMap(s => {
+    const baseCues = (s.sfx || []).map(c => ({
       type: c.type || 'tick',
       time: (Number(s.start) || 0) + (Number(c.offset) || 0)
-    }))
-  );
+    }));
+    const wordCues = (s.resolvedCues || s.cues || [])
+      .filter(c => c && (c.action === 'sfx' || c.sfx) && Number.isFinite(Number(c.at ?? ((Number(s.start) || 0) + (Number(c.localTime) || 0)))))
+      .map(c => ({
+        type: String(c.sfx || c.type || 'tick'),
+        time: Number.isFinite(Number(c.at)) ? Number(c.at) : (Number(s.start) || 0) + (Number(c.localTime) || 0)
+      }));
+    return [...baseCues, ...wordCues];
+  });
   const ambienceSpans = shots
     .filter(s => s.ambience)
     .map(s => ({

@@ -190,6 +190,9 @@ export function planScript(scriptText,{slug='planned',voice='af_heart',rules=loa
       shot.transition='flash';
       shot.transitionDuration=0.22;
     }
+    if(Array.isArray(r.cues)&&r.cues.length){
+      shot.cues=r.cues.map(c=>({...c}));
+    }
     if(r.ambience)shot.ambience=r.ambience;
     if(Number.isFinite(Number(r.fadeIn)))shot.fadeIn=Number(r.fadeIn);
     if(Number.isFinite(Number(r.fadeOut)))shot.fadeOut=Number(r.fadeOut);

@@ -162,12 +162,81 @@ export function resolveProjectShots(rawShots,lineSource,config={}){
   return shots;
 }
 
+export function findWordTimestamp(words,targetWord,shotStart=0,shotEnd=Infinity){
+  const norm=String(targetWord||'').replace(/[^a-z0-9:]/gi,'').toLowerCase();
+  if(!norm||!Array.isArray(words)||!words.length)return null;
+  const searchPool=[];
+  for(const w of words){
+    const ws=Number(w.start),we=Number(w.end);
+    if(!Number.isFinite(ws)||!Number.isFinite(we))continue;
+    if(we>=shotStart-0.15&&ws<=shotEnd+0.15)searchPool.push(w);
+  }
+  const pool=searchPool.length?searchPool:words;
+  for(const w of pool){
+    const tokens=String(w.text||'').match(/[^\s]+/g)||[];
+    if(!tokens.length)continue;
+    const weights=tokens.map(tok=>Math.max(1,tok.replace(/[^a-z0-9]/gi,'').length));
+    const sum=weights.reduce((a,b)=>a+b,0);
+    let cursor=Number(w.start);
+    const span=Math.max(0.01,Number(w.end)-cursor);
+    for(let i=0;i<tokens.length;i++){
+      const dur=span*(weights[i]/sum);
+      const tokNorm=tokens[i].replace(/[^a-z0-9:]/gi,'').toLowerCase();
+      if(tokNorm===norm){
+        return {start:+cursor.toFixed(3),end:+(cursor+dur).toFixed(3),word:tokens[i]};
+      }
+      cursor+=dur;
+    }
+  }
+  return null;
+}
+
+export function resolveShotCues(shots,words=[],lines=[]){
+  return shots.map(shot=>{
+    if(!Array.isArray(shot.cues)||!shot.cues.length)return shot;
+    const shotStart=Number(shot.start)||0;
+    const shotEnd=shotStart+(Number(shot.duration)||1);
+    const resolvedCues=shot.cues.map(cue=>{
+      if(!cue||typeof cue!=='object')return cue;
+      let at=Number.isFinite(Number(cue.at))?Number(cue.at):null;
+      let localTime=Number.isFinite(Number(cue.offset))?Number(cue.offset):null;
+      let matchedWord=null;
+      if(cue.at_word){
+        const hit=findWordTimestamp(words,cue.at_word,shotStart,shotEnd);
+        if(hit){
+          at=hit.start;
+          localTime=+Math.max(0,hit.start-shotStart).toFixed(3);
+          matchedWord=hit;
+        }else if(localTime===null){
+          localTime=+Math.min((Number(shot.duration)||1)*0.4,0.35).toFixed(3);
+          at=+(shotStart+localTime).toFixed(3);
+        }
+      }else if(at!==null&&localTime===null){
+        localTime=+Math.max(0,at-shotStart).toFixed(3);
+      }else if(localTime!==null&&at===null){
+        at=+(shotStart+localTime).toFixed(3);
+      }
+      return {
+        ...cue,
+        action:cue.action||(cue.sfx?'sfx':'pulse'),
+        at,
+        localTime,
+        matchedWord
+      };
+    });
+    return {...shot,resolvedCues};
+  });
+}
+
 export function loadProject(p){
   const dir=projectPath(p),manifest=readJSON(path.join(dir,'manifest.json'));
   const config=readJSON(path.join(dir,'config.json'));
   if(!Array.isArray(manifest.shots)||!manifest.shots.length)throw new Error('Empty manifest');
   const lineSource=resolveLineSource(dir);
-  const shots=resolveProjectShots(manifest.shots,lineSource,config);
+  let shots=resolveProjectShots(manifest.shots,lineSource,config);
+  const wordsFile=path.join(dir,'timeline','words.json');
+  const words=fs.existsSync(wordsFile)?(readJSON(wordsFile).words||[]):[];
+  shots=resolveShotCues(shots,words,lineSource.lines);
   for(let i=0;i<shots.length;i++){
     assertShot(shots[i]);
     if(i&&shots[i].start<shots[i-1].start+shots[i-1].duration-.02)

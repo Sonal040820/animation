@@ -386,6 +386,30 @@ export function validateProject(projectRef){
         message:`Unknown ambience "${shot.ambience}" in shot ${sid}${sug?` (did you mean "${sug}"?)`:''}`
       });
     }
+    if(shot.cues!==undefined){
+      const validCueActions=['blink','pulse','flash','shake','clock-set','sfx'];
+      if(!Array.isArray(shot.cues)){
+        errors.push({code:'MISTYPED_CUES',shot:sid,field:'cues',message:`Shot ${sid}: cues must be an array`});
+      }else{
+        for(const c of shot.cues){
+          if(!c||typeof c!=='object'){
+            errors.push({code:'INVALID_CUE',shot:sid,field:'cues',message:`Shot ${sid}: each cue must be an object`});
+            continue;
+          }
+          const act=c.action||(c.sfx?'sfx':null);
+          if(!act||!validCueActions.includes(act)){
+            const sug=didYouMean(act,validCueActions);
+            errors.push({code:'UNKNOWN_CUE_ACTION',shot:sid,field:'cues',value:act,suggestion:sug,message:`Unknown cue action "${act}" in shot ${sid}`});
+          }
+          if(c.at_word!==undefined&&(typeof c.at_word!=='string'||!c.at_word.trim())){
+            errors.push({code:'INVALID_CUE_WORD',shot:sid,field:'cues.at_word',message:`Shot ${sid}: cue at_word must be a non-empty string`});
+          }
+          if((act==='sfx'||c.sfx)&&!validSfx.includes(c.sfx||c.type)){
+            errors.push({code:'UNKNOWN_SFX',shot:sid,field:'cues.sfx',value:c.sfx||c.type,message:`Unknown cue sfx "${c.sfx||c.type}" in shot ${sid}`});
+          }
+        }
+      }
+    }
 
     // 5. Timing & duration checks
     if(!Number.isFinite(shot.start)||!Number.isFinite(shot.duration)||shot.duration<=0||shot.duration>30){

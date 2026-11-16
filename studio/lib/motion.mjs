@@ -95,14 +95,19 @@ export function blinkAmount(t, { period = 3.2, seed = 0, duration = 0.16, forceA
   let amount = 0;
 
   // Forced blinks (e.g. narrative "I blinked" cue)
+  // Supports numbers (timestamp) or objects { at, duration, exactStart }
   const forcedList = Array.isArray(forceAt)
     ? forceAt
     : (Number.isFinite(forceAt) ? [forceAt] : []);
-  for (const ft of forcedList) {
+  for (const item of forcedList) {
+    const isObj = typeof item === 'object' && item !== null;
+    const ft = isObj ? Number(item.at) : Number(item);
     if (!Number.isFinite(ft)) continue;
-    // Start slightly before `ft` so at `t === ft` the eyelid is already closing/closed
-    const start = ft - baseDur * 0.25;
-    amount = Math.max(amount, singleBlinkCurve(t - start, baseDur * 1.1));
+    const fDur = isObj && Number.isFinite(Number(item.duration))
+      ? clamp(Number(item.duration), 0.08, 0.8)
+      : baseDur * 1.1;
+    const start = (isObj && item.exactStart) ? ft : (ft - baseDur * 0.25);
+    amount = Math.max(amount, singleBlinkCurve(t - start, fDur));
   }
 
   // Natural seeded periodic blinks (random intervals, 120-180ms duration)

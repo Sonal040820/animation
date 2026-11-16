@@ -98,12 +98,34 @@ function legacyFace(ctx, w, h, s, t, params) {
     phase: t,
     rim: s.rim,
     wobble: params?.wobble ?? 4,
-    rimPulse: params?.rimPulse ?? true
+    rimPulse: params?.rimPulse ?? true,
+    blink: Number.isFinite(params?.blinkAmt) ? params.blinkAmt : 0
   });
   drawAtmosphere(ctx, w, h, t, { seed: (params?.seed || 1) + 55, dust: 22, fog: 0.1, color: s.fog });
 }
 
 function renderCloseUpHead(ctx, w, h, s, t, p, isGiant = true) {
+  const forcedBlinks = Array.isArray(p?.blinkAt)
+    ? [...p.blinkAt]
+    : (Number.isFinite(p?.blinkAt) ? [p.blinkAt] : []);
+  for (const cue of (p?.cues || [])) {
+    if (cue && cue.action === 'blink' && Number.isFinite(Number(cue.localTime))) {
+      forcedBlinks.push({
+        at: Number(cue.localTime),
+        duration: Number.isFinite(Number(cue.duration)) ? Number(cue.duration) : 0.30,
+        exactStart: true
+      });
+    }
+  }
+  const bAmt = p?.blink === false
+    ? 0
+    : blinkAmount(t, {
+        seed: (p?.seed || 1) + 23,
+        period: 2.8,
+        duration: 0.16,
+        forceAt: forcedBlinks
+      });
+
   const rig = p?.rig || 'silhouette';
   if (rig === 'block' || rig === 'stick') {
     if (p?.backdrop === 'room-blur') {
@@ -118,7 +140,7 @@ function renderCloseUpHead(ctx, w, h, s, t, p, isGiant = true) {
         });
       });
     }
-    legacyFace(ctx, w, h, s, t, p);
+    legacyFace(ctx, w, h, s, t, { ...p, blinkAmt: bAmt });
     return;
   }
 
@@ -139,18 +161,6 @@ function renderCloseUpHead(ctx, w, h, s, t, p, isGiant = true) {
       drawNightExterior(bctx, bw, bh, t, { seed: p?.seed || 1 });
     });
   }
-
-  const forcedBlinks = Array.isArray(p?.blinkAt)
-    ? p.blinkAt
-    : (Number.isFinite(p?.blinkAt) ? [p.blinkAt] : []);
-  const bAmt = p?.blink === false
-    ? 0
-    : blinkAmount(t, {
-        seed: (p?.seed || 1) + 23,
-        period: 2.8,
-        duration: 0.16,
-        forceAt: forcedBlinks
-      });
 
   const dur = Number.isFinite(p?.duration) && p.duration > 0 ? p.duration : 1.5;
   const expMix = Number.isFinite(p?.expressionMix)
@@ -280,7 +290,12 @@ const TEMPLATES = {
     }
 
     const clockObj = typeof p?.clock === 'object' && p.clock !== null ? p.clock : null;
-    const rawClock = clockObj ? (clockObj.time ?? '11:59') : (p?.clock ?? p?.clockTime ?? '11:59');
+    let rawClock = clockObj ? (clockObj.time ?? '11:59') : (p?.clock ?? p?.clockTime ?? '11:59');
+    for (const cue of (p?.cues || [])) {
+      if (cue && cue.action === 'clock-set' && Number.isFinite(Number(cue.localTime)) && t >= Number(cue.localTime) && cue.time) {
+        rawClock = cue.time;
+      }
+    }
     const clockStr = rawClock === '00:01' ? '12:01' : String(rawClock);
     const clockArg = clockObj ? { ...clockObj, time: clockStr } : clockStr;
 
@@ -346,7 +361,12 @@ const TEMPLATES = {
       drawAtmosphere(ctx, w, h, t, { seed: (p?.seed || 1) + 41, dust: w < 300 ? 6 : 14, fog: 0.07, color: s.fog });
       return;
     }
-    const rawTime = p?.time || '11:59';
+    let rawTime = p?.time || '11:59';
+    for (const cue of (p?.cues || [])) {
+      if (cue && cue.action === 'clock-set' && Number.isFinite(Number(cue.localTime)) && t >= Number(cue.localTime) && cue.time) {
+        rawTime = cue.time;
+      }
+    }
     const timeStr = rawTime === '00:01' ? '12:01' : String(rawTime);
     const backdrop = p?.backdrop ?? 'room-blur';
     if (backdrop === 'room-blur') {
@@ -516,6 +536,25 @@ export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
     : defaultIntensity;
   const transName = shot.transition || shot.params?.transition || 'cut';
   const flashDecay = transName === 'flash' ? 6.5 : 0;
+  const activeCues = Array.isArray(shot.resolvedCues) ? shot.resolvedCues : (Array.isArray(shot.cues) ? shot.cues : []);
+  let cuePulse = 0;
+  let cueShakeX = 0;
+  let cueShakeY = 0;
+  let cueFlashAlpha = 0;
+  for (const cue of activeCues) {
+    if (!cue || !Number.isFinite(Number(cue.localTime))) continue;
+    const lt = Number(cue.localTime);
+    const dt = seconds - lt;
+    if (cue.action === 'pulse') {
+      cuePulse = Math.max(cuePulse, pulse(seconds, lt, 0.22));
+    } else if (cue.action === 'shake' && dt >= 0 && dt < 0.45) {
+      const env = Math.exp(-dt * 7.5);
+      cueShakeX += Math.sin(dt * 48 + seed) * 10 * env;
+      cueShakeY += Math.cos(dt * 43 + seed) * 8 * env;
+    } else if (cue.action === 'flash' && dt >= 0 && dt < 0.24) {
+      cueFlashAlpha = Math.max(cueFlashAlpha, clamp(1 - ease(dt / 0.24), 0, 1) * 0.9);
+    }
+  }
   let camBlur = 0;
   if (CAMERA_MOVES.includes(camKind)) {
     const cam = cameraTransform(camKind, seconds, dur, {
@@ -524,9 +563,10 @@ export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
       flashDecay
     });
     const scale = w / 720;
-    ctx.translate(w * 0.5 + (cam.x || 0) * scale, h * 0.5 + (cam.y || 0) * scale);
+    const zoomBump = 1 + cuePulse * 0.04;
+    ctx.translate(w * 0.5 + ((cam.x || 0) + cueShakeX) * scale, h * 0.5 + ((cam.y || 0) + cueShakeY) * scale);
     ctx.rotate(cam.rotation || 0);
-    ctx.scale(cam.zoom || 1, cam.zoom || 1);
+    ctx.scale((cam.zoom || 1) * zoomBump, (cam.zoom || 1) * zoomBump);
     ctx.translate(-w * 0.5, -h * 0.5);
     camBlur = (cam.blur || 0) * scale;
   } else {
@@ -538,7 +578,8 @@ export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
   const tplParams = {
     ...(shot.params || {}),
     duration: dur,
-    seed: shot.params?.seed ?? seed
+    seed: shot.params?.seed ?? seed,
+    cues: activeCues
   };
 
   if (camBlur > 0.35) {
@@ -595,6 +636,13 @@ export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
       ctx.fillRect(0, 0, w, h);
       ctx.restore();
     }
+  }
+  if (cueFlashAlpha > 0.01) {
+    ctx.save();
+    ctx.fillStyle = '#fff9f4';
+    ctx.globalAlpha = cueFlashAlpha;
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
   }
 
   // Captions

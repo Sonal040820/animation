@@ -63,9 +63,11 @@
       "params": {
         "rig": "silhouette",
         "expression": "surprise",
-        "backdrop": "room-blur",
-        "blinkAt": [0.35]
+        "backdrop": "room-blur"
       },
+      "cues": [
+        { "at_word": "blinked", "action": "blink", "duration": 0.3 }
+      ],
       "sfx": [
         { "type": "blink-swish", "offset": 0.25 }
       ],

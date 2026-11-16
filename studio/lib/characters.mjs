@@ -51,8 +51,8 @@ export function drawCharacter(ctx,{x,y,scale=1,color='#65c4db',rig='block',expre
 
 export const avatarRigChoices=Object.freeze(['stick','block','silhouette']);
 
-// Elite variant — extends drawCharacter with wobble hair sway, rimPulse, and 'surprise' expression.
-export function drawCharacterElite(ctx,{x,y,scale=1,color='#65c4db',rig='block',expression='neutral',phase=0,pose='idle',rim='#64e0ec',gender='unspecified',wobble=0,rimPulse=false}={}){
+// Elite variant — extends drawCharacter with wobble hair sway, rimPulse, blink, and 'surprise' expression.
+export function drawCharacterElite(ctx,{x,y,scale=1,color='#65c4db',rig='block',expression='neutral',phase=0,pose='idle',rim='#64e0ec',gender='unspecified',wobble=0,rimPulse=false,blink=0}={}){
   // rimPulse: oscillate rim-light intensity on a fast sine
   const effectiveRim=rimPulse?`rgba(${hexToRgb(rim)},${0.55+Math.abs(Math.sin(phase*3.7))*0.45})`:rim;
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
@@ -82,8 +82,15 @@ export function drawCharacterElite(ctx,{x,y,scale=1,color='#65c4db',rig='block',
   // Stylized hair silhouette with wobble sway.
   const hw=wobble*Math.sin(phase*1.8);
   ctx.fillStyle='#20232c';ctx.beginPath();ctx.arc(hw,-117+breath,33,Math.PI,0);ctx.lineTo(27+hw,-130+breath);ctx.quadraticCurveTo(-5+hw,-158,-31+hw,-124+breath);ctx.closePath();ctx.fill();
-  // Eyes — surprise: wide circular
-  if(expression==='surprise'){
+  // Eyes — surprise: wide circular (or closed when blink > 0.55)
+  if(blink>0.55){
+    const eyeY=-110+breath;
+    stroke(ctx,[-18,eyeY],[-6,eyeY],2.5,'#17202d');
+    stroke(ctx,[6,eyeY],[18,eyeY],2.5,'#17202d');
+    if(expression==='surprise')ellipse(ctx,0,-93+breath,5,6,'#6f3c48');
+    else if(expression==='scared')ellipse(ctx,0,-93+breath,4,7,'#6f3c48');
+    else stroke(ctx,[-5,-92+breath],[5,-92+breath],1.5,'#6f3c48');
+  } else if(expression==='surprise'){
     const eyeY=-110+breath;
     ellipse(ctx,-12,eyeY,7,8,'#17202d');
     ellipse(ctx,12,eyeY,7,8,'#17202d');

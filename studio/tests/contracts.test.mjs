@@ -7,7 +7,8 @@ import {execFileSync} from 'node:child_process';
 import {TEMPLATE_NAMES,assertShot} from '../lib/templates.mjs';
 import {alignPhrases,alignMeasured,phrases} from '../lib/timing.mjs';
 import {style,STYLES} from '../lib/core.mjs';
-import {enforceDataOnly,loadProject,resolveProjectShots,STUDIO} from '../lib/project.mjs';
+import {enforceDataOnly,loadProject,resolveProjectShots,resolveShotCues,findWordTimestamp,STUDIO} from '../lib/project.mjs';
+import {blinkAmount} from '../lib/motion.mjs';
 import {validateProject} from '../lib/validate.mjs';
 import {syncIndex} from '../lib/learning.mjs';
 import {engineHash} from '../lib/runner.mjs';
@@ -296,4 +297,25 @@ test('measureMotion computes 72x128 grayscale MAD and verifyFilm fails below con
   }finally{
     fs.rmSync(tmpDir,{recursive:true,force:true});
   }
+});
+
+test('at_word cues resolve to exact word timestamp and blink starts within 0.1s of "blinked"',()=>{
+  const words=[
+    {text:'THE CLOCK',start:4.5,end:5.2},
+    {text:'SAID 11:59.',start:5.2,end:6.1},
+    {text:'I BLINKED.',start:7.35,end:8.25}
+  ];
+  const wordHit=findWordTimestamp(words,'blinked',7.2,8.4);
+  assert.ok(wordHit);
+  assert.ok(wordHit.start>7.35&&wordHit.start<8.0);
+  const resolved=resolveShotCues([
+    {id:'s05',template:'giant-face',start:7.2,duration:1.3,cues:[{at_word:'blinked',action:'blink',duration:0.3}]}
+  ],words);
+  const cue=resolved[0].resolvedCues[0];
+  assert.ok(Math.abs(cue.at-wordHit.start)<0.01);
+  // Check blinkAmount closes eyes for ~0.3s starting right at cue.localTime
+  const closedAtWord=blinkAmount(cue.localTime+0.12,{period:0,forceAt:[{at:cue.localTime,duration:0.3,exactStart:true}]});
+  const openBefore=blinkAmount(Math.max(0,cue.localTime-0.05),{period:0,forceAt:[{at:cue.localTime,duration:0.3,exactStart:true}]});
+  assert.ok(openBefore<0.05);
+  assert.ok(closedAtWord>0.9);
 });
