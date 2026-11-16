@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Deterministic, original-code vertical animation engine; no third-party art or generated media",
   "engines": {"node": ">=22.14.0 <23"},
-  "dependencies": {"playwright": "1.65.2"},
+  "dependencies": {"playwright": "1.65.1"},
   "scripts": {
     "doctor": "node cli/studio.mjs doctor",
     "smoke": "node cli/studio.mjs smoke",

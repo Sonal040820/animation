@@ -1,5 +1,7 @@
 # Durable lessons (newest first)
 
+- 2026-11-16 / npm ETARGET on setup run 43867172658: exact symptom 'No matching version found for playwright@1.65.2'; PyPI and npm are not a reliable shared version source. Fix: pin the official Microsoft Playwright GitHub release v1.65.1 instead; recheck on GH runner. First attempt of max three.
+
 Record exact symptoms, commands, causes, fixes, measured times and tests; never retry a failing approach more than 3 times.
 
 - 2026-11-16 / Setup-only scope: The final user instruction overrides the quoted test-video step. No animated video, voice, or creative contact sheet during setup.

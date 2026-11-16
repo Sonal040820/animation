@@ -12,7 +12,7 @@ A code-authored 9:16 short-video pipeline with reproducible Chromium/Canvas2D re
 - studio/out/: final and draft films/contact sheets; studio/.cache/: hashed shot-frame reuse.
 
 ## Pinned platform
-- GitHub Actions ubuntu-24.04, Node 22.14.0, Playwright 1.65.2, Python 3.12.7.
+- GitHub Actions ubuntu-24.04, Node 22.14.0, Playwright 1.65.1, Python 3.12.7.
 - FFmpeg/Chromium actual runtime versions must be measured by doctor and written to studio/environment.json; no assumptions.
 - Optional voice: kokoro-onnx 0.6.1, numpy 2.2.6 and soundfile 0.13.1. Kokoro model and voice files are fetched only when make-voice is invoked and SHA256 validated against official release.
 
