@@ -1,0 +1,351 @@
+{
+  "schema_version": 1,
+  "slug": "the-wrong-side",
+  "title": "The Wrong Side of the Door",
+  "duration": 60,
+  "shots": [
+    {
+      "id": "s01",
+      "template": "intercom-macro",
+      "start": 0,
+      "duration": 3.4,
+      "camera": "creep",
+      "seed": 3200,
+      "params": {
+        "display": "2:17",
+        "signal": true
+      },
+      "sfx": [
+        {
+          "type": "static",
+          "offset": 0.15
+        }
+      ]
+    },
+    {
+      "id": "s02",
+      "template": "wide-establishing",
+      "start": 3.4,
+      "duration": 2.9,
+      "camera": "push",
+      "seed": 3273,
+      "params": {
+        "text": "A BUILDING THAT DOESN'T LISTEN"
+      },
+      "sfx": []
+    },
+    {
+      "id": "s03",
+      "template": "intercom-macro",
+      "start": 6.3,
+      "duration": 2.9,
+      "camera": "push",
+      "seed": 3346,
+      "params": {
+        "display": "CALLING",
+        "signal": true
+      },
+      "sfx": [
+        {
+          "type": "radio",
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "id": "s04",
+      "template": "intercom-macro",
+      "start": 9.2,
+      "duration": 2.8,
+      "camera": "push",
+      "seed": 3419,
+      "params": {
+        "display": "DON'T OPEN",
+        "signal": true
+      },
+      "sfx": [
+        {
+          "type": "whisper",
+          "offset": 0.2
+        }
+      ]
+    },
+    {
+      "id": "s05",
+      "template": "empty-hallway",
+      "start": 12,
+      "duration": 3.7,
+      "camera": "creep",
+      "seed": 3492,
+      "params": {
+        "figure": true,
+        "blur": true
+      },
+      "sfx": [
+        {
+          "type": "lowboom",
+          "offset": 2.65
+        }
+      ]
+    },
+    {
+      "id": "s06",
+      "template": "mirror-double",
+      "start": 15.7,
+      "duration": 3,
+      "camera": "push",
+      "seed": 3565,
+      "params": {
+        "emotion": "neutral",
+        "double": true
+      },
+      "sfx": [
+        {
+          "type": "breath",
+          "offset": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s07",
+      "template": "character-medium",
+      "start": 18.7,
+      "duration": 2.3,
+      "camera": "push",
+      "seed": 3638,
+      "params": {
+        "expression": "scared",
+        "rig": "block",
+        "color": "#4c789c"
+      },
+      "sfx": []
+    },
+    {
+      "id": "s08",
+      "template": "empty-hallway",
+      "start": 21,
+      "duration": 3.6,
+      "camera": "push",
+      "seed": 3711,
+      "params": {
+        "figure": false,
+        "light": "flicker"
+      },
+      "sfx": [
+        {
+          "type": "click",
+          "offset": 0.3
+        }
+      ]
+    },
+    {
+      "id": "s09",
+      "template": "intercom-macro",
+      "start": 24.6,
+      "duration": 3.2,
+      "camera": "creep",
+      "seed": 3784,
+      "params": {
+        "display": "SHE'S LEARNING",
+        "signal": true
+      },
+      "sfx": [
+        {
+          "type": "radio",
+          "offset": 0.1
+        }
+      ]
+    },
+    {
+      "id": "s10",
+      "template": "door-close",
+      "start": 27.8,
+      "duration": 3.8,
+      "camera": "push",
+      "seed": 3857,
+      "params": {
+        "knocks": 3,
+        "angle": 0.05
+      },
+      "sfx": [
+        {
+          "type": "knock",
+          "offset": 1
+        },
+        {
+          "type": "knock",
+          "offset": 1.48
+        },
+        {
+          "type": "knock",
+          "offset": 1.96
+        }
+      ]
+    },
+    {
+      "id": "s11",
+      "template": "bedroom-shadow",
+      "start": 31.6,
+      "duration": 3.8,
+      "camera": "push",
+      "seed": 3930,
+      "params": {
+        "knocks": 3,
+        "light": "flicker"
+      },
+      "sfx": [
+        {
+          "type": "knock",
+          "offset": 0.4
+        },
+        {
+          "type": "knock",
+          "offset": 0.9
+        },
+        {
+          "type": "knock",
+          "offset": 1.45
+        }
+      ]
+    },
+    {
+      "id": "s12",
+      "template": "mirror-double",
+      "start": 35.4,
+      "duration": 3.6,
+      "camera": "push",
+      "seed": 4003,
+      "params": {
+        "emotion": "scared",
+        "double": true
+      },
+      "sfx": [
+        {
+          "type": "heartbeat",
+          "offset": 0.5
+        }
+      ]
+    },
+    {
+      "id": "s13",
+      "template": "giant-face",
+      "start": 39,
+      "duration": 2.6,
+      "camera": "creep",
+      "seed": 4076,
+      "params": {
+        "expression": "scared",
+        "rig": "block",
+        "color": "#648aa3"
+      },
+      "sfx": []
+    },
+    {
+      "id": "s14",
+      "template": "intercom-macro",
+      "start": 41.6,
+      "duration": 2.7,
+      "camera": "push",
+      "seed": 4149,
+      "params": {
+        "display": "NEITHER",
+        "signal": true
+      },
+      "sfx": [
+        {
+          "type": "radio",
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "id": "s15",
+      "template": "door-peephole",
+      "start": 44.3,
+      "duration": 3.1,
+      "camera": "push",
+      "seed": 4222,
+      "params": {
+        "figure": true
+      },
+      "sfx": [
+        {
+          "type": "subbass",
+          "offset": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s16",
+      "template": "stairwell",
+      "start": 47.4,
+      "duration": 3.5,
+      "camera": "push",
+      "seed": 4295,
+      "params": {
+        "wet": true,
+        "figure": false
+      },
+      "sfx": [
+        {
+          "type": "rain",
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "id": "s17",
+      "template": "stairwell",
+      "start": 50.9,
+      "duration": 3.3,
+      "camera": "creep",
+      "seed": 4368,
+      "params": {
+        "wet": true,
+        "figure": true
+      },
+      "sfx": [
+        {
+          "type": "footstep",
+          "offset": 1.1
+        }
+      ]
+    },
+    {
+      "id": "s18",
+      "template": "keyhole-view",
+      "start": 54.2,
+      "duration": 3.3,
+      "camera": "push",
+      "seed": 4441,
+      "params": {
+        "figure": true,
+        "smile": true
+      },
+      "sfx": [
+        {
+          "type": "breath",
+          "offset": 0.7
+        }
+      ]
+    },
+    {
+      "id": "s19",
+      "template": "door-close",
+      "start": 57.5,
+      "duration": 2.5,
+      "camera": "push",
+      "seed": 4514,
+      "params": {
+        "angle": 0.3,
+        "smile": true
+      },
+      "sfx": [
+        {
+          "type": "latch",
+          "offset": 1.6
+        }
+      ]
+    }
+  ]
+}

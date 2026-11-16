@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "studio": "original-short-video-studio",
+  "aspect": "9:16",
+  "fps": 24,
+  "resolution": "720p",
+  "style": "midnight",
+  "rig": "block",
+  "voice": "af_heart",
+  "story": "THE WRONG SIDE OF THE DOOR",
+  "genre": "psychological_horror",
+  "duration": 60,
+  "voice_required": true,
+  "dialogue_required": true,
+  "original_music": true,
+  "quality_target": "standard",
+  "production_status": "script_approved_by_explicit_user_request"
+}

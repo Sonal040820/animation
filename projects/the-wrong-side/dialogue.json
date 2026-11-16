@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "duration": 60,
+  "voices": {
+    "mara": "af_heart",
+    "warning": "af_sky",
+    "double": "af_heart"
+  },
+  "lines": [
+    {
+      "at": 0,
+      "duration": 3.4,
+      "speaker": "mara",
+      "text": "At two seventeen, the intercom rang."
+    },
+    {
+      "at": 3.4,
+      "duration": 2.9,
+      "speaker": "mara",
+      "text": "My building doesn't have an intercom."
+    },
+    {
+      "at": 6.3,
+      "duration": 2.9,
+      "speaker": "mara",
+      "text": "A woman spoke through the static."
+    },
+    {
+      "at": 9.2,
+      "duration": 2.8,
+      "speaker": "warning",
+      "text": "Whatever you hear, don't open the door."
+    },
+    {
+      "at": 12,
+      "duration": 3.7,
+      "speaker": "mara",
+      "text": "Then my own voice answered from the hallway."
+    },
+    {
+      "at": 15.7,
+      "duration": 3,
+      "speaker": "double",
+      "text": "Who are you talking to?"
+    },
+    {
+      "at": 18.7,
+      "duration": 2.3,
+      "speaker": "mara",
+      "text": "I live alone."
+    },
+    {
+      "at": 21,
+      "duration": 3.6,
+      "speaker": "mara",
+      "text": "I turned. Nothing. Just the hallway."
+    },
+    {
+      "at": 24.6,
+      "duration": 3.2,
+      "speaker": "warning",
+      "text": "She's practicing. Don't let her finish."
+    },
+    {
+      "at": 27.8,
+      "duration": 3.8,
+      "speaker": "mara",
+      "text": "Three knocks came from the front door."
+    },
+    {
+      "at": 31.6,
+      "duration": 3.8,
+      "speaker": "mara",
+      "text": "Then three more came from my bedroom."
+    },
+    {
+      "at": 35.4,
+      "duration": 3.6,
+      "speaker": "mara",
+      "text": "My mouth whispered a question I hadn't chosen."
+    },
+    {
+      "at": 39,
+      "duration": 2.6,
+      "speaker": "mara",
+      "text": "Which one is real?"
+    },
+    {
+      "at": 41.6,
+      "duration": 2.7,
+      "speaker": "warning",
+      "text": "Neither."
+    },
+    {
+      "at": 44.3,
+      "duration": 3.1,
+      "speaker": "warning",
+      "text": "You're the one outside."
+    },
+    {
+      "at": 47.4,
+      "duration": 3.5,
+      "speaker": "mara",
+      "text": "My feet were wet. The air smelled like concrete."
+    },
+    {
+      "at": 50.9,
+      "duration": 3.3,
+      "speaker": "mara",
+      "text": "I was standing in the stairwell."
+    },
+    {
+      "at": 54.2,
+      "duration": 3.3,
+      "speaker": "mara",
+      "text": "Through the keyhole, I watched myself smile."
+    },
+    {
+      "at": 57.5,
+      "duration": 2.5,
+      "speaker": "double",
+      "text": "Come in."
+    }
+  ]
+}
