@@ -1,0 +1,54 @@
+name: Horror 60s - storyboard and timing review
+on:
+  push:
+    paths:
+      - 'projects/the-wrong-side/manifest.json'
+      - 'projects/the-wrong-side/dialogue.json'
+      - 'studio/lib/horror.mjs'
+      - '.github/workflows/horror-60-storyboard.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: horror60-sheet
+  cancel-in-progress: true
+jobs:
+  contact-sheet:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'
+          cache: npm
+          cache-dependency-path: studio/package-lock.json
+      - name: Install pinned browser dependencies
+        working-directory: studio
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          npx --no-install playwright install --with-deps chromium
+      - name: Prepare static storyboard without starting animation
+        run: |
+          set -euo pipefail
+          node --test studio/tests/*.test.mjs
+          node studio/cli/studio.mjs check
+          node studio/cli/studio.mjs align --project projects/the-wrong-side
+          node studio/cli/studio.mjs sheet --project projects/the-wrong-side --quality preview
+          sha256sum studio/out/the-wrong-side/contact-sheet.png \
+            | cut -d' ' -f1 > studio/out/the-wrong-side/review-hash.sha256
+          test "$(find studio/out/the-wrong-side/sheet-frames -name 'shot_*.png'|wc -l)" -eq 19
+          echo "CONTACT_SHEET_READY"
+          cat studio/out/the-wrong-side/review-hash.sha256
+      - name: Publish contact sheet, all stills and word schedule
+        uses: actions/upload-artifact@v4
+        with:
+          name: the-wrong-side-static-storyboard
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            studio/out/the-wrong-side/contact-sheet.png
+            studio/out/the-wrong-side/review-hash.sha256
+            studio/out/the-wrong-side/sheet-frames/*.png
+            projects/the-wrong-side/timeline/words.json
