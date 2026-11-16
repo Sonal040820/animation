@@ -32,6 +32,7 @@ export const SFX_TYPES = [
   'heartbeat',
   'breath',
   'sting',
+  'stinger',
   'riser',
   'blink-swish',
   'glass-tap',
@@ -190,6 +191,7 @@ function synthSfxSample(type, d, rnd) {
     case 'impact':
       return exponential * (0.21 * Math.sin(TAU * (80 - 10 * d) * d) + 0.07 * (rnd() * 2 - 1));
     case 'sting':
+    case 'stinger':
       return (
         Math.exp(-d * 4.5) *
         (0.08 * Math.sin(TAU * 311.13 * d) +

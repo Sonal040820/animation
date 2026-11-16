@@ -75,19 +75,20 @@
       "id": "rule-clock-after-midnight",
       "pattern": "\\b(twelve\\s+oh\\s+one|12:01|00:01)\\b",
       "flags": "i",
-      "template": "window-view",
-      "camera": "push",
-      "cameraIntensity": 0.8,
+      "template": "insert-macro-clock",
+      "camera": "shake",
+      "cameraIntensity": 1.35,
+      "transition": "flash",
+      "transitionDuration": 0.22,
       "params": {
-        "interior": true,
-        "girl": false,
-        "clock": "12:01",
-        "narrator": true
+        "time": "12:01",
+        "kind": "digital",
+        "backdrop": "room-blur"
       },
       "sfx": [
-        { "type": "tick", "offset": 0.2 }
+        { "type": "stinger", "offset": 0.0 }
       ],
-      "ambience": "room-tone"
+      "ambience": "clock-tick-loop"
     },
     {
       "id": "rule-clock-macro",
@@ -95,14 +96,15 @@
       "flags": "i",
       "template": "insert-macro-clock",
       "camera": "push",
-      "cameraIntensity": 1.0,
+      "cameraIntensity": 1.35,
       "params": {
         "time": "11:59",
         "kind": "digital",
         "backdrop": "room-blur"
       },
       "sfx": [
-        { "type": "tick", "offset": 0.3 }
+        { "type": "heartbeat", "offset": 0.15 },
+        { "type": "tick", "offset": 0.35 }
       ],
       "ambience": "clock-tick-loop"
     },
@@ -110,15 +112,20 @@
       "id": "rule-gone-vanish",
       "pattern": "\\b(gone|vanish|vanished|disappeared|empty)\\b",
       "flags": "i",
-      "template": "empty-yard",
+      "template": "window-view",
       "camera": "pull",
-      "cameraIntensity": 0.9,
-      "params": {},
+      "cameraIntensity": 1.0,
+      "params": {
+        "interior": true,
+        "girl": false,
+        "clock": "12:01",
+        "narrator": true
+      },
       "sfx": [
         { "type": "impact", "offset": 0.15 }
       ],
       "ambience": "night-wind",
-      "fadeOut": 0.6
+      "fadeOut": 0.65
     },
     {
       "id": "rule-window-interior",
@@ -160,14 +167,14 @@
       "pattern": "\\b(night|midnight|moon|fence|tree|sky|outside)\\b",
       "flags": "i",
       "template": "wide-establishing",
-      "camera": "drift",
+      "camera": "push",
       "cameraIntensity": 1.0,
       "params": {
         "scene": "fence-moon"
       },
       "sfx": [],
       "ambience": "night-wind",
-      "fadeIn": 0.35
+      "fadeIn": 0.25
     },
     {
       "id": "rule-intercom-macro",

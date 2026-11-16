@@ -123,8 +123,8 @@ No media generated during initial setup. When adding a template, update this ind
 | `studio/lib/runner.mjs` | `browserExecutable`, `dimensions`, `engineHash`, `invoke`, `pythonExecutable`, `render`, `sheet`, `smoke`, `withBrowser`, `withBrowserPool` |
 | `studio/lib/scenery.mjs` | `drawAtmosphere`, `drawBlurred`, `drawNightExterior`, `drawRoomInterior`, `drawVignette` |
 | `studio/lib/styles.mjs` | `STYLES`, `STYLE_GRADE` |
-| `studio/lib/template-meta.mjs` | `TEMPLATE_META` |
-| `studio/lib/templates.mjs` | `TEMPLATE_META`, `TEMPLATE_NAMES`, `assertShot`, `drawStudioFrame` |
+| `studio/lib/template-meta.mjs` | `TEMPLATE_META`, `TRANSITION_VALUES` |
+| `studio/lib/templates.mjs` | `TEMPLATE_META`, `TEMPLATE_NAMES`, `TRANSITIONS`, `assertShot`, `drawStudioFrame` |
 | `studio/lib/three-scene.mjs` | `buildHorrorRoomScene`, `buildNightCityScene`, `buildParticleVoidScene`, `renderThreeFrame` |
 | `studio/lib/timing.mjs` | `alignDialogue`, `alignMeasured`, `alignPhrases`, `phrases`, `saveWords`, `tokenize` |
 | `studio/lib/validate.mjs` | `didYouMean`, `levenshtein`, `validateProject` |

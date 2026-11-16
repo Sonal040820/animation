@@ -1,6 +1,8 @@
 // Single source of truth for all shot templates, their tags, parameter schemas, and examples.
 // Consumed by studio/lib/validate.mjs and studio/cli/studio.mjs index generator.
 
+export const TRANSITION_VALUES = Object.freeze(['cut', 'dip', 'flash', 'blink']);
+
 const EXPRESSION_VALUES = Object.freeze([
   'neutral', 'scared', 'terrified', 'surprise', 'suspicious',
   'sad', 'relieved', 'angry', 'blank-stare', 'happy'

@@ -198,3 +198,29 @@ test('planScript produces dialogue v3 with spoken/display separation and golden 
   ]);
   assert.equal(planned.needs_new_code.length,0);
 });
+
+test('planScript plans golden 7-shot storyboard with 12:01 flash macro clock and pull window-view',()=>{
+  const script='Night. I saw a little girl outside my window. Staring right at me. The clock said eleven fifty nine. I blinked. Twelve oh one. She was gone.';
+  const planned=planScript(script,{slug:'golden-1159'});
+  const shots=planned.manifest.shots;
+  assert.equal(shots.length,7);
+  assert.deepEqual(shots.map(s=>s.template),[
+    'wide-establishing',
+    'window-view',
+    'figure-exterior',
+    'insert-macro-clock',
+    'giant-face',
+    'insert-macro-clock',
+    'window-view'
+  ]);
+  assert.equal(shots[3].params.time,'11:59');
+  assert.equal(shots[5].params.time,'12:01');
+  assert.equal(shots[5].transition,'flash');
+  assert.ok(Math.abs(shots[5].transitionDuration-0.22)<0.05);
+  assert.ok(shots[5].sfx.some(c=>c.type==='stinger'||c.type==='sting'));
+  assert.equal(shots[6].camera,'pull');
+  assert.equal(shots[6].params.girl,false);
+  assert.equal(shots[6].params.clock,'12:01');
+  assert.equal(planned.auto_planned.length,7);
+  assert.equal(planned.needs_new_code.length,0);
+});

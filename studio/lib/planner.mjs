@@ -138,6 +138,9 @@ export function planScript(scriptText,{slug='planned',voice='af_heart',rules=loa
   const lines=[];
   const shots=[];
   const needs_new_code=[];
+  const auto_planned=[];
+  let prevWasTimeReveal=false;
+  let lastClockTime=null;
   for(let i=0;i<sentences.length;i++){
     const spoken=sentences[i];
     const lineId='l'+(i+1);
@@ -155,24 +158,46 @@ export function planScript(scriptText,{slug='planned',voice='af_heart',rules=loa
       emphasis
     });
     const m=matchShotRule(spoken,rules);
+    const timeMatch=display.match(/\b(\d{1,2}:\d{2})\b/);
+    const isTimeReveal=Boolean(timeMatch)||m.rule?.template==='insert-macro-clock';
+    const estSpeechSec=Math.max(0.4,spoken.split(/\s+/).filter(Boolean).length*0.32);
+    const shortAfterTime=prevWasTimeReveal&&estSpeechSec<1.0;
     if(!m.matched){
       needs_new_code.push({line:lineId,text:spoken,reason:'No rule in planner-rules.json matched this sentence'});
     }
     const r=m.rule;
+    const params={...(r.params||{})};
+    if(isTimeReveal&&timeMatch){
+      params.time=timeMatch[1];
+      lastClockTime=timeMatch[1];
+    }else if(r.template==='window-view'&&params.girl===false&&lastClockTime){
+      params.clock=lastClockTime;
+    }
     const shot={
       id:'s'+String(i+1).padStart(2,'0'),
       template:r.template,
       line:lineId,
       camera:r.camera||'push',
-      cameraIntensity:Number.isFinite(Number(r.cameraIntensity))?Number(r.cameraIntensity):1.0,
+      cameraIntensity:Number.isFinite(Number(r.cameraIntensity))?Number(r.cameraIntensity):(r.template==='insert-macro-clock'?1.35:1.0),
       seed:2001+i,
-      params:{...(r.params||{})},
+      params,
       sfx:Array.isArray(r.sfx)?r.sfx.map(x=>({...x})):[]
     };
+    if(r.transition){
+      shot.transition=r.transition;
+      if(Number.isFinite(Number(r.transitionDuration)))shot.transitionDuration=Number(r.transitionDuration);
+    }else if(isTimeReveal&&lastClockTime&&i>0&&prevWasTimeReveal){
+      shot.transition='flash';
+      shot.transitionDuration=0.22;
+    }
     if(r.ambience)shot.ambience=r.ambience;
     if(Number.isFinite(Number(r.fadeIn)))shot.fadeIn=Number(r.fadeIn);
     if(Number.isFinite(Number(r.fadeOut)))shot.fadeOut=Number(r.fadeOut);
     if(i===sentences.length-1&&!shot.fadeOut)shot.fadeOut=0.6;
+    if(m.matched){
+      auto_planned.push({shot:shot.id,line:lineId,rule_id:m.rule_id,template:shot.template,short_after_time:shortAfterTime});
+    }
+    prevWasTimeReveal=isTimeReveal;
     shots.push(shot);
   }
   const dialogue={
@@ -187,7 +212,7 @@ export function planScript(scriptText,{slug='planned',voice='af_heart',rules=loa
     status:'planned',
     shots
   };
-  return {dialogue,manifest,needs_new_code};
+  return {dialogue,manifest,needs_new_code,auto_planned};
 }
 
 export function planProject(projectRef,{force=false}={}){
@@ -216,7 +241,7 @@ export function planProject(projectRef,{force=false}={}){
   }
   const scriptText=fs.readFileSync(scriptFile,'utf8');
   const slug=path.basename(dir);
-  const {dialogue,manifest,needs_new_code}=planScript(scriptText,{slug,voice:config.voice||'af_heart',existingDialogue});
+  const {dialogue,manifest,needs_new_code,auto_planned}=planScript(scriptText,{slug,voice:config.voice||'af_heart',existingDialogue});
   fs.writeFileSync(dialogueFile,JSON.stringify(dialogue,null,2)+'\n');
   fs.writeFileSync(manifestFile,JSON.stringify(manifest,null,2)+'\n');
   const timelineDir=path.join(dir,'timeline');
@@ -227,6 +252,8 @@ export function planProject(projectRef,{force=false}={}){
     planned_at:new Date().toISOString(),
     lines_count:dialogue.lines.length,
     shots_count:manifest.shots.length,
+    auto_planned,
+    rules_needed:needs_new_code,
     needs_new_code,
     planned_shots:manifest.shots.map(s=>({
       id:s.id,
@@ -234,6 +261,7 @@ export function planProject(projectRef,{force=false}={}){
       lines:s.lines,
       template:s.template,
       camera:s.camera,
+      transition:s.transition||'cut',
       params:s.params
     }))
   };

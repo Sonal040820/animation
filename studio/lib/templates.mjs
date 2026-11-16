@@ -20,6 +20,8 @@ import { TEMPLATE_META } from './template-meta.mjs';
 
 export { TEMPLATE_META };
 
+export const TRANSITIONS = Object.freeze(['cut', 'dip', 'flash', 'blink']);
+
 export const TEMPLATE_NAMES = Object.freeze([
   'wide-establishing', 'window-view', 'character-medium', 'giant-face',
   'insert-macro-clock', 'figure-exterior', 'empty-yard',
@@ -538,8 +540,12 @@ export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
     ctx.restore();
   }
 
-  // Optional eyelid blink transition wipe
-  const trans = shot.transition || shot.params?.transition;
+  // Optional shot transition wipe: 'cut' | 'dip' | 'flash' | 'blink'
+  const trans = shot.transition || shot.params?.transition || 'cut';
+  const rawTransDur = shot.transitionDuration ?? shot.params?.transitionDuration;
+  const transDur = Number.isFinite(Number(rawTransDur)) && Number(rawTransDur) > 0
+    ? Number(rawTransDur)
+    : Math.min(0.22, dur * 0.35);
   if (trans === 'blink') {
     const blinkWin = Math.min(0.22, dur * 0.25);
     let closeAmt = 0;
@@ -549,6 +555,24 @@ export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
       closeAmt = ease(clamp((seconds - (dur - blinkWin)) / blinkWin, 0, 1));
     }
     drawEyelidBlinkTransition(ctx, w, h, closeAmt);
+  } else if (trans === 'flash' && seconds < transDur) {
+    const flashAlpha = clamp(1 - ease(clamp(seconds / transDur, 0, 1)), 0, 1) * 0.94;
+    if (flashAlpha > 0.01) {
+      ctx.save();
+      ctx.fillStyle = '#fff9f4';
+      ctx.globalAlpha = flashAlpha;
+      ctx.fillRect(0, 0, w, h);
+      ctx.restore();
+    }
+  } else if (trans === 'dip' && seconds < transDur) {
+    const dipAlpha = clamp(1 - ease(clamp(seconds / transDur, 0, 1)), 0, 1) * 0.94;
+    if (dipAlpha > 0.01) {
+      ctx.save();
+      ctx.fillStyle = '#020408';
+      ctx.globalAlpha = dipAlpha;
+      ctx.fillRect(0, 0, w, h);
+      ctx.restore();
+    }
   }
 
   // Captions

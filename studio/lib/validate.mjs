@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {projectPath,readJSON,resolveLineSource,resolveProjectShots,enforceDataOnly,ROOT} from './project.mjs';
-import {TEMPLATE_NAMES} from './templates.mjs';
+import {TEMPLATE_NAMES,TRANSITIONS} from './templates.mjs';
 import {TEMPLATE_META} from './template-meta.mjs';
 import {CAMERA_MOVES} from './motion.mjs';
 import {STYLES} from './styles.mjs';
@@ -286,7 +286,7 @@ export function validateProject(projectRef){
       }
     }
 
-    // 3. Camera check
+    // 3. Camera & Transition checks
     if(shot.camera!==undefined&&!CAMERA_MOVES.includes(shot.camera)){
       const sug=didYouMean(shot.camera,CAMERA_MOVES);
       errors.push({
@@ -296,6 +296,27 @@ export function validateProject(projectRef){
         value:shot.camera,
         suggestion:sug,
         message:`Unknown camera move "${shot.camera}" in shot ${sid}${sug?` (did you mean "${sug}"?)`:''}`
+      });
+    }
+    const validTransitions=Array.isArray(TRANSITIONS)?TRANSITIONS:['cut','dip','flash','blink'];
+    if(shot.transition!==undefined&&!validTransitions.includes(shot.transition)){
+      const sug=didYouMean(shot.transition,validTransitions);
+      errors.push({
+        code:'UNKNOWN_TRANSITION',
+        shot:sid,
+        field:'transition',
+        value:shot.transition,
+        suggestion:sug,
+        message:`Unknown transition "${shot.transition}" in shot ${sid}${sug?` (did you mean "${sug}"?)`:''}`
+      });
+    }
+    if(shot.transitionDuration!==undefined&&(typeof shot.transitionDuration!=='number'||!Number.isFinite(shot.transitionDuration)||shot.transitionDuration<=0||shot.transitionDuration>5)){
+      errors.push({
+        code:'INVALID_TRANSITION_DURATION',
+        shot:sid,
+        field:'transitionDuration',
+        value:shot.transitionDuration,
+        message:`Shot ${sid}: transitionDuration must be a number in (0, 5], got ${shot.transitionDuration}`
       });
     }
 
