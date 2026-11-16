@@ -1,10 +1,10 @@
 # Short-video studio status
 
 Updated: 2026-11-16
-State: SETUP ONLY, no new animation, test MP4, narration or creative contact sheet authorized.
+State: PRODUCTION VERIFIED — first original 60-second film generated and delivered.
 
 ## Created
-- Original Canvas2D studio, styles, pixel font, stick/block avatars, eight templates and software 3D helper.
+- Original Canvas2D studio, styles, pixel font, stick/block avatars, sixteen templates (eight initial + eight reusable horror) and software 3D helper.
 - Deterministic CLI, word alignment, original oscillator audio, quality checks and shot-hash frame cache.
 - Pinned Playwright and optional Kokoro dependencies with official release checksum policy.
 - Seven data-only shots for the supplied 10-second midnight-window story.
@@ -15,15 +15,32 @@ State: SETUP ONLY, no new animation, test MP4, narration or creative contact she
 - Green runner setup: https://github.com/Sonal040820/animation/actions/runs/43867609302
 - Verified Node 22.14.0, Python 3.12.7, Playwright 1.65.1, Chromium 159, FFmpeg/ffprobe 6.1.1; studio/environment.json and studio/package-lock.json committed by CI.
 - Eight low-resolution static template images passed. Scared-brow expression corrected after visual review; final static smoke regression PASSED in run 43868905339.
-- No creative project frames, test video or narration have been generated.
+- This line records the initial setup acceptance; a film was subsequently produced under an explicit user request.
 
 ## Final setup acceptance
 - GitHub Actions run: https://github.com/Sonal040820/animation/actions/runs/43868905339 (SUCCESS).
-- Eight static 144x256 diagnostic PNGs rendered and visually inspected; no creative animation generated.
+- Initial setup smoke rendered eight static 144x256 PNGs; 60s film production was separately authorized and completed later.
 - Lockfile and environment fingerprint stored in GitHub main; future same-version doctor runs reuse the verified fingerprint.
-- Per-video render time, narration performance and production MP4 are intentionally unmeasured and untested until first authorized video.
+- Production measurements are now available in COST.md and the completed film artifact.
 
-## Later (ONLY after authorization)
+## First production: The Wrong Side of the Door (verified)
+- Full film workflow SUCCESS: https://github.com/Sonal040820/animation/actions/runs/43873049143
+- Approved 19-image static sheet: SHA256 4883329936e9212f8c9531263efa6e8b34125134f9a10fc87399b1dde1917eba
+- Final film: 60.000s; 720x1280; H.264 24fps video + AAC audio; 19 locally voiced dialogue/narration lines.
+- Voice: Kokoro ONNX v0.6.1, int8; characters MARA / caller / DOUBLE. No cloud TTS and no downloaded music.
+- Score and SFX original synthesized via studio/lib/audio.mjs; music ducked under voice, loudness normalized.
+- Performance: 1439 captured frames; 398.1s of 720p shot rendering; 100% of shots from reusable studio templates; 0 cached shots for first run.
+- QA: codec, duration, narration and caption constraints PASS. Freeze-detection raised a warning for a sustained nearly static visual hold; future videos should introduce nuanced continuous motion.
+- Source project: projects/the-wrong-side/ — JSON and text DATA only; all reusable scene and voice code stays under studio/lib and studio/cli.
+- Files delivered: final MP4, draft MP4, full screenplay, contact sheet, word timings, provider evidence, COST.md / LESSONS.md / STATUS.md.
+
+## Next improvement
+- Introduce sustained atmospheric micro-motion and subtle parallax in prolonged intercom and locked-off shots to avoid frozen-looking holds while preserving psychological tension.
+- Keep all sixteen templates reusable and add new ones only when a story truly requires them.
+- Reuse the pinned Kokoro model, shot hashes and verification commands to lower compute cost in the next film.
+
+## Historical setup-only restriction (completed)
+
 - Run local Kokoro voice / align, generate and visually inspect an actual contact sheet.
 - Require approved contact-sheet hash before full render; render a playable draft first.
 - Mix and verify final MP4; promote reusable assets/functions and update this ledger.

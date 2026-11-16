@@ -53,3 +53,25 @@ No media generated during initial setup. When adding a template, update this ind
 
 | Durable promotion | promoteVideo(project,{tokens}) => report | copies approved original reusable assets, logs verified costs and lessons |
 | Style grade registry | STYLE_GRADE (in lib/styles.mjs) | neutral/warm/cold grade data, original pixel font |
+
+## Psychological-horror production extensions (2026-11-16)
+
+| Component | Signature | Example |
+|---|---|---|
+| Reusable horror sets | HORROR_TEMPLATES in studio/lib/horror.mjs | 8 original Canvas2D scene types |
+| intercom-macro | params:{display,signal} | 2:17 glowing analog intercom |
+| empty-hallway | params:{figure,blur,light} | vanishing corridor with flickering bulb |
+| door-close | params:{knocks,angle,smile} | shot with visualized knock waves |
+| mirror-double | params:{emotion,double} | protagonist and independently animated double |
+| bedroom-shadow | params:{knocks,light} | almost-open bedroom with silhouette |
+| stairwell | params:{wet,figure} | wet stairwell with reflections |
+| door-peephole | params:{figure} | wide-angle door watcher |
+| keyhole-view | params:{figure,smile} | masked view into room |
+| Timed speaker captions | alignDialogue({duration,lines}) => {words} | sentence-bound 1-2 word groups at absolute time |
+| Timed multi-speaker TTS | python3 studio/cli/voice_scene.py --project projects/<slug> [--fallback] | SHA-pinned Kokoro / offline espeak, voice.wav |
+| Original horror score | synthOriginalAudio(out,duration,cues) | original minor drone, percussion, knocks, static, footfalls |
+| Browser montage | sheet(project,quality) | ALL shots joined in Canvas2D, deterministic approval SHA |
+| Production contract | projects/the-wrong-side/approved-sheet.sha256 | must match visual contact sheet before rendering |
+| 60s vertical render | render('projects/the-wrong-side','standard') | 720x1280,24fps,19 shots |
+
+**Measured first film:** The Wrong Side of the Door. 19/19 templates, 60.00 seconds, Kokoro 19 spoken lines, 720x1280 24fps, 398.1s final frame rendering on GitHub CPU. Production workflow run 43873049143. New scripts should need NO engine code if these 16 templates cover their shots.

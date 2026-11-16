@@ -1,5 +1,10 @@
 # Durable lessons (newest first)
 
+- 2026-11-16 / The Wrong Side of the Door: Complete 60.00s / 720x1280 / 24fps video built with 19 original reusable templates; source-only drama and 3 local Kokoro voices; 398.1s of measured final frame rendering. Verified H.264+AAC. QA warning: long repeated-frame section; likely low-motion shot, so add motion-rich lighting and micro-parallax in future without faking physics. Contact sheet was visually inspected and exact SHA locked before production.
+- 2026-11-16 / Contact sheet FFmpeg tile symptom: 19 individual PNGs existed, but one combined montage showed only the first cell. Root cause: FFmpeg tile output with -frames:v 1. Fix: compose all images deterministically in the existing Chromium Canvas2D renderer, verify 19 visible tiles and SHA before approve. Kept original shot files unchanged.
+- 2026-11-16 / 60s template registry check: new reusable templates were implemented but initial dispatcher and test still assumed eight templates. Fix: export HORROR_TEMPLATES into both dispatcher and template registry; assert uniqueness against actual list length, not a literal 8. CPU smoke and contract tests passed.
+- 2026-11-16 / Contact sheet runner initially lacked FFmpeg executable even though static still capture worked. Fix: install ffmpeg for the standalone storyboard workflow, then remove FFmpeg dependency from contact-sheet assembly by using original Canvas2D.
+
 - 2026-11-16T13:20:10.562Z / the-wrong-side: verified 19 shots, 100% templates, 398.1 render seconds, 0 fully cached shots; First measured production run. No unreported errors are assumed.
 
 - 2026-11-16 / Static smoke visual inspection: Scared-face inner brows were lower than outer brows and resembled anger. Corrected to high inner brows plus eye highlights in studio/lib/characters.mjs; next template smoke serves as regression check.
