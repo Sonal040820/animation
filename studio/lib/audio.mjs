@@ -22,27 +22,62 @@ function wav(file,samples){
   fs.writeFileSync(file,data);
 }
 export function synthOriginalAudio(dir,duration,cues=[]){
+  // Original atonal/minor soundscape: suspended A/C/E harmonics, subharmonic
+  // tension, slow rising Shepard-like colour, and authored transient percussion.
+  // No pre-recorded samples and no copyrighted composition.
   const n=Math.floor(duration*RATE);
   const samples=new Float32Array(n);
   let state=15129421;const rnd=()=>{state^=state<<13;state^=state>>>17;state^=state<<5;return (state>>>0)/4294967296};
+  const cueData=cues.map(c=>({type:c.type,time:Number(c.time)})).filter(c=>Number.isFinite(c.time));
   for(let i=0;i<n;i++){
-    const t=i/RATE;
-    const drone=.04*Math.sin(TAU*55*t)+.02*Math.sin(TAU*82.5*t);
-    const clock=.026*envelope(t,Math.floor(t)+.02,.017)*Math.sin(TAU*780*t);
-    const air=.007*(rnd()*2-1)*(1+.3*Math.sin(t*.8));
-    let s=drone+clock+air;
-    for(const cue of cues){
-      const dt=t-cue.time;
-      if(dt>=0&&dt<.7){
-        const a=Math.exp(-dt*17);
-        if(cue.type==='impact')s+=a*(.19*Math.sin(TAU*(80*dt-12*dt*dt))+.09*(rnd()*2-1));
-        else if(cue.type==='whoosh')s+=.10*envelope(dt,.12,.10)*(rnd()*2-1);
-        else if(cue.type==='tick')s+=.13*Math.exp(-dt*60)*Math.sin(TAU*1320*dt);
+    const t=i/RATE,progress=t/duration;
+    const cycle=t/12;
+    // A minor / add-9 cluster, never a sampled song.
+    const chord=[55,65.406,82.407,110.00,123.47];
+    let drone=0;
+    for(let p=0;p<chord.length;p++){
+      const freq=chord[p]*(1+.0012*Math.sin(t*.23+p));
+      const weight=[.026,.009,.015,.010,.005][p];
+      drone+=weight*Math.sin(TAU*freq*t+Math.sin(t*(.17+p*.07))*.13);
+    }
+    const pulseBeat=.030*envelope(t%1.3,.03,.045)*Math.sin(TAU*46*t);
+    const rise=.014*Math.pow(progress,2)*Math.sin(TAU*(42+24*progress)*t);
+    const breath=.010*(rnd()*2-1)*(1+.22*Math.sin(t*.73));
+    const upperChime=(t>37&&t<56)?(.004*Math.sin(TAU*329.6*t)*(.5+.5*Math.sin(t*.46))):0;
+    let sound=drone+pulseBeat+rise+breath+upperChime;
+    for(const cue of cueData){
+      const d=t-cue.time;
+      if(d<0||d>1.3)continue;
+      const exponential=Math.exp(-d*10);
+      switch(cue.type){
+        case 'knock':
+          sound+=(.26*Math.sin(TAU*(91-10*d)*d)+.12*(rnd()*2-1))*Math.exp(-d*34);break;
+        case 'radio': case 'static':
+          sound+=(rnd()*2-1)*.055*envelope(d,.25,.25);break;
+        case 'whisper': case 'breath':
+          sound+=(rnd()*2-1)*.022*Math.exp(-d*3);break;
+        case 'lowboom': case 'subbass':
+          sound+=.15*Math.exp(-d*3)*Math.sin(TAU*(52-15*d)*d);break;
+        case 'footstep': sound+=.13*Math.exp(-d*25)*Math.sin(TAU*71*d);break;
+        case 'rain':sound+=(rnd()*2-1)*.021*Math.exp(-d*.8);break;
+        case 'latch':
+          sound+=.20*Math.exp(-d*46)*(rnd()*2-1)+.095*Math.exp(-d*14)*Math.sin(TAU*980*d);break;
+        case 'heartbeat':
+          sound+=.16*Math.exp(-d*20)*Math.sin(TAU*62*d)+.08*envelope(d,.19,.04)*Math.sin(TAU*58*d);break;
+        case 'click':case 'tick':
+          sound+=.12*Math.exp(-d*65)*Math.sin(TAU*1150*d);break;
+        case 'whoosh':sound+=.11*envelope(d,.2,.17)*(rnd()*2-1);break;
+        case 'impact':sound+=exponential*(.21*Math.sin(TAU*(80-10*d)*d)+.07*(rnd()*2-1));break;
+        default:break;
       }
     }
-    samples[i]=s;
+    // End in silence immediately before the final dry line, then small sting.
+    if(t>=56.8&&t<57.5)sound*=.12;
+    if(t>=59.55)sound*=Math.max(0,(duration-t)/.45);
+    samples[i]=Math.max(-.8,Math.min(.8,sound));
   }
-  const file=path.join(dir,'synth-original.wav');wav(file,samples);return file;
+  const file=path.join(dir,'synth-original.wav');
+  wav(file,samples);return file;
 }
 export function mix(project,duration){
   const out=path.join(project.out,'final.mp4');
