@@ -193,6 +193,13 @@ export function findWordTimestamp(words,targetWord,shotStart=0,shotEnd=Infinity)
 
 export function resolveShotCues(shots,words=[],lines=[]){
   return shots.map(shot=>{
+    if(shot.recipe?.cues?.length){
+      const cues=shot.recipe.cues.map(c=>{
+        if(c.at_word&&!findWordTimestamp(words,c.at_word,shot.start,shot.start+shot.duration))throw Error(`Recipe cue word "${c.at_word}" not found for ${shot.id}`);
+        return {...c,...(c.at!==undefined?{at:shot.start+c.at}:{})};
+      });
+      shot={...shot,cues:[...(shot.cues||[]),...cues]};
+    }
     if(!Array.isArray(shot.cues)||!shot.cues.length)return shot;
     const shotStart=Number(shot.start)||0;
     const shotEnd=shotStart+(Number(shot.duration)||1);

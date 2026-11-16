@@ -5,6 +5,7 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {STUDIO,ROOT,sha,mkdir,readJSON} from './project.mjs';
 import {TEMPLATE_NAMES} from './templates.mjs';
 import {PLANNER_RULES_FILE,loadPlannerRules,matchShotRule} from './planner.mjs';
+import {RECIPE_REGISTRIES} from './recipe.mjs';
 
 const LIB=path.dirname(fileURLToPath(import.meta.url));
 export const USAGE_FILE=path.join(LIB,'usage.json');
@@ -184,6 +185,12 @@ export async function buildAutoIndexSection(){
     '| Template | Summary | Params Schema | Example | Used |',
     '|---|---|---|---|---:|',
     ...templateRows,
+    '',
+    '### Recipe registries (generated from validation metadata)',
+    '',
+    '| Registry | ID | Params and defaults | Example |',
+    '|---|---|---|---|',
+    ...Object.entries(RECIPE_REGISTRIES).flatMap(([kind,registry])=>Object.entries(registry).map(([id,entry])=>`| ${kind} | ${id} | ${JSON.stringify(entry.defaults)} | ${JSON.stringify(entry.example)} |`)),
     '<!-- AUTO:END -->'
   ].join('\n');
 }

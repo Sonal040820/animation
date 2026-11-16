@@ -128,6 +128,7 @@ No media generated during initial setup. When adding a template, update this ind
 | `studio/lib/project.mjs` | `PROJECTS`, `ROOT`, `STUDIO`, `enforceDataOnly`, `findWordTimestamp`, `loadProject`, `mkdir`, `projectPath`, `readJSON`, `resolveLineSource`, `resolveProjectShots`, `resolveShotCues`, `sha` |
 | `studio/lib/props.mjs` | `drawDigitalClock` |
 | `studio/lib/quality.mjs` | `measureMotion`, `verifyFilm` |
+| `studio/lib/recipe.mjs` | `EASINGS`, `FX`, `PROPS`, `RECIPE_REGISTRIES`, `RIGS`, `SETS`, `drawRecipe`, `mergeRecipe`, `normalizeRecipe`, `resolveKeys`, `resolveRecipe`, `worldPosition` |
 | `studio/lib/runner.mjs` | `browserExecutable`, `dimensions`, `engineHash`, `invoke`, `pythonExecutable`, `render`, `sheet`, `smoke`, `withBrowser`, `withBrowserPool` |
 | `studio/lib/scenery.mjs` | `computeWindowLayout`, `drawAtmosphere`, `drawBlurred`, `drawNightExterior`, `drawRoomInterior`, `drawVignette`, `groundDepthPosition` |
 | `studio/lib/styles.mjs` | `STYLES`, `STYLE_GRADE` |
@@ -162,4 +163,38 @@ No media generated during initial setup. When adding a template, update this ind
 | `stairwell` | Concrete stairwell descending into fog with handrails, wet step reflections, rain streaks, and optional figure. | `wet:boolean, figure:boolean, seed:number` | `{"wet":true,"figure":true}` | 2 |
 | `door-peephole` | Circular fisheye peephole view into the hallway outside the apartment door. | `figure:boolean, smile:boolean, seed:number` | `{"figure":true}` | 1 |
 | `keyhole-view` | Keyhole cutout POV looking through a lock at a figure standing on the other side. | `figure:boolean, smile:boolean, seed:number` | `{"figure":true,"smile":true}` | 1 |
+
+### Recipe registries (generated from validation metadata)
+
+| Registry | ID | Params and defaults | Example |
+|---|---|---|---|
+| sets | yard | {"seed":1,"moon":true,"clouds":true,"fence":true,"tree":true,"stars":80} | {} |
+| sets | bedroom-window | {"seed":1,"curtains":true,"sill":true,"lightLevel":1} | {} |
+| sets | room | {"lightLevel":1} | {} |
+| sets | corridor | {"figure":false,"blur":false,"light":"cold"} | {} |
+| sets | stairwell | {"wet":false,"figure":false} | {} |
+| sets | void | {} | {} |
+| props | clock | {"time":"11:59","color":"#ff4d4d","glow":1} | {"time":"3:00"} |
+| props | moon | {"color":"#d8e4f0"} | {} |
+| props | sill | {"color":"#354354"} | {} |
+| props | door | {"color":"#263444","open":0} | {} |
+| props | lamp | {"color":"#e9c584","on":true} | {} |
+| props | window | {"color":"#8499af"} | {} |
+| props | curtains | {"color":"#5d2330","open":0.7} | {} |
+| props | fence | {"color":"#24364b"} | {} |
+| props | tree | {"color":"#0c1826"} | {} |
+| rigs | stick | {} | {"rig":"stick"} |
+| rigs | block | {} | {"rig":"block"} |
+| rigs | silhouette | {} | {"rig":"silhouette"} |
+| fx | dust | {"amount":16,"seed":1} | {} |
+| fx | fog | {"amount":0.1,"seed":1} | {} |
+| fx | rain | {"amount":35,"seed":1} | {} |
+| fx | vignette | {"amount":0.5} | {} |
+| fx | flash | {"amount":0,"color":"#ffffff"} | {} |
+| fx | glow | {"amount":0.15,"color":"#a9cee9"} | {} |
+| easings | linear | {} | {} |
+| easings | in | {} | {} |
+| easings | out | {} | {} |
+| easings | inOut | {} | {} |
+| easings | hold | {} | {} |
 <!-- AUTO:END -->

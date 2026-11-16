@@ -17,6 +17,7 @@ import {
   buildNightCityScene, buildHorrorRoomScene
 } from './three-scene.mjs';
 import { TEMPLATE_META } from './template-meta.mjs';
+import {normalizeRecipe, drawRecipe} from './recipe.mjs';
 
 export { TEMPLATE_META };
 
@@ -573,7 +574,7 @@ export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
     viewport(ctx, w, h, seconds, camKind);
   }
 
-  const tplFn = TEMPLATES[shot.template];
+  const tplFn = shot.recipe ? (c,w,h,s,t)=>drawRecipe(c,w,h,s,t,normalizeRecipe(shot.recipe)) : TEMPLATES[shot.template];
   if (!tplFn) throw new Error('Unknown template ' + shot.template);
   const tplParams = {
     ...(shot.params || {}),
@@ -685,7 +686,8 @@ export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
 }
 
 export function assertShot(shot) {
-  if (!TEMPLATE_NAMES.includes(shot.template)) throw new Error('Unknown template ' + shot.template);
+  if (shot.recipe) normalizeRecipe(shot.recipe);
+  else if (!TEMPLATE_NAMES.includes(shot.template)) throw new Error('Unknown template ' + shot.template);
   if (!Number.isFinite(shot.start) || !Number.isFinite(shot.duration) || shot.duration <= 0) {
     throw new Error('Invalid shot time');
   }

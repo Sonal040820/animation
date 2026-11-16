@@ -10,6 +10,7 @@ import {STYLES} from './styles.mjs';
 import {avatarRigChoices} from './characters.mjs';
 import {SFX_TYPES,AMBIENCE_TYPES} from './audio.mjs';
 import {computeWindowLayout} from './scenery.mjs';
+import {normalizeRecipe} from './recipe.mjs';
 
 const LIB=path.dirname(fileURLToPath(import.meta.url));
 
@@ -259,7 +260,9 @@ export function validateProject(projectRef){
     const sid=shot.id||('shot_'+i);
 
     // 1. Template check
-    if(!validTemplates.includes(shot.template)){
+    if(shot.recipe){
+      try{normalizeRecipe(shot.recipe);}catch(e){errors.push({code:'INVALID_RECIPE',shot:sid,message:e.message});}
+    }else if(!validTemplates.includes(shot.template)){
       const sug=didYouMean(shot.template,validTemplates);
       errors.push({
         code:'UNKNOWN_TEMPLATE',
