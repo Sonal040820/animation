@@ -78,7 +78,7 @@ function newProject(){
     cursor+=duration;return obj;
   });
   fs.writeFileSync(path.join(dir,'manifest.json'),JSON.stringify({schema_version:1,slug:path.basename(dir),shots},null,2)+'\n');
-  fs.writeFileSync(path.join(dir,'config.json'),JSON.stringify({schema_version:1,aspect:'9:16',
+  fs.writeFileSync(path.join(dir,'config.json'),JSON.stringify({schema_version:1,aspect:'9:16',studio:'original-short-video-studio',
     resolution:'720p',fps:24,style:opts.style||'midnight',rig:'block',voice:'am_adam'},null,2)+'\n');
   output({created:path.relative(ROOT,dir),shots:shots.length,rendered:false});
 }

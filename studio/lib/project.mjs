@@ -41,6 +41,12 @@ export function enforceDataOnly(){
   for(const entry of fs.readdirSync(PROJECTS,{withFileTypes:true})){
     if(!entry.isDirectory())continue;
     const root=path.join(PROJECTS,entry.name);
+    // Legacy HyperFrames projects belong to another pipeline and are unchanged.
+    const configPath=path.join(root,'config.json');
+    if(!fs.existsSync(configPath))continue;
+    let marker;
+    try{marker=readJSON(configPath).studio}catch{continue}
+    if(marker!=='original-short-video-studio')continue;
     const stack=[root];
     while(stack.length){
       const dir=stack.pop();

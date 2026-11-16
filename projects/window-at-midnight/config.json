@@ -12,5 +12,6 @@
     "words_per_group": 2,
     "safe_area": 0.12
   },
-  "production_status": "setup_only_no_media_authorized"
+  "production_status": "setup_only_no_media_authorized",
+  "studio": "original-short-video-studio"
 }
