@@ -258,9 +258,11 @@ const TEMPLATES = {
     });
   },
   'window-view': (ctx, w, h, s, t, p) => {
+    const girlObj = typeof p?.girl === 'object' && p.girl !== null ? p.girl : null;
+    const showGirl = girlObj ? girlObj.visible !== false : p?.girl !== false;
     if (p?.interior === false) {
       building(ctx, w, h, s, t);
-      exteriorWindowLegacy(ctx, w, h, s, t, p?.girl !== false);
+      exteriorWindowLegacy(ctx, w, h, s, t, showGirl);
       const rnd = noise((p?.seed || 1) + 77);
       ctx.save();
       ctx.strokeStyle = '#8ab4c8';
@@ -277,20 +279,23 @@ const TEMPLATES = {
       return;
     }
 
-    const showGirl = p?.girl !== false;
-    const rawClock = p?.clock ?? p?.clockTime ?? '11:59';
+    const clockObj = typeof p?.clock === 'object' && p.clock !== null ? p.clock : null;
+    const rawClock = clockObj ? (clockObj.time ?? '11:59') : (p?.clock ?? p?.clockTime ?? '11:59');
     const clockStr = rawClock === '00:01' ? '12:01' : String(rawClock);
+    const clockArg = clockObj ? { ...clockObj, time: clockStr } : clockStr;
 
     drawRoomInterior(ctx, w, h, t, {
       seed: p?.seed || 1,
       curtains: p?.curtains ?? true,
       sill: p?.sill ?? true,
       clockTime: clockStr,
+      clock: clockArg,
       figureOutside: showGirl
         ? {
-            variant: p?.variant || 'girl',
-            expression: p?.expression || 'blank-stare',
-            pose: p?.pose || 'stand',
+            ...(girlObj || {}),
+            variant: girlObj?.variant || p?.variant || 'girl',
+            expression: girlObj?.expression || p?.expression || 'blank-stare',
+            pose: girlObj?.pose || p?.pose || 'stand',
             phase: t
           }
         : null,
@@ -298,12 +303,19 @@ const TEMPLATES = {
     });
 
     // Blurred foreground narrator silhouette in bottom-left (matches frame_02, frame_03, frame_10)
-    if (p?.narrator !== false) {
+    const narrObj = typeof p?.narrator === 'object' && p.narrator !== null ? p.narrator : null;
+    const showNarrator = narrObj ? narrObj.visible !== false : p?.narrator !== false;
+    if (showNarrator) {
+      const narrX = Number.isFinite(Number(narrObj?.x)) ? Number(narrObj.x) : 0.135;
+      const narrScale = Number.isFinite(Number(narrObj?.scale)) ? Number(narrObj.scale) : 1;
+      const narrDim = Number.isFinite(Number(narrObj?.dim)) ? clamp(Number(narrObj.dim), 0.1, 1) : 1;
       drawBlurred(ctx, w, h, Math.max(2, w * 0.005), (bctx, bw, bh) => {
+        bctx.save();
+        bctx.globalAlpha *= narrDim;
         drawFigure(bctx, {
-          x: bw * 0.135,
+          x: narrX <= 1 ? bw * narrX : narrX,
           y: bh * 1.02,
-          height: bh * 0.29,
+          height: bh * 0.29 * narrScale,
           rig: 'silhouette',
           variant: 'boy',
           facing: 1,
@@ -315,6 +327,7 @@ const TEMPLATES = {
           bodyColor: '#1a2c3e',
           dressColor: '#0e2433'
         });
+        bctx.restore();
       });
     }
 

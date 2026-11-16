@@ -136,9 +136,9 @@
       "cameraIntensity": 1.0,
       "params": {
         "interior": true,
-        "girl": true,
-        "clock": "11:59",
-        "narrator": true
+        "girl": { "visible": true, "depth": 0.78, "x": 0.72, "scale": 0.9 },
+        "clock": { "time": "11:59", "x": 0.275 },
+        "narrator": { "visible": true, "x": 0.135, "scale": 1.0, "dim": 0.85 }
       },
       "sfx": [
         { "type": "breath", "offset": 0.2 }

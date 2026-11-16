@@ -13,6 +13,8 @@ import {syncIndex} from '../lib/learning.mjs';
 import {engineHash} from '../lib/runner.mjs';
 import {verifyFilm} from '../lib/quality.mjs';
 import {planScript,normalizeDisplayText} from '../lib/planner.mjs';
+import {computeWindowLayout,groundDepthPosition} from '../lib/scenery.mjs';
+import {withBrowser} from '../lib/runner.mjs';
 
 test('All original reusable templates',()=>{
   assert.ok(TEMPLATE_NAMES.length>=16);
@@ -223,4 +225,48 @@ test('planScript plans golden 7-shot storyboard with 12:01 flash macro clock and
   assert.equal(shots[6].params.clock,'12:01');
   assert.equal(planned.auto_planned.length,7);
   assert.equal(planned.needs_new_code.length,0);
+});
+
+test('window-view depth helper & s2 girl bounding box inside pane and < 25% of pane height',async ()=>{
+  const pos=groundDepthPosition(0.78,{horizonY:100,groundY:200,minScale:0.75,maxScale:1.25,scaleBase:0.9});
+  assert.equal(typeof pos.x,'number');
+  assert.equal(typeof pos.y,'number');
+  assert.equal(typeof pos.scale,'number');
+  const script='Night. I saw a little girl outside my window. Staring right at me. The clock said eleven fifty nine. I blinked. Twelve oh one. She was gone.';
+  const planned=planScript(script,{slug:'golden-s2-test'});
+  const s2=planned.manifest.shots[1];
+  const layout=computeWindowLayout(720,1280,{girl:s2.params.girl});
+  assert.ok(layout.girl.visible);
+  assert.equal(layout.girl.behindFence,true);
+  assert.ok(layout.girl.box.left>=layout.pane.x+layout.pane.frameThick*0.5);
+  assert.ok(layout.girl.box.right<=layout.pane.x+layout.pane.w-layout.pane.frameThick*0.5);
+  assert.ok(layout.girl.box.top>=layout.pane.y+layout.pane.frameThick*0.5);
+  assert.ok(layout.girl.box.bottom<=layout.pane.sillTopY-layout.pane.frameThick*0.5);
+  assert.ok(layout.girl.height<layout.pane.h*0.25,`Expected girl height ${layout.girl.height} < 25% of pane height ${layout.pane.h}`);
+  // Render one still of s2 in Chromium and verify PNG output + bounding box
+  const tmpPng=path.join(os.tmpdir(),'golden_s2_still.png');
+  try{
+    await withBrowser(async page=>{
+      await page.evaluate(({shot})=>{
+        window.renderStudioFrame(shot,{style:'midnight',rig:'block',width:360,height:640},0.8,[]);
+      },{shot:{...s2,start:0.7,duration:2.4}});
+      const buf=await page.locator('#screen').screenshot({type:'png'});
+      fs.writeFileSync(tmpPng,buf);
+      assert.ok(buf.length>2000);
+    });
+  }finally{
+    fs.rmSync(tmpPng,{force:true});
+  }
+  // Placement validator catches oversized girl (>60% of window height)
+  const tmpProj=path.join(STUDIO,'..','projects','tmp-placement-test');
+  try{
+    fs.mkdirSync(tmpProj,{recursive:true});
+    fs.writeFileSync(path.join(tmpProj,'config.json'),JSON.stringify({schema_version:1,aspect:'9:16',studio:'original-short-video-studio',style:'midnight',rig:'block',width:720,height:1280}));
+    fs.writeFileSync(path.join(tmpProj,'manifest.json'),JSON.stringify({schema_version:1,shots:[{id:'s01',template:'window-view',start:0,duration:2,params:{interior:true,girl:{visible:true,depth:0,x:0.7,scale:3.0}}}]}));
+    const v=validateProject('projects/tmp-placement-test');
+    assert.equal(v.valid,false);
+    assert.ok(v.errors.some(e=>e.code==='WINDOW_PLACEMENT_HEIGHT'||e.code==='WINDOW_PLACEMENT_FEET'));
+  }finally{
+    fs.rmSync(tmpProj,{recursive:true,force:true});
+  }
 });

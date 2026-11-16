@@ -30,14 +30,14 @@ export const TEMPLATE_META = Object.freeze({
     example: { scene: 'fence-moon', moon: true, clouds: true, fence: true, tree: true }
   },
   'window-view': {
-    summary: 'Interior or exterior 4-pane window view with red curtains, sill digital clock, optional girl outside, and blurred foreground narrator.',
+    summary: 'Interior or exterior 4-pane window view with red curtains, sill digital clock, depth-placed girl outside, and blurred foreground narrator.',
     tags: ['interior', 'window', 'clock', 'silhouette', 'narrator', 'curtains'],
     params: {
       interior: { type: 'boolean', default: true },
-      girl: { type: 'boolean', default: true },
-      clock: { type: 'string', default: '11:59' },
+      girl: { type: 'boolean|object', default: true },
+      clock: { type: 'string|object', default: '11:59' },
       clockTime: { type: 'string', default: '11:59' },
-      narrator: { type: 'boolean', default: false },
+      narrator: { type: 'boolean|object', default: false },
       curtains: { type: 'boolean', default: true },
       sill: { type: 'boolean', default: true },
       rain: { type: 'boolean', default: false },
@@ -47,7 +47,7 @@ export const TEMPLATE_META = Object.freeze({
       pose: { type: 'enum', values: POSE_VALUES, default: 'stand' },
       seed: { type: 'number', min: 0, max: 999999, default: 1 }
     },
-    example: { interior: true, girl: true, clock: '11:59', narrator: true }
+    example: { interior: true, girl: { visible: true, depth: 0.78, x: 0.72, scale: 0.9 }, clock: { time: '11:59', x: 0.275 }, narrator: { visible: true } }
   },
   'character-medium': {
     summary: 'Medium character reaction shot supporting silhouette close-up head or full rig with blinks, expressions, and blurred room backdrop.',

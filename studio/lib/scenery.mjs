@@ -1,5 +1,5 @@
 // Original flat-vector horror scenery: moonlit night exterior, 4-pane room interior, OffscreenCanvas blur, atmosphere, vignette.
-import { clamp, noise, ellipse, stroke, rounded } from './core.mjs';
+import { clamp, mix, noise, ellipse, stroke, rounded } from './core.mjs';
 import { smoothNoise } from './motion.mjs';
 import { drawFigure } from './characters.mjs';
 import { drawDigitalClock } from './props.mjs';
@@ -262,6 +262,102 @@ export function drawNightExterior(ctx, w, h, t = 0, {
   ctx.restore();
 }
 
+// Maps normalized depth (0 = near foreground, 1 = far horizon) to screen {x, y, scale}.
+export function groundDepthPosition(depth = 0.5, {
+  x = 0.5,
+  left = 0,
+  width = 1,
+  horizonY = 0.65,
+  groundY = 0.95,
+  minScale = 0.75,
+  maxScale = 1.25,
+  scaleBase = 1
+} = {}) {
+  const d = clamp(Number.isFinite(Number(depth)) ? Number(depth) : 0.5, 0, 1);
+  const near = 1 - d;
+  const screenX = left + (Number.isFinite(Number(x)) ? Number(x) : 0.5) * width;
+  const y = mix(horizonY, groundY, near);
+  const scale = mix(minScale, maxScale, near) * (Number.isFinite(Number(scaleBase)) ? Number(scaleBase) : 1);
+  return { x: screenX, y, scale, depth: d, near };
+}
+
+// Computes exact window frame, pane, and actor bounding box metrics for layout & placement validation.
+export function computeWindowLayout(w, h, { girl = null, winOpt = true } = {}) {
+  const wx = typeof winOpt === 'object' && Number.isFinite(winOpt?.x) ? winOpt.x : w * 0.215;
+  const wy = typeof winOpt === 'object' && Number.isFinite(winOpt?.y) ? winOpt.y : h * 0.125;
+  const ww = typeof winOpt === 'object' && Number.isFinite(winOpt?.w) ? winOpt.w : w * 0.57;
+  const wh = typeof winOpt === 'object' && Number.isFinite(winOpt?.h) ? winOpt.h : h * 0.48;
+  const frameThick = Math.max(4, w * 0.022);
+  const midX = wx + ww * 0.488;
+  const midY = wy + wh * 0.50;
+  const sillTopY = wy + wh;
+
+  let girlBounds = null;
+  const isObj = typeof girl === 'object' && girl !== null;
+  const girlVisible = isObj ? girl.visible !== false : girl === true;
+  if (girlVisible) {
+    if (isObj) {
+      const gxFrac = Number.isFinite(Number(girl.x)) ? Number(girl.x) : 0.72;
+      const gDepth = Number.isFinite(Number(girl.depth)) ? Number(girl.depth) : 0.78;
+      const gScale = Number.isFinite(Number(girl.scale)) ? Number(girl.scale) : 0.9;
+      const pos = groundDepthPosition(gDepth, {
+        x: gxFrac,
+        left: wx,
+        width: ww,
+        horizonY: wy + wh * 0.725,
+        groundY: wy + wh * 0.90,
+        minScale: 0.75,
+        maxScale: 1.25,
+        scaleBase: gScale
+      });
+      const figH = wh * 0.24 * pos.scale;
+      const figW = figH * 0.28;
+      girlBounds = {
+        visible: true,
+        x: pos.x,
+        y: pos.y,
+        height: figH,
+        width: figW,
+        scale: pos.scale,
+        depth: pos.depth,
+        behindFence: pos.depth >= 0.5,
+        box: {
+          left: pos.x - figW * 0.5,
+          right: pos.x + figW * 0.5,
+          top: pos.y - figH,
+          bottom: pos.y
+        }
+      };
+    } else {
+      const gx = wx + ww * 0.61;
+      const gy = wy + wh * 0.855;
+      const figH = wh * 0.35;
+      const figW = figH * 0.28;
+      girlBounds = {
+        visible: true,
+        x: gx,
+        y: gy,
+        height: figH,
+        width: figW,
+        scale: 1,
+        depth: 0.4,
+        behindFence: false,
+        box: {
+          left: gx - figW * 0.5,
+          right: gx + figW * 0.5,
+          top: gy - figH,
+          bottom: gy
+        }
+      };
+    }
+  }
+
+  return {
+    pane: { x: wx, y: wy, w: ww, h: wh, midX, midY, frameThick, sillTopY },
+    girl: girlBounds
+  };
+}
+
 // Draws the dark bedroom interior with 4-pane window, red curtains, windowsill, optional digital clock, and optional figure outside.
 export function drawRoomInterior(ctx, w, h, t = 0, {
   seed = 1,
@@ -269,6 +365,7 @@ export function drawRoomInterior(ctx, w, h, t = 0, {
   curtains = true,
   sill = true,
   clockTime = null,
+  clock = null,
   figureOutside = null,
   lightLevel = 1
 } = {}) {
@@ -282,14 +379,12 @@ export function drawRoomInterior(ctx, w, h, t = 0, {
   ctx.fillStyle = wallGrad;
   ctx.fillRect(0, 0, w, h);
 
-  // Resolve window rectangle
-  const wx = typeof winOpt === 'object' && Number.isFinite(winOpt?.x) ? winOpt.x : w * 0.215;
-  const wy = typeof winOpt === 'object' && Number.isFinite(winOpt?.y) ? winOpt.y : h * 0.125;
-  const ww = typeof winOpt === 'object' && Number.isFinite(winOpt?.w) ? winOpt.w : w * 0.57;
-  const wh = typeof winOpt === 'object' && Number.isFinite(winOpt?.h) ? winOpt.h : h * 0.48;
+  // Resolve window rectangle & depth-aware figure placement
+  const layout = computeWindowLayout(w, h, { girl: figureOutside, winOpt });
+  const { x: wx, y: wy, w: ww, h: wh, midX, midY, frameThick, sillTopY } = layout.pane;
 
   if (winOpt !== false) {
-    // 2. Clipped exterior view through the 4-pane window
+    // 2. Clipped exterior view through the 4-pane window (drawn far to near)
     ctx.save();
     ctx.beginPath();
     ctx.rect(wx, wy, ww, wh);
@@ -357,16 +452,13 @@ export function drawRoomInterior(ctx, w, h, t = 0, {
     // Bare tree branches peeking in from right edge of window
     drawBareTree(ctx, wx + ww * 0.96, wy + wh * 0.72, wh * 0.42, t);
 
-    // Picket fence inside window
-    drawPicketFence(ctx, wx, ww, wy + wh * 0.64, wy + wh * 0.79, 0);
-
-    // Optional figure outside window (matches girl in lower-right pane of frame_03)
-    if (figureOutside) {
+    const drawOutsideGirl = () => {
+      if (!figureOutside || !layout.girl?.visible) return;
       const figOpts = typeof figureOutside === 'object' ? figureOutside : {};
       drawFigure(ctx, {
-        x: wx + ww * 0.61,
-        y: wy + wh * 0.855,
-        height: wh * 0.35,
+        x: layout.girl.x,
+        y: layout.girl.y,
+        height: layout.girl.height,
         rig: 'silhouette',
         variant: 'girl',
         facing: -1,
@@ -377,22 +469,27 @@ export function drawRoomInterior(ctx, w, h, t = 0, {
         rimColor: '#dceeff',
         bodyColor: '#0b1420',
         dressColor: '#9bc4f4',
-        ...figOpts
+        ...figOpts,
+        x: layout.girl.x,
+        y: layout.girl.y,
+        height: layout.girl.height
       });
-    }
+    };
+
+    // Draw far-to-near: girl behind fence if depth >= 0.5, otherwise fence first
+    if (layout.girl?.behindFence) drawOutsideGirl();
+    drawPicketFence(ctx, wx, ww, wy + wh * 0.64, wy + wh * 0.79, 0);
+    if (layout.girl && !layout.girl.behindFence) drawOutsideGirl();
 
     ctx.restore();
 
     // 3. 4-pane window frame and cross mullions
-    const frameThick = Math.max(4, w * 0.022);
     ctx.save();
     ctx.strokeStyle = '#18161f';
     ctx.lineWidth = frameThick;
     ctx.strokeRect(wx, wy, ww, wh);
 
     // Vertical center mullion & horizontal center mullion
-    const midX = wx + ww * 0.488;
-    const midY = wy + wh * 0.50;
     stroke(ctx, [midX, wy], [midX, wy + wh], frameThick * 0.92, '#18161f');
     stroke(ctx, [wx, midY], [wx + ww, midY], frameThick * 0.88, '#18161f');
 
@@ -402,7 +499,6 @@ export function drawRoomInterior(ctx, w, h, t = 0, {
   }
 
   // 4. Deep burgundy-red curtains with vertical folds (matches frame_02 & frame_03)
-  const sillTopY = wy + wh;
   if (curtains) {
     const cTopY = wy - h * 0.022;
     const cBotY = sillTopY + h * 0.004;
@@ -448,10 +544,16 @@ export function drawRoomInterior(ctx, w, h, t = 0, {
   }
 
   // 6. Sill Digital Clock (with warm red glow spill on curtain and sill, matches frame_03 & frame_10)
-  if (clockTime !== null && clockTime !== undefined && clockTime !== false) {
+  const resolvedClockTime = (typeof clock === 'object' && clock !== null)
+    ? (clock.time ?? clockTime)
+    : (clock ?? clockTime);
+  const clockXFrac = (typeof clock === 'object' && clock !== null && Number.isFinite(Number(clock.x)))
+    ? Number(clock.x)
+    : 0.275;
+  if (resolvedClockTime !== null && resolvedClockTime !== undefined && resolvedClockTime !== false) {
     const clockW = w * 0.22;
     const clockH = clockW * 0.375;
-    const clockCX = w * 0.275;
+    const clockCX = clockXFrac <= 1 ? w * clockXFrac : clockXFrac;
     const clockCY = sillTopY - clockH * 0.46;
 
     // Extra red light reflection on sill surface right under clock
@@ -471,7 +573,7 @@ export function drawRoomInterior(ctx, w, h, t = 0, {
       x: clockCX,
       y: clockCY,
       width: clockW,
-      time: String(clockTime),
+      time: String(resolvedClockTime),
       color: '#ff4d4d',
       glow: 1,
       ghost: 0.14,

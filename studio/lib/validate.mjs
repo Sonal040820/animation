@@ -9,6 +9,7 @@ import {CAMERA_MOVES} from './motion.mjs';
 import {STYLES} from './styles.mjs';
 import {avatarRigChoices} from './characters.mjs';
 import {SFX_TYPES,AMBIENCE_TYPES} from './audio.mjs';
+import {computeWindowLayout} from './scenery.mjs';
 
 const LIB=path.dirname(fileURLToPath(import.meta.url));
 
@@ -109,6 +110,16 @@ function getValidEmotions(){
 function checkParamValue(shotId,template,paramName,val,spec){
   if(!spec||typeof spec!=='object')return null;
   const t=spec.type;
+  if(t==='boolean|object'){
+    if(typeof val==='boolean')return null;
+    if(typeof val==='object'&&val!==null&&!Array.isArray(val))return null;
+    return {code:'MISTYPED_PARAM',shot:shotId,field:`params.${paramName}`,message:`Shot ${shotId} (${template}): param "${paramName}" must be boolean or object, got ${typeof val}`};
+  }
+  if(t==='string|object'){
+    if(typeof val==='string')return null;
+    if(typeof val==='object'&&val!==null&&!Array.isArray(val))return null;
+    return {code:'MISTYPED_PARAM',shot:shotId,field:`params.${paramName}`,message:`Shot ${shotId} (${template}): param "${paramName}" must be string or object, got ${typeof val}`};
+  }
   if(t==='boolean'&&typeof val!=='boolean'){
     return {code:'MISTYPED_PARAM',shot:shotId,field:`params.${paramName}`,message:`Shot ${shotId} (${template}): param "${paramName}" must be boolean, got ${typeof val}`};
   }
@@ -281,6 +292,30 @@ export function validateProject(projectRef){
           }else{
             const paramErr=checkParamValue(sid,shot.template,pk,pv,paramSchema[pk]);
             if(paramErr)errors.push(paramErr);
+          }
+        }
+        // Placement validator for window-view exterior actor
+        if(shot.template==='window-view'&&shotParams.interior!==false){
+          const w=Number(config.width)||720;
+          const h=Number(config.height)||1280;
+          const layout=computeWindowLayout(w,h,{girl:shotParams.girl??true});
+          if(layout.girl?.visible){
+            if(layout.girl.y>layout.pane.sillTopY-2||layout.girl.y<layout.pane.y+layout.pane.h*0.50){
+              errors.push({
+                code:'WINDOW_PLACEMENT_FEET',
+                shot:sid,
+                field:'params.girl',
+                message:`Shot ${sid} (window-view): actor feet (y=${layout.girl.y.toFixed(1)}) lie outside valid yard/sill region [${(layout.pane.y+layout.pane.h*0.50).toFixed(1)}, ${(layout.pane.sillTopY-2).toFixed(1)}]`
+              });
+            }
+            if(layout.girl.height>layout.pane.h*0.60){
+              errors.push({
+                code:'WINDOW_PLACEMENT_HEIGHT',
+                shot:sid,
+                field:'params.girl',
+                message:`Shot ${sid} (window-view): actor height (${layout.girl.height.toFixed(1)}) exceeds 60% of window height (${(layout.pane.h*0.60).toFixed(1)})`
+              });
+            }
           }
         }
       }
