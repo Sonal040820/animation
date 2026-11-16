@@ -11,6 +11,7 @@ import {browserExecutable,withBrowser,invoke,smoke,sheet,render,dimensions} from
 import {phrases,saveWords} from '../lib/timing.mjs';
 import {mix} from '../lib/audio.mjs';
 import {verifyFilm} from '../lib/quality.mjs';
+import {promoteVideo} from '../lib/learning.mjs';
 import {TEMPLATE_NAMES} from '../lib/templates.mjs';
 const argv=process.argv.slice(2),command=argv.shift();
 const opts={};
@@ -100,22 +101,9 @@ function makeVoice(){
 }
 function scan(){const errors=enforceDataOnly();if(errors.length)throw new Error('Unpromoted project source code: '+errors.join(', '));output({projectCodeViolations:0})}
 function promote(){
-  const p=project(),problems=enforceDataOnly();
-  if(problems.length)throw new Error('Project contains unpromoted source code: '+problems.join(', '));
-  const used=p.manifest.shots.filter(s=>TEMPLATE_NAMES.includes(s.template));
-  const total=p.manifest.shots.length,ratio=Math.round(used.length/total*100);
-  const statsPath=path.join(p.out,'render-stats.json');
-  const stats=fs.existsSync(statsPath)?readJSON(statsPath):null;
-  const media=path.join(p.out,'final.mp4');
-  if(!fs.existsSync(media))throw new Error('Promotion requires an actual completed, verified final.mp4');
-  if(!fs.existsSync(path.join(p.out,'verification.json')))throw new Error('Verify the film before promotion');
-  const cost=path.join(STUDIO,'COST.md');
-  fs.appendFileSync(cost,'\n| '+path.basename(p.dir)+' | '+total+' | '+ratio+'% | '+(stats?.totalRenderSeconds?.toFixed(1)||'unknown')+
-    ' | '+(opts.tokens||'not tracked')+' | '+(stats?.stats?.filter(x=>x.reused===x.frames).length||0)+' |');
-  const status=path.join(STUDIO,'STATUS.md');
-  fs.appendFileSync(status,'\n- '+new Date().toISOString()+': verified '+path.basename(p.dir)+
-    ', '+total+' template shots, '+ratio+'% reused; media saved under studio/out/.');
-  output({promoted:true,templateReusePercent:ratio,shots:total,addedToCost:true});
+  const p=project(),violations=enforceDataOnly();
+  if(violations.length)throw new Error('Unpromoted project code: '+violations.join(', '));
+  return output(promoteVideo(p,{tokens:opts.tokens}));
 }
 async function main(){
   if(command==='doctor')return await doctor();

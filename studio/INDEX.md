@@ -50,3 +50,6 @@ The index is a mandatory durable API memory file. Engine functions live in studi
 - promote --project projects/new — durable cost/reuse/status ledger
 
 No media generated during initial setup. When adding a template, update this index and add a one-frame smoke test.
+
+| Durable promotion | promoteVideo(project,{tokens}) => report | copies approved original reusable assets, logs verified costs and lessons |
+| Style grade registry | STYLE_GRADE (in lib/styles.mjs) | neutral/warm/cold grade data, original pixel font |

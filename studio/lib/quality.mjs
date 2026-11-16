@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {invoke} from './runner.mjs';
+import {spawnSync} from 'node:child_process';
 import {readJSON} from './project.mjs';
 export function verifyFilm(projectRef,project,quality){
   const file=path.join(project.out,'final.mp4');
@@ -21,10 +22,14 @@ export function verifyFilm(projectRef,project,quality){
   }
   const warnings=[];
   try{
-    const info=invoke('ffmpeg',['-hide_banner','-i',file,'-vf','blackdetect=d=0.85:pix_th=0.10,freezedetect=n=-50dB:d=1.6','-an','-f','null','-'],{timeout:120000});
-    if(/black_start:/.test(info))warnings.push('Long black section detected');
-    if(/freeze_start:/.test(info))warnings.push('Long repeated frame detected');
-  }catch{/* ffmpeg's diagnostic logs are returned on stderr, output validated above */}
+    const analysis=spawnSync('ffmpeg',['-hide_banner','-i',file,
+      '-vf','blackdetect=d=0.85:pix_th=0.10,freezedetect=n=-50dB:d=1.6',
+      '-an','-f','null','-'],{encoding:'utf8',timeout:120000,maxBuffer:1024*1024});
+    const diagnosis=analysis.stderr||'';
+    if(/black_start:/.test(diagnosis))warnings.push('Long black section detected');
+    if(/freeze_start:/.test(diagnosis))warnings.push('Long repeated frame detected');
+    if(analysis.status!==0)warnings.push('Frame analysis unavailable; ffmpeg exit '+analysis.status);
+  }catch{warnings.push('Frame analysis unavailable')}
   const report={status:'pass',file,duration:probe.format.duration,resolution:video.width+'x'+video.height,
     audio:true,warnings};
   fs.writeFileSync(path.join(project.out,'verification.json'),JSON.stringify(report,null,2));

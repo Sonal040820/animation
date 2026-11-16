@@ -53,7 +53,7 @@ export function promoteVideo(project,options={}){
   const secs=Number(stats.totalRenderSeconds);
   if(!Number.isFinite(secs)||secs<0)throw new Error('Render seconds unavailable');
   const fingerprint=sha(JSON.stringify({manifest:project.manifest,config:project.config,
-    stats,verification,promotions:project.manifest.promotions||[]}));
+    promotions:project.manifest.promotions||[]}));
   const marker=path.join(out,'promotion.json');
   if(fs.existsSync(marker)&&JSON.parse(fs.readFileSync(marker,'utf8')).fingerprint===fingerprint)
     return {promoted:true,reused:true,ratio,seconds:secs};
