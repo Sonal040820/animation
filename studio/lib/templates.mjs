@@ -1,6 +1,7 @@
 // Template-only shots: every visual element is drawn from code. Stateless frame API.
 import {clamp,ease,noise,drawBackground,ellipse,rounded,stroke,viewport,bitmapText,projection3D,caption,style} from './core.mjs';
 import {drawCharacter} from './characters.mjs';
+import {STYLE_GRADE} from './styles.mjs';
 export const TEMPLATE_NAMES=Object.freeze([
   'wide-establishing','window-view','character-medium','giant-face',
   'insert-macro-clock','data-card','3d-orbit','title-card'
@@ -90,6 +91,20 @@ export function drawStudioFrame(canvas,shot,config,seconds=0,words=[]){
   ctx.save();viewport(ctx,w,h,seconds,shot.camera||'push');
   TEMPLATES[shot.template](ctx,w,h,s,seconds,shot.params||{});
   ctx.restore();
+  // A data-driven vignette and subtle bloom wash, applied below captions.
+  const grade=STYLE_GRADE[config.style||'midnight'];
+  if(grade){
+    ctx.save();
+    const v=ctx.createRadialGradient(w*.5,h*.46,w*.16,w*.5,h*.47,Math.max(w,h)*.74);
+    v.addColorStop(0,'rgba(0,0,0,0)');
+    v.addColorStop(1,'rgba(0,0,0,'+grade.vignette+')');
+    ctx.fillStyle=v;ctx.fillRect(0,0,w,h);
+    ctx.restore();
+    ctx.save();ctx.globalAlpha=grade.bloom*.11;
+    const bloom=ctx.createRadialGradient(w*.75,h*.23,0,w*.75,h*.23,w*.65);
+    bloom.addColorStop(0,s.accent);bloom.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=bloom;ctx.fillRect(0,0,w,h);ctx.restore();
+  }
   ctx.save();caption(ctx,w,h,words,seconds+(shot.start||0),s);ctx.restore();
   const grain=noise((shot.seed||1)*8971+Math.floor(seconds*24));
   ctx.save();ctx.globalAlpha=s.grain;
