@@ -14,6 +14,7 @@ CACHE = ROOT / "studio" / ".cache" / "kokoro"
 BASE = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/"
 MODELS = {
     "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+    "kokoro-v1.0.int8.onnx": "ae315a79b623f244700e4afb9246c46a26066782e049ba174bf3ba433970ee9c",
     "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d",
 }
 
