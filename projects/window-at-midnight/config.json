@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "aspect": "9:16",
+  "resolution": "720p",
+  "fps": 24,
+  "style": "midnight",
+  "rig": "block",
+  "voice": "am_adam",
+  "sfx_enabled": true,
+  "captions": {
+    "position": 0.79,
+    "words_per_group": 2,
+    "safe_area": 0.12
+  },
+  "production_status": "setup_only_no_media_authorized"
+}
