@@ -14,8 +14,14 @@ State: SETUP ONLY, no new animation, test MP4, narration or creative contact she
 ## Actual setup acceptance
 - Green runner setup: https://github.com/Sonal040820/animation/actions/runs/43867609302
 - Verified Node 22.14.0, Python 3.12.7, Playwright 1.65.1, Chromium 159, FFmpeg/ffprobe 6.1.1; studio/environment.json and studio/package-lock.json committed by CI.
-- Eight low-resolution static template images passed. Scared-brow expression corrected after visual review; next CI will confirm regression.
+- Eight low-resolution static template images passed. Scared-brow expression corrected after visual review; final static smoke regression PASSED in run 43868905339.
 - No creative project frames, test video or narration have been generated.
+
+## Final setup acceptance
+- GitHub Actions run: https://github.com/Sonal040820/animation/actions/runs/43868905339 (SUCCESS).
+- Eight static 144x256 diagnostic PNGs rendered and visually inspected; no creative animation generated.
+- Lockfile and environment fingerprint stored in GitHub main; future same-version doctor runs reuse the verified fingerprint.
+- Per-video render time, narration performance and production MP4 are intentionally unmeasured and untested until first authorized video.
 
 ## Later (ONLY after authorization)
 - Run local Kokoro voice / align, generate and visually inspect an actual contact sheet.
