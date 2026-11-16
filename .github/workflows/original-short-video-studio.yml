@@ -167,6 +167,19 @@ jobs:
           node studio/cli/studio.mjs promote --project "$PROJECT_PATH"
           echo "SAFETY_LADDER_FINAL_COMPLETE"
 
+      - name: Commit durable learning after a verified authorized film
+        if: github.event_name == 'workflow_dispatch' && env.STUDIO_STAGE == 'render' && success()
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add studio/INDEX.md studio/LESSONS.md studio/COST.md studio/STATUS.md
+          if [[ -d studio/lib/assets ]]; then git add -A studio/lib/assets; fi
+          if ! git diff --cached --quiet; then
+            git commit -m "learn(studio): promote verified video reusable assets and measured costs [skip ci]"
+            git push origin HEAD:main || echo "Memory push denied; copy files from film artifact"
+          fi
+
       - name: Upload toolchain evidence and eight static template stills
         if: always()
         uses: actions/upload-artifact@v4
@@ -202,3 +215,7 @@ jobs:
             studio/out/*/final.mp4
             studio/out/*/verification.json
             studio/out/*/render-stats.json
+            studio/INDEX.md
+            studio/LESSONS.md
+            studio/COST.md
+            studio/STATUS.md
