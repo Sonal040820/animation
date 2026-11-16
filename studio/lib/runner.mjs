@@ -32,6 +32,8 @@ export function pythonExecutable(){
 }
 
 export function engineHash(libDir=LIB){
+  const registryDir=path.join(libDir,'registry');
+  const registry=fs.existsSync(registryDir)?fs.readdirSync(registryDir).filter(n=>n.endsWith('.json')).sort().map(n=>n+':'+sha(fs.readFileSync(path.join(registryDir,n)))).join('\n'):'';
   const files=fs.readdirSync(libDir,{withFileTypes:true})
     .filter(e=>e.isFile()&&/\.(mjs|json)$/i.test(e.name))
     .map(e=>e.name)
@@ -40,7 +42,7 @@ export function engineHash(libDir=LIB){
     const data=fs.readFileSync(path.join(libDir,name));
     return name+':'+sha(data);
   }).join('\n');
-  return sha(combined);
+  return sha(combined+registry);
 }
 
 export function browserExecutable(){

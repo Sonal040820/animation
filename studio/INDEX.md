@@ -122,6 +122,7 @@ No media generated during initial setup. When adding a template, update this ind
 | `studio/lib/audio.mjs` | `AMBIENCE_TYPES`, `MUSIC_MOODS`, `SFX_TYPES`, `mix`, `synthOriginalAudio` |
 | `studio/lib/characters.mjs` | `EXPRESSIONS`, `avatarRigChoices`, `blendExpression`, `drawCharacter`, `drawCharacterElite`, `drawFigure`, `drawHead` |
 | `studio/lib/core.mjs` | `STYLES`, `bitmapText`, `caption`, `clamp`, `drawBackground`, `ease`, `ellipse`, `measureVectorText`, `mix`, `noise`, `projection3D`, `pulse`, `rounded`, `spring`, `stroke`, `style`, `vectorText`, `viewport` |
+| `studio/lib/declarative.mjs` | `declarationEntry`, `validateDeclaration` |
 | `studio/lib/font.mjs` | `VECTOR_GLYPHS`, `measureVectorText`, `vectorText` |
 | `studio/lib/horror.mjs` | `HORROR_TEMPLATES`, `bedroomShadow`, `doorClose`, `doorPeephole`, `emptyHallway`, `intercomMacro`, `keyholeView`, `mirrorDouble`, `stairwell` |
 | `studio/lib/learning.mjs` | `CLI_COMMANDS`, `USAGE_FILE`, `buildAutoIndexSection`, `learnPlannerRules`, `promoteVideo`, `syncIndex`, `updateTemplateUsage` |
@@ -132,6 +133,7 @@ No media generated during initial setup. When adding a template, update this ind
 | `studio/lib/props.mjs` | `drawDigitalClock` |
 | `studio/lib/quality.mjs` | `measureMotion`, `verifyFilm` |
 | `studio/lib/recipe.mjs` | `EASINGS`, `FX`, `PROPS`, `RECIPE_REGISTRIES`, `RIGS`, `SETS`, `drawRecipe`, `mergeRecipe`, `normalizeRecipe`, `resolveActor`, `resolveKeys`, `resolveRecipe`, `worldPosition` |
+| `studio/lib/registry-promotion.mjs` | `countRecipeUsage`, `promoteRegistry` |
 | `studio/lib/runner.mjs` | `browserExecutable`, `dimensions`, `engineHash`, `invoke`, `pythonExecutable`, `render`, `sheet`, `smoke`, `withBrowser`, `withBrowserPool` |
 | `studio/lib/scenery.mjs` | `computeWindowLayout`, `drawAtmosphere`, `drawBlurred`, `drawNightExterior`, `drawRoomInterior`, `drawVignette`, `groundDepthPosition` |
 | `studio/lib/styles.mjs` | `STYLES`, `STYLE_GRADE` |

@@ -15,6 +15,7 @@ import {computeWindowLayout} from '../lib/scenery.mjs';
 import {TEMPLATE_NAMES} from '../lib/templates.mjs';
 import {presetRecipe,PRESETS} from '../lib/presets.mjs';
 import {normalizeRecipe,resolveRecipe} from '../lib/recipe.mjs';
+import {promoteRegistry} from '../lib/registry-promotion.mjs';
 
 const argv=process.argv.slice(2),command=argv.shift();
 const opts={};
@@ -184,6 +185,7 @@ function scan(){
 }
 
 async function promote(){
+  if(opts.asset){const result=promoteRegistry(projectArg,String(opts.asset));await syncIndex();return output(result);}
   const p=project(),violations=enforceDataOnly();
   if(violations.length)throw new Error('Unpromoted project code: '+violations.join(', '));
   return output(await promoteVideo(p,{tokens:opts.tokens}));

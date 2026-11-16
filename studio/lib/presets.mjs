@@ -9,7 +9,12 @@ export function presetRecipe(id,overrides={},params={}){
 }
 export function recipeShot(shot){
   if(shot.preset&&shot.recipe)throw Error('Choose preset or recipe, not both');
-  if(!shot.preset)return shot;
+  if(!shot.preset){
+    const id=shot.recipe?.set?.preset;
+    if(id?.startsWith('preset:'))return {...shot,template:id.slice(7),params:shot.recipe.set.params||{}};
+    return shot;
+  }
   const {preset,overrides,...rest}=shot;
-  return {...rest,template:preset,recipe:presetRecipe(preset,overrides,shot.params)};
+  const recipe=presetRecipe(preset,overrides,shot.params);
+  return {...rest,template:preset,params:recipe.set.params,recipe};
 }

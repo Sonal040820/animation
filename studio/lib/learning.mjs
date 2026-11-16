@@ -6,6 +6,7 @@ import {STUDIO,ROOT,sha,mkdir,readJSON} from './project.mjs';
 import {TEMPLATE_NAMES} from './templates.mjs';
 import {PLANNER_RULES_FILE,loadPlannerRules,matchShotRule} from './planner.mjs';
 import {RECIPE_REGISTRIES} from './recipe.mjs';
+import {countRecipeUsage} from './registry-promotion.mjs';
 
 const LIB=path.dirname(fileURLToPath(import.meta.url));
 export const USAGE_FILE=path.join(LIB,'usage.json');
@@ -83,6 +84,7 @@ export function learnPlannerRules(project){
   const learned=[];
 
   for(const shot of project.manifest.shots||[]){
+    if(!shot.template)continue;
     const lineIds=Array.isArray(shot.lines)&&shot.lines.length?shot.lines:(shot.line?[shot.line]:[]);
     const text=lineIds.map(id=>lineMap.get(id)||'').join(' ').trim();
     if(!text)continue;
@@ -231,7 +233,7 @@ function computePlanningStats(project){
       for(let i=0;i<shots.length;i++){
         const s=shots[i];
         const p=planned.find(x=>x.id===s.id)||planned[i];
-        if(p&&p.template===s.template&&JSON.stringify(p.params||{})===JSON.stringify(s.params||{})){
+        if(p&&(p.template||p.preset)===s.template&&JSON.stringify(p.params||p.overrides?.set?.params||{})===JSON.stringify(s.params||{})){
           autoCount++;
         }
       }
@@ -290,6 +292,9 @@ export async function promoteVideo(project,options={}){
     indexAdditions.push(promoteAsset(project,record));
 
   const usage=updateTemplateUsage(project);
+  const recipeUsage=countRecipeUsage(shots);
+  usage.registry??={};for(const [id,count] of Object.entries(recipeUsage.counts))usage.registry[id]=(usage.registry[id]||0)+count;
+  fs.writeFileSync(USAGE_FILE,JSON.stringify(usage,null,2)+'\n');
   const learnedRules=learnPlannerRules(project);
   await syncIndex({check:false});
 
@@ -306,6 +311,7 @@ export async function promoteVideo(project,options={}){
   }
   const plannedCol=`${planStats.autoPercent}% auto (${planStats.autoShots}/${shots.length}) / ${100-planStats.autoPercent}% hand-edited`;
   fs.appendFileSync(costFile,`\n| ${slug} | ${shots.length} | ${ratio}% | ${plannedCol} | ${secs.toFixed(1)} | ${cached} | ${voiceProvider} |\n`);
+  fs.appendFileSync(costFile,`\nRecipe metrics for ${slug}: ${recipeUsage.recipes}/${shots.length} recipes (${recipeUsage.recipePercent.toFixed(1)}%); registry uses ${JSON.stringify(recipeUsage.counts)}; render ${secs.toFixed(1)}s. New entries/engine lines require the story audit.\n`);
 
   const lesson=`- ${new Date().toISOString()} / ${slug}: verified ${shots.length} shots, ${ratio}% template reuse, ${plannedCol}, ${secs.toFixed(1)} render seconds, ${cached} fully cached shots, voice=${voiceProvider}; ${comparison}.\n`;
   const lessonsFile=path.join(STUDIO,'LESSONS.md');

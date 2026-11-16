@@ -4,6 +4,8 @@ import {groundDepthPosition, drawNightExterior, drawRoomInterior, drawAtmosphere
 import {drawFigure, EXPRESSIONS, blendExpression} from './characters.mjs';
 import {drawDigitalClock} from './props.mjs';
 import {HORROR_TEMPLATES} from './horror.mjs';
+import catalog from './registry/catalog.json' with {type:'json'};
+import {declarationEntry} from './declarative.mjs';
 
 const number=(value=0,min=-Infinity,max=Infinity)=>({type:'number',default:value,min,max});
 const bool=(value=false)=>({type:'boolean',default:value});
@@ -43,6 +45,10 @@ export const FX={
   glow:entry({amount:number(.15,0,1),color:string('#a9cee9')},(c,w,h,s,t,p)=>{const g=c.createRadialGradient(w/2,h*.4,0,w/2,h*.4,w*.7);g.addColorStop(0,p.color);g.addColorStop(1,'transparent');c.globalAlpha*=p.amount;c.fillStyle=g;c.fillRect(0,0,w,h);})
 };
 export const RECIPE_REGISTRIES={sets:SETS,props:PROPS,rigs:RIGS,fx:FX,easings:EASINGS};
+for(const [kind,entries] of Object.entries(catalog))for(const [id,data] of Object.entries(entries)){
+  if(Object.hasOwn(RECIPE_REGISTRIES[kind],id))throw Error('Registry id collision '+id);
+  RECIPE_REGISTRIES[kind][id]=declarationEntry(data);
+}
 const poses=['stand','walk','look','flinch','still','idle','run','fear'];
 const actorFields=['id','rig','color','pos','scale','layer','keys','pose','expression','look','blink','talk','blend'];
 const propFields=['id','type','pos','scale','layer','state','keys'];
@@ -61,17 +67,19 @@ function keys(list,allowed,check,label){
   let last=-1;
   for(const key of list){fields(key,['t','easing',...allowed],label);finite(key.t,`${label}.t`,0);if(key.t<=last)throw Error(`${label} times must strictly increase`);last=key.t;known(key.easing||'linear',EASINGS,'easing');check(key);}
 }
-export function worldPosition(pos={x:.5,depth:.5},scale=1){
+export function worldPosition(pos={x:.5,depth:.5},scale=1,set='void'){
   // Phase 1 uses reversed depth; retain its contract for legacy projects.
-  const p=groundDepthPosition(1-pos.depth,{x:pos.x,horizonY:.38,groundY:.80,minScale:.55,maxScale:1,scaleBase:scale});
+  const window=set==='bedroom-window'||set==='preset:window-view';
+  const p=groundDepthPosition(1-pos.depth,{x:pos.x,horizonY:window?.40:.38,groundY:window?.56:.80,minScale:window?.25:.55,maxScale:window?.45:1,scaleBase:scale});
   return {x:p.x,y:p.y,scale:p.scale};
 }
-function placement(item,actor){
+function placement(item,actor,set){
   fields(item.pos,['x','depth'],'pos');finite(item.pos.x,'pos.x',0,1);finite(item.pos.depth,'pos.depth',0,1);finite(item.scale??1,'scale',.05,2);
   if(item.layer!==undefined)finite(item.layer,'layer',-100,100);
-  const p=worldPosition(item.pos,item.scale??1),height=(actor?.28:.18)*p.scale,width=(actor?.13:.28)*p.scale;
+  const p=worldPosition(item.pos,item.scale??1,set),height=(actor?.32:.18)*p.scale,width=(actor?.24:.28)*p.scale;
   if(p.y>=.77)throw Error('Placement overlaps caption zone at 79%');
   if(p.x-width/2<.04||p.x+width/2>.96||p.y-height<.04)throw Error('Placement bounds outside safe area');
+  if((set==='bedroom-window'||set==='preset:window-view')&&(p.x-width/2<.24||p.x+width/2>.76||p.y-height<.15||p.y>.58))throw Error('Placement overlaps window frame/sill');
 }
 function actorValues(a){
   if(a.pose!==undefined)known(a.pose,Object.fromEntries(poses.map(x=>[x,true])),'pose');
@@ -92,11 +100,11 @@ export function normalizeRecipe(input){
   for(const a of r.actors){
     fields(a,actorFields,'actor');if(typeof a.id!=='string'||!a.id||ids.has(a.id))throw Error('Actor id must be unique and nonempty');ids.add(a.id);
     a.rig??='silhouette';known(a.rig,RIGS,'rig');a.pos??={x:.5,depth:.5};a.scale??=1;a.pose??='stand';a.expression??='neutral';a.color??='#8fb4e6';a.keys??=[];
-    actorValues(a);placement(a,true);keys(a.keys,actorFields.filter(x=>!['id','rig','keys'].includes(x)),k=>{actorValues(k);placement({...a,...k},true);},'actor.keys');
+    actorValues(a);placement(a,true,r.set.preset);keys(a.keys,actorFields.filter(x=>!['id','rig','keys'].includes(x)),k=>{actorValues(k);placement({...a,...k},true,r.set.preset);},'actor.keys');
   }
   for(const p of r.props){
     fields(p,propFields,'prop');known(p.type,PROPS,'prop');p.pos??={x:.5,depth:.5};p.scale??=1;p.state={...PROPS[p.type].defaults,...p.state};p.keys??=[];
-    params(p.state,PROPS[p.type],'prop.state');placement(p,false);keys(p.keys,['pos','scale','layer','state'],k=>{if(k.state)params(k.state,PROPS[p.type],'prop.state');placement({...p,...k},false);},'prop.keys');
+    params(p.state,PROPS[p.type],'prop.state');placement(p,false,r.set.preset);keys(p.keys,['pos','scale','layer','state'],k=>{if(k.state)params(k.state,PROPS[p.type],'prop.state');placement({...p,...k},false,r.set.preset);},'prop.keys');
   }
   if(r.camera){fields(r.camera,['keys','shake'],'camera');const check=k=>{for(const f of cameraFields)if(k[f]!==undefined)finite(k[f],`camera.${f}`,f==='zoom'?.1:f==='blur'?0:-10,f==='blur'?40:10);};keys(r.camera.keys||[],cameraFields,check,'camera.keys');if(r.camera.shake){fields(r.camera.shake,['amount','decay'],'shake');finite(r.camera.shake.amount,'shake.amount',0,1);finite(r.camera.shake.decay??5,'shake.decay',0,50);}}
   for(const f of r.fx){fields(f,['type','params','keys'],'fx');known(f.type,FX,'fx');f.params={...FX[f.type].defaults,...f.params};params(f.params,FX[f.type],'fx.params');keys(f.keys||[],['params'],k=>{if(k.params)params(k.params,FX[f.type],'fx.params');},'fx.keys');}
@@ -139,6 +147,6 @@ export function drawRecipe(ctx,w,h,s,t,recipe,context={}){
   ctx.save();ctx.translate(w/2+cam.x*w,h/2+cam.y*h);ctx.rotate(cam.rotation);ctx.scale(cam.zoom,cam.zoom);ctx.translate(-w/2,-h/2);if(cam.blur)ctx.filter=`blur(${cam.blur*w/720}px)`;
   SETS[r.set.preset].draw(ctx,w,h,s,t,{...r.set.params,duration:context.duration,seed:r.set.params.seed??context.seed,cues:context.cues});
   const items=[...r.actors.map(a=>({...a,actor:true})),...r.props].sort((a,b)=>a.pos.depth-b.pos.depth||(a.layer||0)-(b.layer||0));
-  for(const item of items){const p=worldPosition(item.pos,item.scale);ctx.save();if(item.actor){let blink=item.blink;for(const cue of context.cues||[]){if(cue.action==='blink'&&(!cue.actor||cue.actor===item.id)){const dt=t-cue.localTime,d=cue.duration||.16;if(dt>=0&&dt<d)blink=Math.sin(Math.PI*dt/d);}}drawFigure(ctx,{x:p.x*w,y:p.y*h,height:.28*p.scale*h,rig:item.rig,pose:item.pose,poseWeights:item.poseWeights,expression:item.expression,gaze:{x:item.look?.[0]||0,y:item.look?.[1]||0},blink,phase:t,dressColor:item.color});}else{ctx.translate(p.x*w,p.y*h);PROPS[item.type].draw(ctx,.28*p.scale*w,.18*p.scale*h,s,t,item.state);}ctx.restore();}
+  for(const item of items){const p=worldPosition(item.pos,item.scale,r.set.preset);ctx.save();if(item.actor){let blink=item.blink;for(const cue of context.cues||[]){if(cue.action==='blink'&&(!cue.actor||cue.actor===item.id)){const dt=t-cue.localTime,d=cue.duration||.16;if(dt>=0&&dt<d)blink=Math.sin(Math.PI*dt/d);}}drawFigure(ctx,{x:p.x*w,y:p.y*h,height:.28*p.scale*h,rig:item.rig,pose:item.pose,poseWeights:item.poseWeights,expression:item.expression,gaze:{x:item.look?.[0]||0,y:item.look?.[1]||0},blink,phase:t,dressColor:item.color});}else{ctx.translate(p.x*w,p.y*h);PROPS[item.type].draw(ctx,.28*p.scale*w,.18*p.scale*h,s,t,item.state);}ctx.restore();}
   for(const f of r.fx){ctx.save();FX[f.type].draw(ctx,w,h,s,t,f.params);ctx.restore();}ctx.restore();
 }
