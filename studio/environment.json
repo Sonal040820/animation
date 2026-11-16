@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "status": "verified",
+  "fingerprint": "db95259dd067a37f4f03464474b99d4844574937eb0e7ba1edb68ca2352d043e",
+  "platform": "linux",
+  "arch": "x64",
+  "node": "v22.14.0",
+  "python": "Python 3.12.7",
+  "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+  "ffprobe": "ffprobe version 6.1.1-3ubuntu5 Copyright (c) 2007-2023 the FFmpeg developers",
+  "playwright": "1.65.1",
+  "chromium": "Google Chrome for Testing 159.0.8154.6",
+  "browserSource": "playwright-pinned",
+  "browserOverrideBoolean": false,
+  "checks": {
+    "canvas2d": true,
+    "offscreenCanvas": true
+  },
+  "renderer": "Canvas2D+Chromium+ffmpeg",
+  "voice": "optional Kokoro ONNX; models not downloaded during setup",
+  "checked_at": "2026-11-16T12:34:39.109Z"
+}
