@@ -1,0 +1,204 @@
+name: Original short-video studio (CPU only)
+
+on:
+  push:
+    paths:
+      - 'studio/lib/**'
+      - 'studio/cli/**'
+      - 'studio/package.json'
+      - 'studio/tests/**'
+      - '.github/workflows/original-short-video-studio.yml'
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'setup = no video; sheet = static storyboard; render = approved movie'
+        type: choice
+        options: [setup, sheet, render]
+        default: setup
+        required: true
+      project_path:
+        description: 'Data-only project path (projects/<slug>)'
+        default: projects/window-at-midnight
+        required: true
+        type: string
+      quality:
+        description: 'Render quality'
+        type: choice
+        options: [draft, preview, standard, high]
+        default: standard
+        required: true
+      approved_sheet_sha:
+        description: 'Required for render; SHA256 from reviewed static sheet'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: original-short-studio-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  studio:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 115
+    env:
+      PROJECT_PATH: ${{ inputs.project_path || 'projects/window-at-midnight' }}
+      VIDEO_QUALITY: ${{ inputs.quality || 'standard' }}
+      STUDIO_STAGE: ${{ inputs.stage || 'setup' }}
+      APPROVED_SHEET_SHA: ${{ inputs.approved_sheet_sha || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'
+          cache: 'npm'
+          cache-dependency-path: studio/package.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.7'
+          cache: 'pip'
+          cache-dependency-path: studio/requirements-voice.txt
+
+      - name: Verify FFmpeg availability
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends ffmpeg
+          fi
+          ffmpeg -version | head -1
+          ffprobe -version | head -1
+
+      - name: Resolve and install exactly pinned Playwright
+        working-directory: studio
+        run: |
+          set -euo pipefail
+          if [[ ! -s package-lock.json ]]; then
+            npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          fi
+          npm ci --ignore-scripts --no-audit --no-fund
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/ms-playwright
+            studio/.cache/kokoro
+          key: original-studio-${{ runner.os }}-${{ hashFiles('studio/package.json','studio/package-lock.json') }}-v1
+
+      - name: Install pinned Chromium runtime
+        working-directory: studio
+        run: |
+          set -euo pipefail
+          npx --no-install playwright install --with-deps chromium
+
+      - name: Capability probe and cached environment.json
+        run: |
+          set -euo pipefail
+          node studio/cli/studio.mjs doctor
+
+      - name: Static template smoke and unit contracts (NO video)
+        run: |
+          set -euo pipefail
+          node --test studio/tests/*.test.mjs
+          node studio/cli/studio.mjs check
+          node studio/cli/studio.mjs smoke
+
+      - name: Persist verified toolchain and lockfile to repository
+        if: github.event_name == 'push' || env.STUDIO_STAGE == 'setup'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add studio/environment.json studio/package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m "ci(studio): verified CPU toolchain and package lock [skip ci]"
+            git push origin HEAD:main || echo "Repository write denied; files remain in setup artifact"
+          fi
+
+      - name: Generate narration and still contact sheet only on explicit request
+        if: github.event_name == 'workflow_dispatch' && (env.STUDIO_STAGE == 'sheet' || env.STUDIO_STAGE == 'render')
+        run: |
+          set -euo pipefail
+          python3 -m pip install -r studio/requirements-voice.txt
+          if ! node studio/cli/studio.mjs make-voice --project "$PROJECT_PATH"; then
+            echo "KOKORO_UNAVAILABLE: continuing with captions plus original ambience"
+          fi
+          node studio/cli/studio.mjs align --project "$PROJECT_PATH"
+          node studio/cli/studio.mjs sheet --project "$PROJECT_PATH" --quality draft
+          path="studio/out/$(basename "$PROJECT_PATH")/contact-sheet.png"
+          sha256sum "$path" | cut -d' ' -f1 > studio/sheet-approval.sha256
+          cat studio/sheet-approval.sha256
+
+      - name: Enforce reviewed contact sheet before movie frames
+        if: github.event_name == 'workflow_dispatch' && env.STUDIO_STAGE == 'render'
+        run: |
+          set -euo pipefail
+          [[ "$APPROVED_SHEET_SHA" =~ ^[0-9a-fA-F]{64}$ ]] || {
+            echo "SHEET_REVIEW_REQUIRED: submit approved sheet SHA"
+            exit 1
+          }
+          [[ "$(cat studio/sheet-approval.sha256)" == "$APPROVED_SHEET_SHA" ]] || {
+            echo "SHEET_CHANGED: no movie rendered; review new contact sheet"
+            exit 1
+          }
+
+      - name: Render a rough playable draft first
+        if: github.event_name == 'workflow_dispatch' && env.STUDIO_STAGE == 'render'
+        run: |
+          set -euo pipefail
+          node studio/cli/studio.mjs render --project "$PROJECT_PATH" --quality draft
+          node studio/cli/studio.mjs mix --project "$PROJECT_PATH"
+          node studio/cli/studio.mjs verify --project "$PROJECT_PATH" --quality draft
+          cp "studio/out/$(basename "$PROJECT_PATH")/final.mp4" \
+             "studio/out/$(basename "$PROJECT_PATH")/draft.mp4"
+          echo "SAFETY_LADDER_LEVEL_1_COMPLETE"
+
+      - name: Render, mix, verify and promote final-quality film
+        if: github.event_name == 'workflow_dispatch' && env.STUDIO_STAGE == 'render'
+        run: |
+          set -euo pipefail
+          node studio/cli/studio.mjs render --project "$PROJECT_PATH" --quality "$VIDEO_QUALITY"
+          node studio/cli/studio.mjs mix --project "$PROJECT_PATH"
+          node studio/cli/studio.mjs verify --project "$PROJECT_PATH" --quality "$VIDEO_QUALITY"
+          node studio/cli/studio.mjs promote --project "$PROJECT_PATH"
+          echo "SAFETY_LADDER_FINAL_COMPLETE"
+
+      - name: Upload toolchain evidence and eight static template stills
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-studio-setup-evidence
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            studio/environment.json
+            studio/package-lock.json
+            studio/.cache/template-smoke/*.png
+
+      - name: Upload project contact sheet for review
+        if: github.event_name == 'workflow_dispatch' && (env.STUDIO_STAGE == 'sheet' || env.STUDIO_STAGE == 'render')
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-studio-contact-sheet
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            studio/out/*/contact-sheet.png
+            studio/sheet-approval.sha256
+
+      - name: Upload best draft, final MP4 and media metrics if authorized
+        if: github.event_name == 'workflow_dispatch' && env.STUDIO_STAGE == 'render' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-studio-movie
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            studio/out/*/draft.mp4
+            studio/out/*/final.mp4
+            studio/out/*/verification.json
+            studio/out/*/render-stats.json
