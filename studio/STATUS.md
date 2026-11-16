@@ -31,3 +31,5 @@ State: SETUP ONLY, no new animation, test MP4, narration or creative contact she
 
 ## Resume order
 Read STATUS, INDEX, LESSONS, COST. Check latest workflow logs before changing code. Preserve working renderer components; avoid unnecessary rewrites.
+
+- 2026-11-16T13:20:10.562Z: the-wrong-side promoted with 100% template reuse, 398.1 seconds; First measured production run.

@@ -7,3 +7,5 @@ Do not invent counts, timing, billing, token usage or GPU quotas. After a verifi
 | _Setup only — no film rendered_ | — | — | — | — | — |
 
 Approximately 40 CPU-hours/month is the requested planning budget, not a verified entitlement. Static tests are not logged as videos.
+
+| the-wrong-side | 19 | 100% | 398.1 | not tracked | 0 |
