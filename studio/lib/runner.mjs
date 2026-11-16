@@ -71,20 +71,41 @@ export async function sheet(projectRef,quality='draft'){
   const project=loadProject(projectRef),size=dimensions(quality);
   const out=path.join(STUDIO,'out',path.basename(project.dir));
   const dir=path.join(out,'sheet-frames');mkdir(dir);
-  const words=wordsFor(project);
+  const sheetFile=path.join(out,'contact-sheet.png');
+  const words=wordsFor(project),n=project.manifest.shots.length;
+  const cols=Math.min(4,n),rows=Math.ceil(n/cols);
   await withBrowser(async page=>{
-    for(let i=0;i<project.manifest.shots.length;i++){
+    const images=[];
+    for(let i=0;i<n;i++){
       const shot=project.manifest.shots[i];
       const local=shot.duration*.5;
-      await capture(page,shot,{...project.config,...size},local,words,path.join(dir,'shot_'+String(i).padStart(3,'0')+'.png'));
+      const file=path.join(dir,'shot_'+String(i).padStart(3,'0')+'.png');
+      await capture(page,shot,{...project.config,...size},local,words,file);
+      images.push(fs.readFileSync(file).toString('base64'));
     }
+    // Compose the ENTIRE contact sheet using the already running pinned browser.
+    // FFmpeg tile with -frames:v 1 produced only the first still on some runners.
+    const base64=await page.evaluate(async ({images,cols,rows})=>{
+      const ww=180,hh=320,pad=12,margin=8;
+      const board=document.createElement('canvas');
+      board.width=cols*(ww+pad)+margin;
+      board.height=rows*(hh+pad)+margin;
+      const ctx=board.getContext('2d',{alpha:false});
+      ctx.fillStyle='#080d17';ctx.fillRect(0,0,board.width,board.height);
+      for(let i=0;i<images.length;i++){
+        const image=new Image();
+        image.src='data:image/png;base64,'+images[i];
+        await image.decode();
+        const x=margin+(i%cols)*(ww+pad),y=margin+Math.floor(i/cols)*(hh+pad);
+        ctx.drawImage(image,x,y,ww,hh);
+        ctx.fillStyle='#db7683';ctx.fillRect(x,y,Math.max(2,Math.floor(ww*.015)),14);
+      }
+      return board.toDataURL('image/png').slice('data:image/png;base64,'.length);
+    },{images,cols,rows});
+    fs.writeFileSync(sheetFile,Buffer.from(base64,'base64'));
   });
-  const sheetFile=path.join(out,'contact-sheet.png');
-  const n=project.manifest.shots.length;
-  const cols=Math.min(4,n),rows=Math.ceil(n/cols);
-  invoke('ffmpeg',['-hide_banner','-loglevel','error','-y','-framerate','1','-i',path.join(dir,'shot_%03d.png'),
-    '-vf','scale=180:320,tile='+cols+'x'+rows+':padding=8:margin=8','-frames:v','1',sheetFile],{timeout:120000});
-  if(!fs.existsSync(sheetFile)||fs.statSync(sheetFile).size<1000)throw new Error('Contact sheet creation failed');
+  if(!fs.existsSync(sheetFile)||fs.statSync(sheetFile).size<1000)
+    throw new Error('Contact sheet creation failed');
   return {out:sheetFile,shots:n};
 }
 export async function smoke(){
