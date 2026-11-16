@@ -484,7 +484,8 @@ def synthesize_v2(project: Path, cfg: dict, provider: str, kokoro):
 
     for index, line in enumerate(lines):
         line_id = str(line.get("id") or f"l{index+1}")
-        text = str(line.get("text") or "").strip()
+        text = str(line.get("spoken") or line.get("text") or "").strip()
+        display_text = str(line.get("display") or line.get("text") or text).strip()
         if not text:
             raise RuntimeError(f"Empty dialogue line text at {line_id}")
         speaker = str(line.get("speaker") or default_speaker)
@@ -592,7 +593,9 @@ def synthesize_v2(project: Path, cfg: dict, provider: str, kokoro):
         line_entry = {
             "id": line_id,
             "speaker": speaker,
-            "text": text,
+            "spoken": text,
+            "display": display_text,
+            "text": display_text,
             "emotion": emotion,
             "start": start_sec,
             "end": end_sec,

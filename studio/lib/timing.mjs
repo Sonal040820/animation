@@ -12,13 +12,14 @@ export function phrases(script){
   return items.map(x=>x.trim()).filter(Boolean);
 }
 
-const DEFAULT_EMPHASIS=/^(NIGHT|BLINKED|GONE|TWELVE|STARE|STARING|ONE|NEITHER|OUTSIDE|ALONE|DOOR|COME|IN|REAL|MYSELF)$/i;
+const DEFAULT_EMPHASIS=/^(NIGHT|BLINKED|GONE|TWELVE|STARE|STARING|ONE|1159|1201|NEITHER|OUTSIDE|ALONE|DOOR|COME|IN|REAL|MYSELF)$/i;
 
 function isEmphasized(groupTokens,lineEmphasisSet,globalEmphasisSet){
   for(const tok of groupTokens){
+    const rawUpper=String(tok).trim().toUpperCase().replace(/[.!?,]+$/,'');
     const clean=String(tok).replace(/[^a-z0-9]/gi,'').toUpperCase();
-    if(!clean)continue;
-    if(lineEmphasisSet.has(clean)||globalEmphasisSet.has(clean))return true;
+    if(!clean&&!rawUpper)continue;
+    if(lineEmphasisSet.has(clean)||lineEmphasisSet.has(rawUpper)||globalEmphasisSet.has(clean)||globalEmphasisSet.has(rawUpper))return true;
     if(DEFAULT_EMPHASIS.test(clean))return true;
   }
   return false;
@@ -30,10 +31,24 @@ export function alignMeasured(linesJson,{emphasis=[]}={}){
   const globalSet=new Set();
   const perLineMap=new Map();
   if(Array.isArray(emphasis)){
-    for(const w of emphasis)globalSet.add(String(w).replace(/[^a-z0-9]/gi,'').toUpperCase());
+    for(const w of emphasis){
+      const clean=String(w).replace(/[^a-z0-9]/gi,'').toUpperCase();
+      const raw=String(w).trim().toUpperCase().replace(/[.!?,]+$/,'');
+      if(clean)globalSet.add(clean);
+      if(raw)globalSet.add(raw);
+    }
   }else if(emphasis&&typeof emphasis==='object'){
     for(const [k,v] of Object.entries(emphasis)){
-      if(Array.isArray(v))perLineMap.set(k,new Set(v.map(x=>String(x).replace(/[^a-z0-9]/gi,'').toUpperCase())));
+      if(Array.isArray(v)){
+        const s=new Set();
+        for(const x of v){
+          const clean=String(x).replace(/[^a-z0-9]/gi,'').toUpperCase();
+          const raw=String(x).trim().toUpperCase().replace(/[.!?,]+$/,'');
+          if(clean)s.add(clean);
+          if(raw)s.add(raw);
+        }
+        perLineMap.set(k,s);
+      }
     }
   }
   const words=[];
@@ -47,10 +62,16 @@ export function alignMeasured(linesJson,{emphasis=[]}={}){
     if(end>maxEnd)maxEnd=end;
     const lineSet=new Set(perLineMap.get(line.id)||[]);
     if(Array.isArray(line.emphasis)){
-      for(const w of line.emphasis)lineSet.add(String(w).replace(/[^a-z0-9]/gi,'').toUpperCase());
+      for(const w of line.emphasis){
+        const clean=String(w).replace(/[^a-z0-9]/gi,'').toUpperCase();
+        const raw=String(w).trim().toUpperCase().replace(/[.!?,]+$/,'');
+        if(clean)lineSet.add(clean);
+        if(raw)lineSet.add(raw);
+      }
     }
-    // Split line by sentence boundaries first so caption groups never cross sentences
-    const sents=phrases(line.text);
+    // Split display text by sentence boundaries first so caption groups never cross sentences
+    const displayText=String(line.display??line.text??line.spoken??'').trim();
+    const sents=phrases(displayText);
     const groups=[];
     for(const sent of sents){
       const tokens=tokenize(sent);
@@ -128,19 +149,20 @@ export function saveWords(project,text,durations=null,total=10){
 export function alignDialogue(document){
   const lines=document.lines||[];
   if(!lines.length)throw new Error('Invalid dialogue: no lines');
-  const isV2=document.schema_version===2||lines.some(l=>!Number.isFinite(Number(l.at))||!Number.isFinite(Number(l.duration)));
-  if(isV2){
+  const isV2Plus=document.schema_version>=2||lines.some(l=>!Number.isFinite(Number(l.at))||!Number.isFinite(Number(l.duration)));
+  if(isV2Plus){
     let cursor=0;
     const estLines=lines.map((l,idx)=>{
-      const text=String(l.text||'').trim();
-      const wc=text.split(/\s+/).filter(Boolean).length;
-      const spoken=Math.max(0.75,+(wc*0.32+text.length*0.018).toFixed(3));
+      const spoken=String(l.spoken??l.text??'').trim();
+      const display=String(l.display??l.text??spoken).trim();
+      const wc=spoken.split(/\s+/).filter(Boolean).length;
+      const spokenDur=Math.max(0.75,+(wc*0.32+spoken.length*0.018).toFixed(3));
       const pauseBefore=Number.isFinite(Number(l.pause_before))?Number(l.pause_before):0.05;
       const pauseAfter=Number.isFinite(Number(l.pause_after))?Number(l.pause_after):0.18;
       const start=+(cursor+pauseBefore).toFixed(3);
-      const end=+(start+spoken).toFixed(3);
+      const end=+(start+spokenDur).toFixed(3);
       cursor=+(end+pauseAfter).toFixed(3);
-      return {...l,id:l.id||('l'+(idx+1)),speaker:l.speaker||document.default_speaker||'narrator',start,end,spoken_seconds:spoken};
+      return {...l,id:l.id||('l'+(idx+1)),speaker:l.speaker||document.default_speaker||'narrator',spoken,display,text:display,start,end,spoken_seconds:spokenDur};
     });
     const res=alignMeasured({duration:cursor,lines:estLines});
     return {...res,method:'estimated-line/character-weight'};

@@ -122,15 +122,24 @@ function align(){
   if(fs.existsSync(linesPath)){
     const linesJson=readJSON(linesPath);
     const emphasisMap={};
+    const displayMap={};
     if(fs.existsSync(dataPath)){
       const dlg=readJSON(dataPath);
       for(let i=0;i<(dlg.lines||[]).length;i++){
         const dl=dlg.lines[i];
         const lid=dl.id||('l'+(i+1));
         if(Array.isArray(dl.emphasis))emphasisMap[lid]=dl.emphasis;
+        if(typeof dl.display==='string'&&dl.display.trim())displayMap[lid]=dl.display.trim();
       }
     }
-    const result=alignMeasured(linesJson,{emphasis:emphasisMap});
+    const mergedLinesJson={
+      ...linesJson,
+      lines:(linesJson.lines||[]).map(ln=>({
+        ...ln,
+        display:displayMap[ln.id]||ln.display||ln.text||ln.spoken
+      }))
+    };
+    const result=alignMeasured(mergedLinesJson,{emphasis:emphasisMap});
     fs.writeFileSync(path.join(p.dir,'timeline','words.json'),JSON.stringify(result,null,2)+'\n');
     output({captions:result.words.length,method:result.method,duration:result.expected_duration});
     return;

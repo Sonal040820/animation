@@ -12,7 +12,7 @@ import {validateProject} from '../lib/validate.mjs';
 import {syncIndex} from '../lib/learning.mjs';
 import {engineHash} from '../lib/runner.mjs';
 import {verifyFilm} from '../lib/quality.mjs';
-import {planScript} from '../lib/planner.mjs';
+import {planScript,normalizeDisplayText} from '../lib/planner.mjs';
 
 test('All original reusable templates',()=>{
   assert.ok(TEMPLATE_NAMES.length>=16);
@@ -160,12 +160,41 @@ test('verifyFilm fails when dialogue exists and voice.wav is missing',()=>{
   }
 });
 
-test('planScript produces dialogue v2 and line-bound manifest from script text',()=>{
-  const script='Night. I saw a little girl outside my window. The clock said eleven fifty nine. I blinked. She was gone.';
+test('planScript produces dialogue v3 with spoken/display separation and golden caption sequence',()=>{
+  const script='Night. I saw a little girl outside my window. Staring right at me. The clock said eleven fifty nine. I blinked. Twelve oh one. She was gone.';
+  assert.equal(normalizeDisplayText('The clock said eleven fifty nine.'),'The clock said 11:59.');
+  assert.equal(normalizeDisplayText('Twelve oh one.'),'12:01.');
   const planned=planScript(script,{slug:'test-horror'});
-  assert.equal(planned.dialogue.schema_version,2);
-  assert.equal(planned.dialogue.lines.length,5);
-  assert.equal(planned.manifest.shots.length,5);
-  assert.ok(planned.manifest.shots.every(s=>Boolean(s.line)));
+  assert.equal(planned.dialogue.schema_version,3);
+  assert.equal(planned.dialogue.lines.length,7);
+  assert.equal(planned.dialogue.lines[3].spoken,'The clock said eleven fifty nine.');
+  assert.equal(planned.dialogue.lines[3].display,'The clock said 11:59.');
+  assert.equal(planned.dialogue.lines[5].spoken,'Twelve oh one.');
+  assert.equal(planned.dialogue.lines[5].display,'12:01.');
+  // Hand-edited display must never be overwritten
+  const replanned=planScript(script,{slug:'test-horror',existingDialogue:{lines:[{id:'l4',display:'CLOCK: 11:59.'}]}});
+  assert.equal(replanned.dialogue.lines[3].display,'CLOCK: 11:59.');
+  // Captions group by display words, max 2 words, break at sentence ends
+  const aligned=alignPhrases?null:null;
+  const estLines=planned.dialogue.lines.map((l,i)=>({
+    id:l.id,speaker:l.speaker,spoken:l.spoken,display:l.display,text:l.display,
+    start:i*1.4+0.1,end:i*1.4+1.2,spoken_seconds:1.1,emphasis:l.emphasis
+  }));
+  const words=alignMeasured({duration:10.5,lines:estLines}).words.map(w=>w.text.toUpperCase());
+  assert.deepEqual(words,[
+    'NIGHT.',
+    'I SAW',
+    'A LITTLE',
+    'GIRL OUTSIDE',
+    'MY WINDOW.',
+    'STARING RIGHT',
+    'AT ME.',
+    'THE CLOCK',
+    'SAID 11:59.',
+    'I BLINKED.',
+    '12:01.',
+    'SHE WAS',
+    'GONE.'
+  ]);
   assert.equal(planned.needs_new_code.length,0);
 });

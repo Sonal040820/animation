@@ -205,8 +205,12 @@ export function validateProject(projectRef){
           }
           seenIds.add(ln.id);
         }
-        if(!ln.text||!String(ln.text).trim()){
-          errors.push({code:'EMPTY_LINE_TEXT',line:lid,message:`Dialogue line "${lid}" has empty text`});
+        const spokenVal=ln.spoken??ln.text;
+        if(!spokenVal||!String(spokenVal).trim()){
+          errors.push({code:'EMPTY_LINE_TEXT',line:lid,message:`Dialogue line "${lid}" has empty spoken/text`});
+        }
+        if(ln.display!==undefined&&(typeof ln.display!=='string'||!ln.display.trim())){
+          errors.push({code:'INVALID_DISPLAY_TEXT',line:lid,field:'display',message:`Dialogue line "${lid}" display must be a non-empty string`});
         }
         if(ln.emotion!==undefined&&!validEmotions.includes(ln.emotion)){
           const sug=didYouMean(ln.emotion,validEmotions);
@@ -408,6 +412,25 @@ export function validateProject(projectRef){
             code:'CAPTION_EXCEEDS_DURATION',
             text:w.text,
             message:`Caption "${w.text}" ends at ${w.end}s beyond project duration ${totalDuration}s`
+          });
+        }
+      }
+      if(lineSource.lines&&lineSource.lines.length){
+        const expectedTokens=[];
+        for(const ln of lineSource.lines){
+          const disp=String(ln.display??ln.text??ln.spoken??'').trim();
+          const toks=disp.match(/[^\s]+/g)||[];
+          expectedTokens.push(...toks);
+        }
+        const captionTokens=[];
+        for(const w of words){
+          const toks=String(w.text||'').trim().match(/[^\s]+/g)||[];
+          captionTokens.push(...toks);
+        }
+        if(expectedTokens.length&&captionTokens.length&&expectedTokens.join(' ')!==captionTokens.join(' ')){
+          errors.push({
+            code:'CAPTION_DISPLAY_MISMATCH',
+            message:`Captions (${captionTokens.length} words) do not cover every display word once (${expectedTokens.length} words)`
           });
         }
       }

@@ -33,22 +33,25 @@ function estimateLinesFromItems(items){
   let cursor=0;
   const lines=items.map((item,idx)=>{
     const obj=typeof item==='string'?{id:'l'+(idx+1),text:item}:item;
-    const text=String(obj.text||'').trim();
-    const words=text.split(/\s+/).filter(Boolean).length;
-    const spoken=Math.max(0.75,+(words*0.32+text.length*0.018).toFixed(3));
+    const spoken=String(obj.spoken??obj.text??'').trim();
+    const display=String(obj.display??obj.text??spoken).trim();
+    const words=spoken.split(/\s+/).filter(Boolean).length;
+    const spokenDur=Math.max(0.75,+(words*0.32+spoken.length*0.018).toFixed(3));
     const pauseBefore=Number.isFinite(Number(obj.pause_before))?Number(obj.pause_before):0.05;
     const pauseAfter=Number.isFinite(Number(obj.pause_after))?Number(obj.pause_after):0.18;
     const start=+(cursor+pauseBefore).toFixed(3);
-    const end=+(start+spoken).toFixed(3);
+    const end=+(start+spokenDur).toFixed(3);
     cursor=+(end+pauseAfter).toFixed(3);
     return {
       id:obj.id||('l'+(idx+1)),
       speaker:obj.speaker||'narrator',
-      text,
+      spoken,
+      display,
+      text:display,
       emotion:obj.emotion||'neutral',
       start,
       end,
-      spoken_seconds:spoken
+      spoken_seconds:spokenDur
     };
   });
   return {duration:+cursor.toFixed(3),lines};
@@ -58,7 +61,12 @@ export function resolveLineSource(dir){
   const linesFile=path.join(dir,'timeline','lines.json');
   if(fs.existsSync(linesFile)){
     const data=readJSON(linesFile);
-    const lines=Array.isArray(data.lines)?data.lines:[];
+    const lines=(Array.isArray(data.lines)?data.lines:[]).map(l=>({
+      ...l,
+      spoken:l.spoken??l.text??'',
+      display:l.display??l.text??l.spoken??'',
+      text:l.display??l.text??l.spoken??''
+    }));
     const duration=Number(data.duration)||Math.max(0,...lines.map(l=>Number(l.end)||0));
     return {timing:'measured',duration,lines,voicePresent:Boolean(data.voice_present),provider:data.provider||null};
   }
@@ -71,10 +79,14 @@ export function resolveLineSource(dir){
       const lines=rawLines.map((l,idx)=>{
         const start=Number(l.at);
         const dur=Number(l.duration);
+        const spoken=l.spoken??l.text;
+        const display=l.display??l.text??spoken;
         return {
           id:l.id||('l'+(idx+1)),
           speaker:l.speaker||dlg.default_speaker||'narrator',
-          text:l.text,
+          spoken,
+          display,
+          text:display,
           emotion:l.emotion||'neutral',
           start:+start.toFixed(3),
           end:+(start+dur).toFixed(3),

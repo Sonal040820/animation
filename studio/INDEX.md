@@ -116,7 +116,7 @@ No media generated during initial setup. When adding a template, update this ind
 | `studio/lib/horror.mjs` | `HORROR_TEMPLATES`, `bedroomShadow`, `doorClose`, `doorPeephole`, `emptyHallway`, `intercomMacro`, `keyholeView`, `mirrorDouble`, `stairwell` |
 | `studio/lib/learning.mjs` | `CLI_COMMANDS`, `USAGE_FILE`, `buildAutoIndexSection`, `learnPlannerRules`, `promoteVideo`, `syncIndex`, `updateTemplateUsage` |
 | `studio/lib/motion.mjs` | `CAMERA_MOVES`, `blinkAmount`, `breathe`, `cameraTransform`, `easeInOutCubic`, `easeOutBack`, `follow`, `smoothNoise`, `spring` |
-| `studio/lib/planner.mjs` | `PLANNER_RULES_FILE`, `guessEmotion`, `loadPlannerRules`, `matchShotRule`, `planProject`, `planScript` |
+| `studio/lib/planner.mjs` | `PLANNER_RULES_FILE`, `guessEmotion`, `loadPlannerRules`, `matchShotRule`, `normalizeDisplayText`, `planProject`, `planScript` |
 | `studio/lib/project.mjs` | `PROJECTS`, `ROOT`, `STUDIO`, `enforceDataOnly`, `loadProject`, `mkdir`, `projectPath`, `readJSON`, `resolveLineSource`, `resolveProjectShots`, `sha` |
 | `studio/lib/props.mjs` | `drawDigitalClock` |
 | `studio/lib/quality.mjs` | `verifyFilm` |

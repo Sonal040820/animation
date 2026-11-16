@@ -13,17 +13,63 @@ export function loadPlannerRules(){
   return readJSON(PLANNER_RULES_FILE);
 }
 
-const EMPHASIS_CANDIDATES=/^(NIGHT|GIRL|WINDOW|STARING|STARE|CLOCK|ELEVEN|FIFTY|NINE|BLINKED|BLINK|TWELVE|ONE|GONE|VANISHED|DOOR|OUTSIDE|ALONE|NEITHER|REAL|MYSELF)$/i;
+const HOUR_WORDS={
+  one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12
+};
+const DIGIT_WORDS={
+  oh:0,zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9
+};
+const TEEN_WORDS={
+  ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19
+};
+const TENS_WORDS={
+  twenty:20,thirty:30,forty:40,fifty:50
+};
+
+// Converts spoken clock/time phrases (e.g. "eleven fifty nine", "twelve oh one") into display clock form ("11:59", "12:01").
+export function normalizeDisplayText(spokenText){
+  let out=String(spokenText||'').trim();
+  if(!out)return out;
+  const hoursRe='(?:'+Object.keys(HOUR_WORDS).join('|')+')';
+  const digitsRe='(?:'+Object.keys(DIGIT_WORDS).join('|')+')';
+  const teensRe='(?:'+Object.keys(TEEN_WORDS).join('|')+')';
+  const tensRe='(?:'+Object.keys(TENS_WORDS).join('|')+')';
+  const onesRe='(?:one|two|three|four|five|six|seven|eight|nine)';
+
+  // 1. "<hour> o'clock" / "<hour> o clock" -> "H:00"
+  out=out.replace(new RegExp(`\\b(${hoursRe})\\s+o['’]?\\s*clock\\b`,'gi'),(_,h)=>{
+    return `${HOUR_WORDS[h.toLowerCase()]}:00`;
+  });
+  // 2. "<hour> oh <digit>" -> "H:0D" (e.g. "twelve oh one" -> "12:01")
+  out=out.replace(new RegExp(`\\b(${hoursRe})\\s+(?:oh|zero)\\s+(${onesRe})\\b`,'gi'),(_,h,m)=>{
+    const mm=String(DIGIT_WORDS[m.toLowerCase()]).padStart(2,'0');
+    return `${HOUR_WORDS[h.toLowerCase()]}:${mm}`;
+  });
+  // 3. "<hour> <tens> [ones]" -> "H:MM" (e.g. "eleven fifty nine" -> "11:59")
+  out=out.replace(new RegExp(`\\b(${hoursRe})\\s+(${tensRe})(?:[-\\s]+(${onesRe}))?\\b`,'gi'),(_,h,t,o)=>{
+    const m=TENS_WORDS[t.toLowerCase()]+(o?DIGIT_WORDS[o.toLowerCase()]:0);
+    return `${HOUR_WORDS[h.toLowerCase()]}:${String(m).padStart(2,'0')}`;
+  });
+  // 4. "<hour> <teens>" -> "H:MM" (e.g. "two seventeen" -> "2:17")
+  out=out.replace(new RegExp(`\\b(${hoursRe})\\s+(${teensRe})\\b`,'gi'),(_,h,m)=>{
+    return `${HOUR_WORDS[h.toLowerCase()]}:${String(TEEN_WORDS[m.toLowerCase()]).padStart(2,'0')}`;
+  });
+  return out;
+}
+
+const EMPHASIS_CANDIDATES=/^(NIGHT|GIRL|WINDOW|STARING|STARE|CLOCK|ELEVEN|FIFTY|NINE|BLINKED|BLINK|TWELVE|ONE|GONE|VANISHED|DOOR|OUTSIDE|ALONE|NEITHER|REAL|MYSELF|11:59|12:01)$/i;
 
 function extractEmphasis(sentence){
   const tokens=tokenize(sentence);
   const picked=[];
   for(const tok of tokens){
+    const raw=tok.trim().toUpperCase().replace(/[.!?,]+$/,'');
     const clean=tok.replace(/[^a-z0-9]/gi,'').toUpperCase();
-    if(EMPHASIS_CANDIDATES.test(clean)&&!picked.includes(clean))picked.push(clean);
+    const key=/^\d{1,2}:\d{2}$/.test(raw)?raw:clean;
+    if((EMPHASIS_CANDIDATES.test(clean)||EMPHASIS_CANDIDATES.test(raw))&&!picked.includes(key))picked.push(key);
   }
   if(!picked.length&&tokens.length){
-    const last=tokens.at(-1).replace(/[^a-z0-9]/gi,'').toUpperCase();
+    const last=tokens.at(-1).replace(/[^a-z0-9:]/gi,'').toUpperCase();
     if(last)picked.push(last);
   }
   return picked;
@@ -80,28 +126,37 @@ export function matchShotRule(sentence,rules=loadPlannerRules()){
   };
 }
 
-export function planScript(scriptText,{slug='planned',voice='af_heart',rules=loadPlannerRules()}={}){
+export function planScript(scriptText,{slug='planned',voice='af_heart',rules=loadPlannerRules(),existingDialogue=null}={}){
   const sentences=phrases(scriptText);
   if(!sentences.length)throw new Error('script.txt contains no sentences to plan');
+  const existingMap=new Map();
+  for(const ln of (existingDialogue?.lines||[])){
+    if(ln?.id&&typeof ln.display==='string'&&ln.display.trim()){
+      existingMap.set(ln.id,ln.display.trim());
+    }
+  }
   const lines=[];
   const shots=[];
   const needs_new_code=[];
   for(let i=0;i<sentences.length;i++){
-    const text=sentences[i];
+    const spoken=sentences[i];
     const lineId='l'+(i+1);
-    const emo=guessEmotion(text,rules);
-    const emphasis=extractEmphasis(text);
+    const display=existingMap.get(lineId)||normalizeDisplayText(spoken);
+    const emo=guessEmotion(spoken,rules);
+    const emphasis=extractEmphasis(display);
     lines.push({
       id:lineId,
-      text,
+      spoken,
+      display,
+      text:spoken,
       emotion:emo.emotion,
       speaker:'narrator',
       pause_after:emo.pause_after,
       emphasis
     });
-    const m=matchShotRule(text,rules);
+    const m=matchShotRule(spoken,rules);
     if(!m.matched){
-      needs_new_code.push({line:lineId,text,reason:'No rule in planner-rules.json matched this sentence'});
+      needs_new_code.push({line:lineId,text:spoken,reason:'No rule in planner-rules.json matched this sentence'});
     }
     const r=m.rule;
     const shot={
@@ -121,7 +176,7 @@ export function planScript(scriptText,{slug='planned',voice='af_heart',rules=loa
     shots.push(shot);
   }
   const dialogue={
-    schema_version:2,
+    schema_version:3,
     voices:{narrator:voice},
     default_speaker:'narrator',
     lines
@@ -144,6 +199,7 @@ export function planProject(projectRef,{force=false}={}){
   if(!force&&(fs.existsSync(dialogueFile)||fs.existsSync(manifestFile))){
     throw new Error('Refusing to overwrite existing dialogue.json or manifest.json without --force');
   }
+  const existingDialogue=fs.existsSync(dialogueFile)?readJSON(dialogueFile):null;
   const configFile=path.join(dir,'config.json');
   const config=fs.existsSync(configFile)?readJSON(configFile):{
     schema_version:1,
@@ -160,7 +216,7 @@ export function planProject(projectRef,{force=false}={}){
   }
   const scriptText=fs.readFileSync(scriptFile,'utf8');
   const slug=path.basename(dir);
-  const {dialogue,manifest,needs_new_code}=planScript(scriptText,{slug,voice:config.voice||'af_heart'});
+  const {dialogue,manifest,needs_new_code}=planScript(scriptText,{slug,voice:config.voice||'af_heart',existingDialogue});
   fs.writeFileSync(dialogueFile,JSON.stringify(dialogue,null,2)+'\n');
   fs.writeFileSync(manifestFile,JSON.stringify(manifest,null,2)+'\n');
   const timelineDir=path.join(dir,'timeline');
