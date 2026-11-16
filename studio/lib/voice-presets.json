@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "emotions": {
+    "neutral": {
+      "speed": 1.0,
+      "gain_db": 0.0,
+      "pitch_semitones": 0.0,
+      "pause_before": 0.05,
+      "pause_after": 0.22,
+      "tremolo": { "rate": 0.0, "depth": 0.0 },
+      "breathiness": 0.02,
+      "lowpass_hz": 8500,
+      "reverb": { "delay_ms": 55, "decay": 0.06 },
+      "text_shaping": { "mode": "none", "ellipsis": false, "clause_pause": 0.10, "sentence_pause": 0.24 }
+    },
+    "ominous": {
+      "speed": 0.88,
+      "gain_db": -0.5,
+      "pitch_semitones": -2.0,
+      "pause_before": 0.10,
+      "pause_after": 0.38,
+      "tremolo": { "rate": 4.2, "depth": 0.05 },
+      "breathiness": 0.08,
+      "lowpass_hz": 5200,
+      "reverb": { "delay_ms": 95, "decay": 0.18 },
+      "text_shaping": { "mode": "trail_off", "ellipsis": false, "clause_pause": 0.18, "sentence_pause": 0.34 }
+    },
+    "whisper": {
+      "speed": 0.90,
+      "gain_db": -3.5,
+      "pitch_semitones": -0.8,
+      "pause_before": 0.08,
+      "pause_after": 0.30,
+      "tremolo": { "rate": 5.5, "depth": 0.06 },
+      "breathiness": 0.35,
+      "lowpass_hz": 4500,
+      "reverb": { "delay_ms": 65, "decay": 0.12 },
+      "text_shaping": { "mode": "soft", "ellipsis": true, "clause_pause": 0.16, "sentence_pause": 0.30 }
+    },
+    "scared": {
+      "speed": 1.04,
+      "gain_db": 0.0,
+      "pitch_semitones": 1.4,
+      "pause_before": 0.06,
+      "pause_after": 0.24,
+      "tremolo": { "rate": 6.8, "depth": 0.14 },
+      "breathiness": 0.14,
+      "lowpass_hz": 9800,
+      "reverb": { "delay_ms": 70, "decay": 0.10 },
+      "text_shaping": { "mode": "hesitate", "ellipsis": true, "clause_pause": 0.15, "sentence_pause": 0.26 }
+    },
+    "terrified": {
+      "speed": 1.12,
+      "gain_db": 1.0,
+      "pitch_semitones": 2.2,
+      "pause_before": 0.04,
+      "pause_after": 0.20,
+      "tremolo": { "rate": 8.2, "depth": 0.22 },
+      "breathiness": 0.20,
+      "lowpass_hz": 10500,
+      "reverb": { "delay_ms": 80, "decay": 0.14 },
+      "text_shaping": { "mode": "stammer", "ellipsis": true, "clause_pause": 0.12, "sentence_pause": 0.22 }
+    },
+    "tense": {
+      "speed": 1.05,
+      "gain_db": 0.2,
+      "pitch_semitones": 0.6,
+      "pause_before": 0.04,
+      "pause_after": 0.18,
+      "tremolo": { "rate": 6.0, "depth": 0.08 },
+      "breathiness": 0.07,
+      "lowpass_hz": 9200,
+      "reverb": { "delay_ms": 60, "decay": 0.08 },
+      "text_shaping": { "mode": "clipped", "ellipsis": false, "clause_pause": 0.08, "sentence_pause": 0.20 }
+    },
+    "calm": {
+      "speed": 0.94,
+      "gain_db": -0.5,
+      "pitch_semitones": -0.4,
+      "pause_before": 0.08,
+      "pause_after": 0.28,
+      "tremolo": { "rate": 0.0, "depth": 0.0 },
+      "breathiness": 0.04,
+      "lowpass_hz": 7800,
+      "reverb": { "delay_ms": 65, "decay": 0.08 },
+      "text_shaping": { "mode": "none", "ellipsis": false, "clause_pause": 0.14, "sentence_pause": 0.28 }
+    },
+    "sad": {
+      "speed": 0.87,
+      "gain_db": -1.8,
+      "pitch_semitones": -1.4,
+      "pause_before": 0.12,
+      "pause_after": 0.36,
+      "tremolo": { "rate": 4.8, "depth": 0.09 },
+      "breathiness": 0.12,
+      "lowpass_hz": 5600,
+      "reverb": { "delay_ms": 85, "decay": 0.14 },
+      "text_shaping": { "mode": "trail_off", "ellipsis": true, "clause_pause": 0.18, "sentence_pause": 0.34 }
+    },
+    "relieved": {
+      "speed": 0.95,
+      "gain_db": -0.4,
+      "pitch_semitones": 0.3,
+      "pause_before": 0.09,
+      "pause_after": 0.30,
+      "tremolo": { "rate": 3.5, "depth": 0.03 },
+      "breathiness": 0.06,
+      "lowpass_hz": 9600,
+      "reverb": { "delay_ms": 60, "decay": 0.06 },
+      "text_shaping": { "mode": "soft", "ellipsis": false, "clause_pause": 0.14, "sentence_pause": 0.28 }
+    },
+    "excited": {
+      "speed": 1.12,
+      "gain_db": 1.2,
+      "pitch_semitones": 1.6,
+      "pause_before": 0.03,
+      "pause_after": 0.16,
+      "tremolo": { "rate": 5.2, "depth": 0.04 },
+      "breathiness": 0.03,
+      "lowpass_hz": 11000,
+      "reverb": { "delay_ms": 50, "decay": 0.06 },
+      "text_shaping": { "mode": "urgent", "ellipsis": false, "clause_pause": 0.08, "sentence_pause": 0.18 }
+    }
+  }
+}

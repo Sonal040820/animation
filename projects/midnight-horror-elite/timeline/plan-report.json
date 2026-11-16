@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "slug": "midnight-horror-elite",
+  "planned_at": "2026-11-16T16:56:06.105Z",
+  "lines_count": 7,
+  "shots_count": 7,
+  "needs_new_code": [],
+  "planned_shots": [
+    {
+      "id": "s01",
+      "line": "l1",
+      "template": "wide-establishing",
+      "camera": "drift",
+      "params": {
+        "scene": "fence-moon"
+      }
+    },
+    {
+      "id": "s02",
+      "line": "l2",
+      "template": "window-view",
+      "camera": "push",
+      "params": {
+        "interior": true,
+        "girl": true,
+        "clock": "11:59",
+        "narrator": true
+      }
+    },
+    {
+      "id": "s03",
+      "line": "l3",
+      "template": "figure-exterior",
+      "camera": "creep",
+      "params": {
+        "variant": "girl",
+        "pose": "stand",
+        "expression": "blank-stare"
+      }
+    },
+    {
+      "id": "s04",
+      "line": "l4",
+      "template": "insert-macro-clock",
+      "camera": "push",
+      "params": {
+        "time": "11:59",
+        "kind": "digital",
+        "backdrop": "room-blur"
+      }
+    },
+    {
+      "id": "s05",
+      "line": "l5",
+      "template": "giant-face",
+      "camera": "push",
+      "params": {
+        "rig": "silhouette",
+        "expression": "surprise",
+        "backdrop": "room-blur",
+        "blinkAt": [
+          0.35
+        ]
+      }
+    },
+    {
+      "id": "s06",
+      "line": "l6",
+      "template": "window-view",
+      "camera": "push",
+      "params": {
+        "interior": true,
+        "girl": false,
+        "clock": "12:01",
+        "narrator": true
+      }
+    },
+    {
+      "id": "s07",
+      "line": "l7",
+      "template": "empty-yard",
+      "camera": "pull",
+      "params": {}
+    }
+  ]
+}

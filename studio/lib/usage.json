@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "projects_promoted": [
+    "the-wrong-side",
+    "midnight-horror-elite"
+  ],
+  "templates": {
+    "intercom-macro": 4,
+    "wide-establishing": 2,
+    "empty-hallway": 2,
+    "mirror-double": 2,
+    "character-medium": 1,
+    "door-close": 2,
+    "bedroom-shadow": 1,
+    "giant-face": 2,
+    "door-peephole": 1,
+    "stairwell": 2,
+    "keyhole-view": 1,
+    "window-view": 2,
+    "figure-exterior": 1,
+    "insert-macro-clock": 1
+  },
+  "updated_at": "2026-11-16T17:12:49.871Z"
+}

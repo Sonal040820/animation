@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "provider": "kokoro-onnx-0.6.1-int8",
+  "voice_present": true,
+  "duration": 10.5194,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "narrator",
+      "text": "Night.",
+      "emotion": "ominous",
+      "start": 0.04,
+      "end": 0.9298,
+      "spoken_seconds": 0.8898,
+      "emphasis": [
+        "NIGHT"
+      ]
+    },
+    {
+      "id": "l2",
+      "speaker": "narrator",
+      "text": "I saw a little girl outside my window.",
+      "emotion": "ominous",
+      "start": 1.0498,
+      "end": 3.3068,
+      "spoken_seconds": 2.2569,
+      "emphasis": [
+        "WINDOW"
+      ]
+    },
+    {
+      "id": "l3",
+      "speaker": "narrator",
+      "text": "Staring right at me.",
+      "emotion": "tense",
+      "start": 3.4068,
+      "end": 4.6777,
+      "spoken_seconds": 1.2709,
+      "emphasis": [
+        "STARING"
+      ]
+    },
+    {
+      "id": "l4",
+      "speaker": "narrator",
+      "text": "The clock said eleven fifty nine.",
+      "emotion": "ominous",
+      "start": 4.7777,
+      "end": 6.8133,
+      "spoken_seconds": 2.0357,
+      "emphasis": [
+        "CLOCK"
+      ]
+    },
+    {
+      "id": "l5",
+      "speaker": "narrator",
+      "text": "I blinked.",
+      "emotion": "scared",
+      "start": 6.9133,
+      "end": 7.8941,
+      "spoken_seconds": 0.9808,
+      "emphasis": [
+        "BLINKED"
+      ]
+    },
+    {
+      "id": "l6",
+      "speaker": "narrator",
+      "text": "Twelve oh one.",
+      "emotion": "tense",
+      "start": 7.9941,
+      "end": 9.0085,
+      "spoken_seconds": 1.0144,
+      "emphasis": [
+        "TWELVE",
+        "ONE"
+      ]
+    },
+    {
+      "id": "l7",
+      "speaker": "narrator",
+      "text": "She was gone.",
+      "emotion": "whisper",
+      "start": 9.1185,
+      "end": 10.4194,
+      "spoken_seconds": 1.3009,
+      "emphasis": [
+        "GONE"
+      ]
+    }
+  ]
+}

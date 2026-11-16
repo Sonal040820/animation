@@ -43,6 +43,28 @@ def get_model(filename):
     return dest
 
 
+def resolve_voice_style(engine, voice_spec: str):
+    import numpy as np
+    spec = (voice_spec or "af_heart").strip()
+    if "+" not in spec and ":" not in spec:
+        return engine.get_voice_style(spec).astype(np.float32)
+    parts = [p.strip() for p in spec.split("+") if p.strip()]
+    styles, weights = [], []
+    for part in parts:
+        if ":" in part:
+            name, w_str = part.split(":", 1)
+            w = float(w_str.strip())
+        else:
+            name, w = part, 1.0
+        styles.append(engine.get_voice_style(name.strip()).astype(np.float32))
+        weights.append(w)
+    total = sum(weights)
+    if total <= 0:
+        raise ValueError(f"Invalid voice blend weights in {voice_spec!r}")
+    blended = sum((w / total) * s for w, s in zip(weights, styles))
+    return np.asarray(blended, dtype=np.float32)
+
+
 def phrases(text):
     return [s.strip() for s in re.findall(r"[^.!?]+[.!?]?", text) if s.strip()]
 
@@ -58,45 +80,76 @@ def main():
     project = (ROOT / args.project).resolve()
     if project.parent != root.resolve() or not project.is_dir():
         raise RuntimeError("Voice project must be exactly projects/<slug>")
-    script = (project / "script.txt").read_text(encoding="utf8")
+    script = (project / "script.txt").read_text(encoding="utf-8-sig")
     segments = phrases(script)
     if not segments:
         raise RuntimeError("Cannot synthesize empty script")
-    # Large optional downloads happen only for a user-invoked voice generation.
-    model = get_model("kokoro-v1.0.onnx")
+    # Prefer int8 model if already cached to avoid unnecessary duplicate download.
+    model_name = "kokoro-v1.0.onnx" if (CACHE / "kokoro-v1.0.onnx").exists() else "kokoro-v1.0.int8.onnx"
+    model = get_model(model_name)
     voices = get_model("voices-v1.0.bin")
     import numpy as np
     import soundfile as sf
     from kokoro_onnx import Kokoro
     engine = Kokoro(str(model), str(voices))
+    voice_style = resolve_voice_style(engine, args.voice)
     target = project / "timeline"
     target.mkdir(parents=True, exist_ok=True)
     audio = []
     durations = []
+    lines_meta = []
     sample_rate = None
+    cursor_samples = 0
+    gap_sec = 0.12
     for i, sentence in enumerate(segments):
-        pcm, rate = engine.create(sentence, voice=args.voice, speed=args.speed, lang=args.lang)
+        pcm, rate = engine.create(sentence, voice=voice_style, speed=args.speed, lang=args.lang)
         if sample_rate is None:
             sample_rate = rate
         elif sample_rate != rate:
             raise RuntimeError("Kokoro returned inconsistent sample rates")
         pcm = np.asarray(pcm, dtype=np.float32)
-        durations.append(round(len(pcm) / sample_rate, 5))
+        dur = round(len(pcm) / sample_rate, 5)
+        start_sec = round(cursor_samples / sample_rate, 4)
+        end_sec = round((cursor_samples + len(pcm)) / sample_rate, 4)
+        durations.append(dur)
         sf.write(str(target / ("phrase_%02d.wav" % i)), pcm, rate, subtype="PCM_16")
         audio.append(pcm)
+        cursor_samples += len(pcm)
+        lines_meta.append({
+            "id": f"l{i+1}",
+            "speaker": "narrator",
+            "text": sentence,
+            "emotion": "neutral",
+            "start": start_sec,
+            "end": end_sec,
+            "spoken_seconds": round(end_sec - start_sec, 4),
+        })
         if i != len(segments) - 1:
-            audio.append(np.zeros(int(rate * 0.12), dtype=np.float32))
+            gap_samples = int(rate * gap_sec)
+            audio.append(np.zeros(gap_samples, dtype=np.float32))
+            cursor_samples += gap_samples
     result = np.concatenate(audio)
-    sf.write(str(target / "voice.wav"), result, sample_rate, subtype="PCM_16")
+    wav_path = target / "voice.wav"
+    sf.write(str(wav_path), result, sample_rate, subtype="PCM_16")
+    total_dur = round(sf.info(str(wav_path)).duration, 4)
+    provider = "kokoro-onnx-0.6.1-int8" if "int8" in model_name else "kokoro-onnx-0.6.1"
     (target / "phrases.json").write_text(json.dumps({
         "method": "Kokoro ONNX local per phrase",
+        "provider": provider,
         "voice": args.voice,
         "durations": durations,
-        "gap": 0.12,
-        "duration": round(len(result) / sample_rate, 5),
+        "gap": gap_sec,
+        "duration": total_dur,
         "sentences": segments,
-    }, indent=2))
-    print(json.dumps({"status": "voice_ready", "duration": len(result) / sample_rate,
+    }, indent=2), encoding="utf8")
+    (target / "lines.json").write_text(json.dumps({
+        "schema_version": 1,
+        "provider": provider,
+        "voice_present": True,
+        "duration": total_dur,
+        "lines": lines_meta,
+    }, indent=2), encoding="utf8")
+    print(json.dumps({"status": "voice_ready", "provider": provider, "duration": total_dur,
                       "phrases": len(segments), "voice": args.voice}))
 
 

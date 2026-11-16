@@ -1,11 +1,12 @@
-# Render cost and reuse ledger
+# Studio cost and reuse ledger
 
-Do not invent counts, timing, billing, token usage or GPU quotas. After a verified film, append measured shots, template-only percentage, render seconds, cached-shot count and any known tokens. Compare against prior film and record what would improve reuse.
+Log every authorized video render with shot count, template-only percentage, planned auto vs hand-edited percentage, render seconds, cached-shot count, and voice provider. Compare against prior film and record what would improve reuse.
 
-| Video | Shots | Template-only reuse | Render seconds | Tokens | Fully cached shots |
-|---|---:|---:|---:|---:|---:|
-| _Setup only — no film rendered_ | — | — | — | — | — |
+| Video | Shots | Template reuse | Planned auto vs hand-edited | Render seconds | Cached shots | Voice provider |
+|---|---:|---:|---|---:|---:|---|
+| _Setup only — no film rendered_ | — | — | — | — | — | — |
+| the-wrong-side | 19 | 100% | 0% auto (0/19) / 100% hand-edited | 398.1 | 0 | kokoro-onnx |
 
 Approximately 40 CPU-hours/month is the requested planning budget, not a verified entitlement. Static tests are not logged as videos.
 
-| the-wrong-side | 19 | 100% | 398.1 | not tracked | 0 |
+| midnight-horror-elite | 6 | 100% | 67% auto (4/6) / 33% hand-edited | 581.1 | 0 | kokoro-onnx-0.6.1-int8 |

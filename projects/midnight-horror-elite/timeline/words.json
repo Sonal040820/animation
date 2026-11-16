@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "method": "measured-line/character-weight",
+  "expected_duration": 10.519,
+  "words": [
+    {
+      "text": "Night.",
+      "start": 0.04,
+      "end": 0.93,
+      "line_id": "l1",
+      "speaker": "narrator",
+      "emphasis": true
+    },
+    {
+      "text": "I saw",
+      "start": 1.05,
+      "end": 1.351,
+      "line_id": "l2",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "a little",
+      "start": 1.351,
+      "end": 1.877,
+      "line_id": "l2",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "girl outside",
+      "start": 1.877,
+      "end": 2.705,
+      "line_id": "l2",
+      "speaker": "narrator",
+      "emphasis": true
+    },
+    {
+      "text": "my window.",
+      "start": 2.705,
+      "end": 3.307,
+      "line_id": "l2",
+      "speaker": "narrator",
+      "emphasis": true
+    },
+    {
+      "text": "Staring right",
+      "start": 3.407,
+      "end": 4.36,
+      "line_id": "l3",
+      "speaker": "narrator",
+      "emphasis": true
+    },
+    {
+      "text": "at me.",
+      "start": 4.36,
+      "end": 4.678,
+      "line_id": "l3",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "The clock",
+      "start": 4.778,
+      "end": 5.381,
+      "line_id": "l4",
+      "speaker": "narrator",
+      "emphasis": true
+    },
+    {
+      "text": "said eleven",
+      "start": 5.381,
+      "end": 6.135,
+      "line_id": "l4",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "fifty nine.",
+      "start": 6.135,
+      "end": 6.813,
+      "line_id": "l4",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "I blinked.",
+      "start": 6.913,
+      "end": 7.894,
+      "line_id": "l5",
+      "speaker": "narrator",
+      "emphasis": true
+    },
+    {
+      "text": "Twelve oh",
+      "start": 7.994,
+      "end": 8.732,
+      "line_id": "l6",
+      "speaker": "narrator",
+      "emphasis": true
+    },
+    {
+      "text": "one.",
+      "start": 8.732,
+      "end": 9.008,
+      "line_id": "l6",
+      "speaker": "narrator",
+      "emphasis": true
+    },
+    {
+      "text": "She was",
+      "start": 9.118,
+      "end": 9.899,
+      "line_id": "l7",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "gone.",
+      "start": 9.899,
+      "end": 10.419,
+      "line_id": "l7",
+      "speaker": "narrator",
+      "emphasis": true
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "slug": "midnight-horror-elite",
+  "status": "ready",
+  "shots": [
+    {
+      "id": "s01",
+      "template": "wide-establishing",
+      "line": "l1",
+      "camera": "drift",
+      "cameraIntensity": 1,
+      "seed": 2001,
+      "params": {
+        "scene": "fence-moon",
+        "moon": true,
+        "clouds": true,
+        "fence": true,
+        "tree": true
+      },
+      "sfx": [],
+      "ambience": "night-wind",
+      "fadeIn": 0.25
+    },
+    {
+      "id": "s02",
+      "template": "window-view",
+      "line": "l2",
+      "camera": "push",
+      "cameraIntensity": 1,
+      "seed": 2002,
+      "params": {
+        "interior": true,
+        "girl": true,
+        "clock": "11:59",
+        "narrator": true
+      },
+      "sfx": [
+        {
+          "type": "breath",
+          "offset": 0.2
+        }
+      ],
+      "ambience": "room-tone"
+    },
+    {
+      "id": "s03",
+      "template": "figure-exterior",
+      "line": "l3",
+      "camera": "creep",
+      "cameraIntensity": 1,
+      "seed": 2003,
+      "params": {
+        "variant": "girl",
+        "pose": "stand",
+        "expression": "blank-stare",
+        "moon": true,
+        "clouds": true,
+        "fence": true,
+        "tree": true
+      },
+      "sfx": [
+        {
+          "type": "heartbeat",
+          "offset": 0.2
+        }
+      ],
+      "ambience": "night-wind"
+    },
+    {
+      "id": "s04",
+      "template": "insert-macro-clock",
+      "line": "l4",
+      "camera": "push",
+      "cameraIntensity": 1,
+      "seed": 2004,
+      "params": {
+        "time": "11:59",
+        "kind": "digital",
+        "backdrop": "room-blur"
+      },
+      "sfx": [
+        {
+          "type": "tick",
+          "offset": 0.25
+        },
+        {
+          "type": "tick",
+          "offset": 0.85
+        }
+      ],
+      "ambience": "clock-tick-loop"
+    },
+    {
+      "id": "s05",
+      "template": "giant-face",
+      "line": "l5",
+      "camera": "push",
+      "cameraIntensity": 1,
+      "seed": 2005,
+      "params": {
+        "rig": "silhouette",
+        "expression": "surprise",
+        "backdrop": "room-blur",
+        "blinkAt": [
+          0.35
+        ]
+      },
+      "sfx": [
+        {
+          "type": "blink-swish",
+          "offset": 0.3
+        }
+      ],
+      "ambience": "room-tone"
+    },
+    {
+      "id": "s06",
+      "template": "window-view",
+      "lines": [
+        "l6",
+        "l7"
+      ],
+      "camera": "pull",
+      "cameraIntensity": 0.85,
+      "seed": 2006,
+      "params": {
+        "interior": true,
+        "girl": false,
+        "clock": "12:01",
+        "narrator": true
+      },
+      "sfx": [
+        {
+          "type": "tick",
+          "offset": 0.2
+        },
+        {
+          "type": "impact",
+          "offset": 1.15
+        }
+      ],
+      "ambience": "room-tone",
+      "fadeOut": 0.65
+    }
+  ]
+}

@@ -100,11 +100,15 @@ jobs:
           set -euo pipefail
           node studio/cli/studio.mjs doctor
 
-      - name: Static template smoke and unit contracts (NO video)
+      - name: Static template smoke, index check, validation and unit contracts (NO video)
         run: |
           set -euo pipefail
           node --test studio/tests/*.test.mjs
+          node studio/cli/studio.mjs index --check
           node studio/cli/studio.mjs check
+          node studio/cli/studio.mjs validate --project projects/window-at-midnight
+          node studio/cli/studio.mjs validate --project projects/the-wrong-side
+          node studio/cli/studio.mjs validate --project projects/midnight-horror-elite
           node studio/cli/studio.mjs smoke
 
       - name: Persist verified toolchain and lockfile to repository
@@ -123,11 +127,11 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && (env.STUDIO_STAGE == 'sheet' || env.STUDIO_STAGE == 'render')
         run: |
           set -euo pipefail
+          node studio/cli/studio.mjs validate --project "$PROJECT_PATH"
           python3 -m pip install -r studio/requirements-voice.txt
-          if ! node studio/cli/studio.mjs make-voice --project "$PROJECT_PATH"; then
-            echo "KOKORO_UNAVAILABLE: continuing with captions plus original ambience"
-          fi
+          node studio/cli/studio.mjs make-voice --project "$PROJECT_PATH"
           node studio/cli/studio.mjs align --project "$PROJECT_PATH"
+          node studio/cli/studio.mjs validate --project "$PROJECT_PATH"
           node studio/cli/studio.mjs sheet --project "$PROJECT_PATH" --quality draft
           path="studio/out/$(basename "$PROJECT_PATH")/contact-sheet.png"
           sha256sum "$path" | cut -d' ' -f1 > studio/sheet-approval.sha256
@@ -173,7 +177,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add studio/INDEX.md studio/LESSONS.md studio/COST.md studio/STATUS.md
+          git add studio/INDEX.md studio/LESSONS.md studio/COST.md studio/STATUS.md studio/lib/usage.json studio/lib/planner-rules.json
           if [[ -d studio/lib/assets ]]; then git add -A studio/lib/assets; fi
           if ! git diff --cached --quiet; then
             git commit -m "learn(studio): promote verified video reusable assets and measured costs [skip ci]"
@@ -213,8 +217,13 @@ jobs:
           path: |
             studio/out/*/draft.mp4
             studio/out/*/final.mp4
+            studio/out/*/facts.json
             studio/out/*/verification.json
+            studio/out/*/audio-report.json
             studio/out/*/render-stats.json
+            studio/out/*/render-log.jsonl
+            studio/lib/usage.json
+            studio/lib/planner-rules.json
             studio/INDEX.md
             studio/LESSONS.md
             studio/COST.md

@@ -12,6 +12,10 @@ The index is a mandatory durable API memory file. Engine functions live in studi
 | Original font | bitmapText(ctx,text,cx,y,pixel,color,maxWidth) | bitmapText(ctx,'NIGHT',180,280,7,'#fff') |
 | Dynamic captions | caption(ctx,w,h,words,now,palette) | 1-2 words at 79% height |
 | Avatar | drawCharacter(ctx,{x,y,scale,color,rig,expression,phase,pose,rim}) | rig='block', expression='scared' |
+| drawCharacterElite | drawCharacterElite(ctx,{x,y,scale,color,rig,expression,phase,pose,rim,wobble,rimPulse}) | expression='surprise' supported |
+| three-particle-void | template: params:{} | Torus particle cloud, orbiting camera, pulsing starburst |
+| three-night-city | template: params:{} | Low-poly night city, moon, orbiting camera |
+| three-horror-room | template: params:{} | Flickering room, turning figure silhouette, camera shake |
 | Frame | drawStudioFrame(canvas,shot,config,seconds,words) | rendering browser callback |
 | Shot validation | assertShot(shot) | validate before render |
 | Project | loadProject('projects/<slug>') | {dir,manifest,config,duration} |
@@ -35,6 +39,9 @@ The index is a mandatory durable API memory file. Engine functions live in studi
 - data-card (params: text, value; example: digital fact card)
 - 3d-orbit (params: camera, seed; example: rotating code-projected cuboid)
 - title-card (params: text; example: title sting)
+- three-particle-void (params: {}; example: 3D torus particle cloud and pulsing starburst)
+- three-night-city (params: {}; example: 3D perspective low-poly night city and moon)
+- three-horror-room (params: {}; example: 3D flickering room with turning figure silhouette)
 
 ## Deterministic CLI (run from repository root)
 - doctor — capability check, version fingerprint, environment.json
@@ -75,3 +82,76 @@ No media generated during initial setup. When adding a template, update this ind
 | 60s vertical render | render('projects/the-wrong-side','standard') | 720x1280,24fps,19 shots |
 
 **Measured first film:** The Wrong Side of the Door. 19/19 templates, 60.00 seconds, Kokoro 19 spoken lines, 720x1280 24fps, 398.1s final frame rendering on GitHub CPU. Production workflow run 43873049143. New scripts should need NO engine code if these 16 templates cover their shots.
+
+<!-- AUTO:BEGIN -->
+## Auto-Generated Engine Reference (do not hand-edit inside AUTO markers)
+
+### CLI Commands (`node studio/cli/studio.mjs <command>`)
+
+| Command | Arguments | Summary |
+|---|---|---|
+| `doctor` | `[--force]` | Capability check, version fingerprint, writes studio/environment.json |
+| `smoke` | `—` | Render one static low-res frame per template in parallel browser pool |
+| `check` | `—` | Enforce data-only rule across studio projects (reject unpromoted code) |
+| `plan` | `--project projects/<slug> [--force]` | Generate dialogue.json v2 and line-bound manifest.json from script.txt via planner-rules.json |
+| `validate` | `--project projects/<slug>` | Validate manifest templates, params (TEMPLATE_META), camera, sfx/ambience, emotions, overlaps/gaps, captions |
+| `index` | `[--check]` | Regenerate or check drift of AUTO section in studio/INDEX.md from live code |
+| `new-project` | `--project projects/<slug> --script "..." [--seconds N]` | Create starter data-only project |
+| `make-voice` | `--project projects/<slug>` | Synthesize expressive voice.wav and measured timeline/lines.json |
+| `align` | `--project projects/<slug>` | Align 1-2 word sentence-bound captions into timeline/words.json (uses measured lines.json when present) |
+| `sheet` | `--project projects/<slug> [--quality draft]` | Validate and render labelled contact sheet (shot id + template + time) |
+| `render` | `--project projects/<slug> [--quality draft|preview|standard|high]` | Validate and render frames in parallel page pool with engine-hash cache and render-log.jsonl |
+| `mix` | `--project projects/<slug>` | Synthesize original score/ambience/SFX, duck under voice, loudnorm to -14 LUFS, write audio-report.json |
+| `verify` | `--project projects/<slug> [--quality standard] [--allow-silent]` | Probe final.mp4, verify voice/captions/loudness/black/freeze, write measured facts.json |
+| `promote` | `--project projects/<slug>` | Increment usage.json, learn rules into planner-rules.json, regenerate INDEX.md, log measured COST/LESSONS/STATUS |
+
+### Library Module Exports (`studio/lib/*.mjs`)
+
+| Module | Exported Symbols |
+|---|---|
+| `studio/lib/audio.mjs` | `AMBIENCE_TYPES`, `MUSIC_MOODS`, `SFX_TYPES`, `mix`, `synthOriginalAudio` |
+| `studio/lib/characters.mjs` | `EXPRESSIONS`, `avatarRigChoices`, `blendExpression`, `drawCharacter`, `drawCharacterElite`, `drawFigure`, `drawHead` |
+| `studio/lib/core.mjs` | `STYLES`, `bitmapText`, `caption`, `clamp`, `drawBackground`, `ease`, `ellipse`, `measureVectorText`, `mix`, `noise`, `projection3D`, `pulse`, `rounded`, `spring`, `stroke`, `style`, `vectorText`, `viewport` |
+| `studio/lib/font.mjs` | `VECTOR_GLYPHS`, `measureVectorText`, `vectorText` |
+| `studio/lib/horror.mjs` | `HORROR_TEMPLATES`, `bedroomShadow`, `doorClose`, `doorPeephole`, `emptyHallway`, `intercomMacro`, `keyholeView`, `mirrorDouble`, `stairwell` |
+| `studio/lib/learning.mjs` | `CLI_COMMANDS`, `USAGE_FILE`, `buildAutoIndexSection`, `learnPlannerRules`, `promoteVideo`, `syncIndex`, `updateTemplateUsage` |
+| `studio/lib/motion.mjs` | `CAMERA_MOVES`, `blinkAmount`, `breathe`, `cameraTransform`, `easeInOutCubic`, `easeOutBack`, `follow`, `smoothNoise`, `spring` |
+| `studio/lib/planner.mjs` | `PLANNER_RULES_FILE`, `guessEmotion`, `loadPlannerRules`, `matchShotRule`, `planProject`, `planScript` |
+| `studio/lib/project.mjs` | `PROJECTS`, `ROOT`, `STUDIO`, `enforceDataOnly`, `loadProject`, `mkdir`, `projectPath`, `readJSON`, `resolveLineSource`, `resolveProjectShots`, `sha` |
+| `studio/lib/props.mjs` | `drawDigitalClock` |
+| `studio/lib/quality.mjs` | `verifyFilm` |
+| `studio/lib/runner.mjs` | `browserExecutable`, `dimensions`, `engineHash`, `invoke`, `pythonExecutable`, `render`, `sheet`, `smoke`, `withBrowser`, `withBrowserPool` |
+| `studio/lib/scenery.mjs` | `drawAtmosphere`, `drawBlurred`, `drawNightExterior`, `drawRoomInterior`, `drawVignette` |
+| `studio/lib/styles.mjs` | `STYLES`, `STYLE_GRADE` |
+| `studio/lib/template-meta.mjs` | `TEMPLATE_META` |
+| `studio/lib/templates.mjs` | `TEMPLATE_META`, `TEMPLATE_NAMES`, `assertShot`, `drawStudioFrame` |
+| `studio/lib/three-scene.mjs` | `buildHorrorRoomScene`, `buildNightCityScene`, `buildParticleVoidScene`, `renderThreeFrame` |
+| `studio/lib/timing.mjs` | `alignDialogue`, `alignMeasured`, `alignPhrases`, `phrases`, `saveWords`, `tokenize` |
+| `studio/lib/validate.mjs` | `didYouMean`, `levenshtein`, `validateProject` |
+
+### Template Registry (`TEMPLATE_META` & `usage.json`)
+
+| Template | Summary | Params Schema | Example | Used |
+|---|---|---|---|---:|
+| `wide-establishing` | Wide exterior night shot with moonlit sky, drifting clouds, rolling hill, picket fence, bare tree, or apartment facade. | `scene:enum(fence-moon|building|yard|night), set:string, text:string, moon:boolean, clouds:boolean, fence:boolean, tree:boolean, stars:number, seed:number` | `{"scene":"fence-moon","moon":true,"clouds":true,"fence":true,"tree":true}` | 2 |
+| `window-view` | Interior or exterior 4-pane window view with red curtains, sill digital clock, optional girl outside, and blurred foreground narrator. | `interior:boolean, girl:boolean, clock:string, clockTime:string, narrator:boolean, curtains:boolean, sill:boolean, rain:boolean, lightLevel:number, expression:enum(neutral|scared|terrified|surprise|suspicious|sad|relieved|angry|blank-stare|happy), variant:enum(girl|boy|adult), pose:enum(stand|walk|look|flinch|still|idle|run|fear), seed:number` | `{"interior":true,"girl":true,"clock":"11:59","narrator":true}` | 2 |
+| `character-medium` | Medium character reaction shot supporting silhouette close-up head or full rig with blinks, expressions, and blurred room backdrop. | `rig:enum(silhouette|block|stick), expression:enum(neutral|scared|terrified|surprise|suspicious|sad|relieved|angry|blank-stare|happy), expressionTo:enum(neutral|scared|terrified|surprise|suspicious|sad|relieved|angry|blank-stare|happy), expressionMix:number, backdrop:enum(room-blur|none|night), blinkAt:array, blink:boolean, gaze:object, color:string, wobble:number, rimPulse:boolean, variant:enum(girl|boy|adult), pose:enum(stand|walk|look|flinch|still|idle|run|fear), seed:number` | `{"rig":"silhouette","expression":"scared","backdrop":"room-blur"}` | 1 |
+| `giant-face` | Extreme close-up head shot with expressive eyes, natural or forced blinks, rim-light arc, and optional blurred room backdrop. | `rig:enum(silhouette|block|stick), expression:enum(neutral|scared|terrified|surprise|suspicious|sad|relieved|angry|blank-stare|happy), expressionTo:enum(neutral|scared|terrified|surprise|suspicious|sad|relieved|angry|blank-stare|happy), expressionMix:number, backdrop:enum(room-blur|none|night), blinkAt:array, blink:boolean, gaze:object, color:string, headColor:string, shirtColor:string, rimColor:string, wobble:number, rimPulse:boolean, seed:number` | `{"rig":"silhouette","expression":"surprise","backdrop":"room-blur","blinkAt":[0.35]}` | 2 |
+| `insert-macro-clock` | Macro clock insert shot supporting 7-segment red digital clock over blurred room backdrop or classic analog midnight dial. | `time:string, kind:enum(digital|analog), backdrop:enum(room-blur|wall|none), color:string, glow:number, ghost:number, flicker:number, seed:number` | `{"time":"11:59","kind":"digital","backdrop":"room-blur"}` | 1 |
+| `figure-exterior` | Silhouette figure standing or walking in the moonlit night yard in front of the picket fence and bare tree. | `variant:enum(girl|boy|adult), pose:enum(stand|walk|look|flinch|still|idle|run|fear), expression:enum(neutral|scared|terrified|surprise|suspicious|sad|relieved|angry|blank-stare|happy), expressionTo:enum(neutral|scared|terrified|surprise|suspicious|sad|relieved|angry|blank-stare|happy), expressionMix:number, rig:enum(silhouette|block|stick), facing:enum(left|right|front), gaze:object, walk:boolean, moon:boolean, clouds:boolean, fence:boolean, tree:boolean, seed:number` | `{"variant":"girl","pose":"stand","expression":"blank-stare"}` | 1 |
+| `empty-yard` | Empty moonlit night exterior yard with picket fence, bare tree, drifting clouds, and mist after a figure vanishes. | `moon:boolean, clouds:boolean, fence:boolean, tree:boolean, stars:number, clock:string, lightLevel:number, text:string, seed:number` | `{"moon":true,"clouds":true,"fence":true,"tree":true}` | 0 |
+| `data-card` | Typographic data card displaying a title and highlighted value over atmospheric background. | `text:string, value:string, subtext:string, seed:number` | `{"text":"THE CLOCK","value":"11:59"}` | 0 |
+| `3d-orbit` | Wireframe and shaded 3D cube orbiting in perspective space. | `speed:number, scale:number, camera:string, text:string, seed:number` | `{"speed":1,"scale":1}` | 0 |
+| `title-card` | Bold emblem and title card with pulsing atmospheric halo. | `text:string, subtitle:string, value:string, seed:number` | `{"text":"NIGHT"}` | 0 |
+| `three-particle-void` | 3D perspective particle torus orbiting a pulsing central starburst. | `text:string, speed:number, intensity:number, seed:number` | `{"speed":1}` | 0 |
+| `three-night-city` | 3D perspective night city skyline with orbiting camera, moon glow, and flickering emissive windows. | `text:string, speed:number, intensity:number, seed:number` | `{"text":"NIGHT"}` | 0 |
+| `three-horror-room` | 3D perspective dark room with flickering ceiling light and turning silhouette in the corner. | `text:string, speed:number, intensity:number, seed:number` | `{"intensity":1}` | 0 |
+| `intercom-macro` | Macro shot of an apartment wall intercom panel with LED indicator, speaker grille, and digital readout. | `display:string, signal:boolean, text:string, seed:number` | `{"display":"2:17","signal":true}` | 4 |
+| `empty-hallway` | One-point perspective apartment hallway with overhead bulb, doors, optional distant ghost figure, and light flicker. | `figure:boolean, blur:boolean, light:enum(steady|flicker), seed:number` | `{"figure":true,"blur":true}` | 2 |
+| `door-close` | Close shot of a heavy apartment door with peephole, handle, optional knock shockwaves, and eerie seam smile. | `knocks:number, angle:number, smile:boolean, seed:number` | `{"knocks":3,"angle":0.05}` | 2 |
+| `mirror-double` | Framed bathroom/hall mirror reflection where the double jitters and its eyes glow out of sync. | `emotion:enum(neutral|scared|terrified|surprise|suspicious|sad|relieved|angry|blank-stare|happy), expression:enum(neutral|scared|terrified|surprise|suspicious|sad|relieved|angry|blank-stare|happy), double:boolean, seed:number` | `{"emotion":"scared","double":true}` | 2 |
+| `bedroom-shadow` | Partially open bedroom door revealing a breathing shadow figure in the gap and flickering hallway light. | `knocks:number, light:enum(steady|flicker), figure:boolean, seed:number` | `{"knocks":3,"light":"flicker"}` | 1 |
+| `stairwell` | Concrete stairwell descending into fog with handrails, wet step reflections, rain streaks, and optional figure. | `wet:boolean, figure:boolean, seed:number` | `{"wet":true,"figure":true}` | 2 |
+| `door-peephole` | Circular fisheye peephole view into the hallway outside the apartment door. | `figure:boolean, smile:boolean, seed:number` | `{"figure":true}` | 1 |
+| `keyhole-view` | Keyhole cutout POV looking through a lock at a figure standing on the other side. | `figure:boolean, smile:boolean, seed:number` | `{"figure":true,"smile":true}` | 1 |
+<!-- AUTO:END -->

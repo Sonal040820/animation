@@ -2,6 +2,8 @@
 <body style="margin:0;background:black"><canvas id="screen" width="360" height="640"></canvas>
 <script type="module">
 import {drawStudioFrame} from './templates.mjs';
+import {bitmapText} from './core.mjs';
+window.studioBitmapText=bitmapText;
 window.studioReady=true;
 window.renderStudioFrame=(shot,config,seconds,words)=>{
   const canvas=document.getElementById('screen');

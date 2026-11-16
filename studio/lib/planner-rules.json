@@ -1,0 +1,253 @@
+{
+  "schema_version": 1,
+  "default_emotion": "ominous",
+  "emotion_rules": [
+    {
+      "id": "emotion-blink-scared",
+      "pattern": "\\b(blink|blinked|blinking|sudden|flinch|gasp|staring|stare)\\b",
+      "flags": "i",
+      "emotion": "scared",
+      "pause_after": 0.24
+    },
+    {
+      "id": "emotion-whisper-gone",
+      "pattern": "\\b(gone|vanish|vanished|disappeared|nothing|nobody|neither|come\\s+in)\\b",
+      "flags": "i",
+      "emotion": "whisper",
+      "pause_after": 0.32
+    },
+    {
+      "id": "emotion-terrified",
+      "pattern": "\\b(scream|terror|terrified|blood|run|dead)\\b",
+      "flags": "i",
+      "emotion": "terrified",
+      "pause_after": 0.20
+    },
+    {
+      "id": "emotion-tense",
+      "pattern": "\\b(watching|eyes|shadow|behind|knock|knocks|practicing|twelve\\s+oh\\s+one|12:01|00:01)\\b",
+      "flags": "i",
+      "emotion": "tense",
+      "pause_after": 0.20
+    },
+    {
+      "id": "emotion-ominous",
+      "pattern": "\\b(night|dark|cold|alone|window|clock|eleven|fifty|nine|11:59|door|hallway|stairwell|intercom)\\b",
+      "flags": "i",
+      "emotion": "ominous",
+      "pause_after": 0.28
+    },
+    {
+      "id": "emotion-sad",
+      "pattern": "\\b(sad|cry|grief|lost|tears)\\b",
+      "flags": "i",
+      "emotion": "sad",
+      "pause_after": 0.32
+    },
+    {
+      "id": "emotion-relieved",
+      "pattern": "\\b(safe|relieved|morning|calm|breath)\\b",
+      "flags": "i",
+      "emotion": "relieved",
+      "pause_after": 0.28
+    }
+  ],
+  "shot_rules": [
+    {
+      "id": "rule-blink-closeup",
+      "pattern": "\\b(blink|blinked|blinking|eyes\\s+closed)\\b",
+      "flags": "i",
+      "template": "giant-face",
+      "camera": "push",
+      "cameraIntensity": 1.0,
+      "params": {
+        "rig": "silhouette",
+        "expression": "surprise",
+        "backdrop": "room-blur",
+        "blinkAt": [0.35]
+      },
+      "sfx": [
+        { "type": "blink-swish", "offset": 0.25 }
+      ],
+      "ambience": "room-tone"
+    },
+    {
+      "id": "rule-clock-after-midnight",
+      "pattern": "\\b(twelve\\s+oh\\s+one|12:01|00:01)\\b",
+      "flags": "i",
+      "template": "window-view",
+      "camera": "push",
+      "cameraIntensity": 0.8,
+      "params": {
+        "interior": true,
+        "girl": false,
+        "clock": "12:01",
+        "narrator": true
+      },
+      "sfx": [
+        { "type": "tick", "offset": 0.2 }
+      ],
+      "ambience": "room-tone"
+    },
+    {
+      "id": "rule-clock-macro",
+      "pattern": "\\b(clock|eleven\\s+fifty\\s+nine|11:59|\\d{1,2}:\\d{2})\\b",
+      "flags": "i",
+      "template": "insert-macro-clock",
+      "camera": "push",
+      "cameraIntensity": 1.0,
+      "params": {
+        "time": "11:59",
+        "kind": "digital",
+        "backdrop": "room-blur"
+      },
+      "sfx": [
+        { "type": "tick", "offset": 0.3 }
+      ],
+      "ambience": "clock-tick-loop"
+    },
+    {
+      "id": "rule-gone-vanish",
+      "pattern": "\\b(gone|vanish|vanished|disappeared|empty)\\b",
+      "flags": "i",
+      "template": "empty-yard",
+      "camera": "pull",
+      "cameraIntensity": 0.9,
+      "params": {},
+      "sfx": [
+        { "type": "impact", "offset": 0.15 }
+      ],
+      "ambience": "night-wind",
+      "fadeOut": 0.6
+    },
+    {
+      "id": "rule-window-interior",
+      "pattern": "\\b(window|curtain|sill|outside\\s+my)\\b",
+      "flags": "i",
+      "template": "window-view",
+      "camera": "push",
+      "cameraIntensity": 1.0,
+      "params": {
+        "interior": true,
+        "girl": true,
+        "clock": "11:59",
+        "narrator": true
+      },
+      "sfx": [
+        { "type": "breath", "offset": 0.2 }
+      ],
+      "ambience": "room-tone"
+    },
+    {
+      "id": "rule-staring-figure-exterior",
+      "pattern": "\\b(staring|stare|watching|standing\\s+outside|girl\\s+outside)\\b",
+      "flags": "i",
+      "template": "figure-exterior",
+      "camera": "creep",
+      "cameraIntensity": 1.0,
+      "params": {
+        "variant": "girl",
+        "pose": "stand",
+        "expression": "blank-stare"
+      },
+      "sfx": [
+        { "type": "heartbeat", "offset": 0.2 }
+      ],
+      "ambience": "night-wind"
+    },
+    {
+      "id": "rule-night-establishing",
+      "pattern": "\\b(night|midnight|moon|fence|tree|sky|outside)\\b",
+      "flags": "i",
+      "template": "wide-establishing",
+      "camera": "drift",
+      "cameraIntensity": 1.0,
+      "params": {
+        "scene": "fence-moon"
+      },
+      "sfx": [],
+      "ambience": "night-wind",
+      "fadeIn": 0.35
+    },
+    {
+      "id": "rule-intercom-macro",
+      "pattern": "\\b(intercom|static|rang|caller)\\b",
+      "flags": "i",
+      "template": "intercom-macro",
+      "camera": "creep",
+      "cameraIntensity": 1.0,
+      "params": {
+        "display": "2:17",
+        "signal": true
+      },
+      "sfx": [
+        { "type": "static", "offset": 0.15 }
+      ],
+      "ambience": "room-tone"
+    },
+    {
+      "id": "rule-empty-hallway",
+      "pattern": "\\b(hallway|corridor)\\b",
+      "flags": "i",
+      "template": "empty-hallway",
+      "camera": "creep",
+      "cameraIntensity": 1.0,
+      "params": {
+        "figure": true,
+        "blur": true
+      },
+      "sfx": [
+        { "type": "lowboom", "offset": 0.4 }
+      ],
+      "ambience": "room-tone"
+    },
+    {
+      "id": "rule-door-close",
+      "pattern": "\\b(door|knock|knocks|latch|come\\s+in)\\b",
+      "flags": "i",
+      "template": "door-close",
+      "camera": "push",
+      "cameraIntensity": 1.0,
+      "params": {
+        "knocks": 3,
+        "angle": 0.05
+      },
+      "sfx": [
+        { "type": "knock", "offset": 0.35 }
+      ],
+      "ambience": "room-tone"
+    },
+    {
+      "id": "rule-stairwell",
+      "pattern": "\\b(stairwell|stairs|concrete|wet)\\b",
+      "flags": "i",
+      "template": "stairwell",
+      "camera": "creep",
+      "cameraIntensity": 1.0,
+      "params": {
+        "wet": true,
+        "figure": true
+      },
+      "sfx": [
+        { "type": "footstep", "offset": 0.4 }
+      ],
+      "ambience": "rain"
+    },
+    {
+      "id": "rule-keyhole",
+      "pattern": "\\b(keyhole|peephole|smile)\\b",
+      "flags": "i",
+      "template": "keyhole-view",
+      "camera": "push",
+      "cameraIntensity": 1.0,
+      "params": {
+        "figure": true,
+        "smile": true
+      },
+      "sfx": [
+        { "type": "breath", "offset": 0.3 }
+      ],
+      "ambience": "room-tone"
+    }
+  ]
+}

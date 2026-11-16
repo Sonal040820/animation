@@ -1,5 +1,9 @@
 # Durable lessons (newest first)
 
+- 2026-11-16T17:12:49.886Z / midnight-horror-elite: verified 6 shots, 100% template reuse, 67% auto (4/6) / 33% hand-edited, 581.1 render seconds, 0 fully cached shots, voice=kokoro-onnx-0.6.1-int8; First measured production run.
+
+- 2026-11-16T15:23:11.817Z / midnight-horror-elite: verified 8 shots, 100% templates, 186.0 render seconds, 0 fully cached shots; Previous reuse 100% => 100%; render seconds 398.1 => 186.0. No unreported errors are assumed.
+
 - 2026-11-16 / The Wrong Side of the Door: Complete 60.00s / 720x1280 / 24fps video built with 19 original reusable templates; source-only drama and 3 local Kokoro voices; 398.1s of measured final frame rendering. Verified H.264+AAC. QA warning: long repeated-frame section; likely low-motion shot, so add motion-rich lighting and micro-parallax in future without faking physics. Contact sheet was visually inspected and exact SHA locked before production.
 - 2026-11-16 / Contact sheet FFmpeg tile symptom: 19 individual PNGs existed, but one combined montage showed only the first cell. Root cause: FFmpeg tile output with -frames:v 1. Fix: compose all images deterministically in the existing Chromium Canvas2D renderer, verify 19 visible tiles and SHA before approve. Kept original shot files unchanged.
 - 2026-11-16 / 60s template registry check: new reusable templates were implemented but initial dispatcher and test still assumed eight templates. Fix: export HORROR_TEMPLATES into both dispatcher and template registry; assert uniqueness against actual list length, not a literal 8. CPU smoke and contract tests passed.

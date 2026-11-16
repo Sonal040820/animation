@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "voices": {
+    "narrator": "af_heart"
+  },
+  "default_speaker": "narrator",
+  "lines": [
+    {
+      "id": "l1",
+      "text": "Night.",
+      "emotion": "ominous",
+      "speaker": "narrator",
+      "speed": 1.05,
+      "pause_before": 0.04,
+      "pause_after": 0.1,
+      "emphasis": [
+        "NIGHT"
+      ]
+    },
+    {
+      "id": "l2",
+      "text": "I saw a little girl outside my window.",
+      "emotion": "ominous",
+      "speaker": "narrator",
+      "speed": 1.12,
+      "pause_before": 0.02,
+      "pause_after": 0.08,
+      "emphasis": [
+        "WINDOW"
+      ]
+    },
+    {
+      "id": "l3",
+      "text": "Staring right at me.",
+      "emotion": "tense",
+      "speaker": "narrator",
+      "speed": 1.12,
+      "pause_before": 0.02,
+      "pause_after": 0.08,
+      "emphasis": [
+        "STARING"
+      ]
+    },
+    {
+      "id": "l4",
+      "text": "The clock said eleven fifty nine.",
+      "emotion": "ominous",
+      "speaker": "narrator",
+      "speed": 1.12,
+      "pause_before": 0.02,
+      "pause_after": 0.08,
+      "emphasis": [
+        "CLOCK"
+      ]
+    },
+    {
+      "id": "l5",
+      "text": "I blinked.",
+      "emotion": "scared",
+      "speaker": "narrator",
+      "speed": 1.14,
+      "pause_before": 0.02,
+      "pause_after": 0.08,
+      "emphasis": [
+        "BLINKED"
+      ]
+    },
+    {
+      "id": "l6",
+      "text": "Twelve oh one.",
+      "emotion": "tense",
+      "speaker": "narrator",
+      "speed": 1.12,
+      "pause_before": 0.02,
+      "pause_after": 0.08,
+      "emphasis": [
+        "TWELVE",
+        "ONE"
+      ]
+    },
+    {
+      "id": "l7",
+      "text": "She was gone.",
+      "emotion": "whisper",
+      "speaker": "narrator",
+      "speed": 1.06,
+      "pause_before": 0.03,
+      "pause_after": 0.1,
+      "emphasis": [
+        "GONE"
+      ]
+    }
+  ]
+}
