@@ -6,7 +6,7 @@ import {style,STYLES} from '../lib/core.mjs';
 import {enforceDataOnly,loadProject} from '../lib/project.mjs';
 test('All original reusable templates',()=>{
  assert.ok(TEMPLATE_NAMES.length>=16);
- assert.equal(new Set(TEMPLATE_NAMES).size,8);
+ assert.equal(new Set(TEMPLATE_NAMES).size,TEMPLATE_NAMES.length);
  for(const template of TEMPLATE_NAMES)assert.doesNotThrow(()=>assertShot({template,start:0,duration:1}));
 });
 test('All four data-defined styles exist',()=>{
@@ -29,4 +29,12 @@ test('Horror project manifest is data-only and coherent',()=>{
  const p=loadProject('projects/window-at-midnight');
  assert.equal(p.config.aspect,'9:16');
  assert.ok(p.duration>=9.5&&p.duration<=10.5);
+});
+
+test('60-second psychological horror production contract',()=>{
+ const p=loadProject('projects/the-wrong-side');
+ assert.equal(p.duration,60);
+ assert.equal(p.manifest.shots.length,19);
+ assert.equal(p.config.studio,'original-short-video-studio');
+ assert.ok(p.manifest.shots.every(s=>TEMPLATE_NAMES.includes(s.template)));
 });
