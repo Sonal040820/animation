@@ -29,7 +29,7 @@ export function loadProject(p){
       throw new Error('Overlapping shots: '+shots[i].id);
   }
   const duration=Math.max(...shots.map(s=>s.start+s.duration));
-  if(duration>30||duration<.1)throw new Error('Video length out of range');
+  if(duration>90||duration<.1)throw new Error('Video duration must be 0–90 seconds');
   if(config.aspect!=='9:16')throw new Error('This studio accepts vertical 9:16 only');
   if(!['midnight','ember','arctic','ink'].includes(config.style))throw new Error('Unknown style');
   if(!['stick','block'].includes(config.rig))throw new Error('Unknown rig');

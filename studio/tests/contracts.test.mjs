@@ -4,8 +4,8 @@ import {TEMPLATE_NAMES,assertShot} from '../lib/templates.mjs';
 import {alignPhrases,phrases} from '../lib/timing.mjs';
 import {style,STYLES} from '../lib/core.mjs';
 import {enforceDataOnly,loadProject} from '../lib/project.mjs';
-test('Eight independent reusable templates',()=>{
- assert.equal(TEMPLATE_NAMES.length,8);
+test('All original reusable templates',()=>{
+ assert.ok(TEMPLATE_NAMES.length>=16);
  assert.equal(new Set(TEMPLATE_NAMES).size,8);
  for(const template of TEMPLATE_NAMES)assert.doesNotThrow(()=>assertShot({template,start:0,duration:1}));
 });

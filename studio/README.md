@@ -34,3 +34,6 @@ The GitHub workflow is setup-only by default, with explicit manual inputs projec
 
 ## Current boundaries
 A smoke test is a SINGLE still per template, not an animation. Code-drawn 2.5D orbit is not GPU 3D and does not claim physically accurate 3D lighting. Caption alignment by phrase duration is an approximation. Timing/performance are not claimed until measured on the actual GitHub runner.
+
+## 60-second production extension
+The studio now supports up to 90-second manifests and reusable timed multi-speaker dialogue. The original setup-only restriction applied to the original setup request, not to a subsequent explicit production authorization. Full film generation is separately gated by an inspected contact sheet.

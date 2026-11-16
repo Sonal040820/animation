@@ -1,6 +1,7 @@
 // Template-only shots: every visual element is drawn from code. Stateless frame API.
 import {clamp,ease,noise,drawBackground,ellipse,rounded,stroke,viewport,bitmapText,projection3D,caption,style} from './core.mjs';
 import {drawCharacter} from './characters.mjs';
+import {HORROR_TEMPLATES} from './horror.mjs';
 import {STYLE_GRADE} from './styles.mjs';
 export const TEMPLATE_NAMES=Object.freeze([
   'wide-establishing','window-view','character-medium','giant-face',

@@ -8,7 +8,7 @@ import {fileURLToPath} from 'node:url';
 import {chromium} from 'playwright';
 import {ROOT,STUDIO,PROJECTS,sha,readJSON,mkdir,projectPath,loadProject,enforceDataOnly} from '../lib/project.mjs';
 import {browserExecutable,withBrowser,invoke,smoke,sheet,render,dimensions} from '../lib/runner.mjs';
-import {phrases,saveWords} from '../lib/timing.mjs';
+import {phrases,saveWords,alignDialogue} from '../lib/timing.mjs';
 import {mix} from '../lib/audio.mjs';
 import {verifyFilm} from '../lib/quality.mjs';
 import {promoteVideo} from '../lib/learning.mjs';
@@ -89,13 +89,22 @@ function align(){
   const timingPath=path.join(p.dir,'timeline','phrases.json');
   const voice=fs.existsSync(timingPath)?readJSON(timingPath):null;
   const duration=voice?.duration||p.duration;
-  const result=saveWords(p.dir,script,voice?.durations||null,duration);
+  const dataPath=path.join(p.dir,'dialogue.json');
+  const result=fs.existsSync(dataPath)?alignDialogue(readJSON(dataPath)):saveWords(p.dir,script,voice?.durations||null,duration);
+  if(fs.existsSync(dataPath)){
+    mkdir(path.join(p.dir,'timeline'));
+    fs.writeFileSync(path.join(p.dir,'timeline','words.json'),JSON.stringify(result,null,2)+'\n');
+  }
   output({captions:result.words.length,method:result.method,duration});
 }
 function makeVoice(){
   const p=project();
   const args=['studio/cli/voice.py','--project',path.relative(ROOT,p.dir),'--voice',String(opts.voice||p.config.voice||'am_adam')];
   if(opts.speed)args.push('--speed',String(opts.speed));
+  if(fs.existsSync(path.join(p.dir,'dialogue.json'))){
+    const outputText=invoke('python3',['studio/cli/voice_scene.py','--project',path.relative(ROOT,p.dir)],{cwd:ROOT,timeout:900000});
+    process.stdout.write(outputText);return;
+  }
   const stdout=invoke('python3',args,{cwd:ROOT,timeout:600000});
   process.stdout.write(stdout);
 }
