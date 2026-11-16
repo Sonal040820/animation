@@ -52,12 +52,12 @@ export function drawCharacter(ctx,{x,y,scale=1,color='#65c4db',rig='block',expre
 export const avatarRigChoices=Object.freeze(['stick','block','silhouette']);
 
 // Elite variant — extends drawCharacter with wobble hair sway, rimPulse, blink, and 'surprise' expression.
-export function drawCharacterElite(ctx,{x,y,scale=1,color='#65c4db',rig='block',expression='neutral',phase=0,pose='idle',rim='#64e0ec',gender='unspecified',wobble=0,rimPulse=false,blink=0}={}){
+export function drawCharacterElite(ctx,{x,y,scale=1,color='#65c4db',rig='block',expression='neutral',phase=0,pose='idle',poseWeights=null,gaze={x:0,y:0},rim='#64e0ec',gender='unspecified',wobble=0,rimPulse=false,blink=0}={}){
   // rimPulse: oscillate rim-light intensity on a fast sine
   const effectiveRim=rimPulse?`rgba(${hexToRgb(rim)},${0.55+Math.abs(Math.sin(phase*3.7))*0.45})`:rim;
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
-  const breath=Math.sin(phase*2)*2,step=pose==='walk'?Math.sin(phase*8)*11:0;
-  const lean=pose==='run'?-.12:pose==='fear'?.08:0;
+  const breath=Math.sin(phase*2)*2,step=poseWeights?Math.sin(phase*8)*11*(poseWeights.walk||0):pose==='walk'?Math.sin(phase*8)*11:0;
+  const lean=poseWeights?-.12*(poseWeights.run||0)+.08*(poseWeights.fear||0)+.1*(poseWeights.flinch||0):pose==='run'?-.12:pose==='fear'?.08:0;
   ctx.rotate(lean);
   ctx.shadowColor=effectiveRim;ctx.shadowBlur=rimPulse?18+Math.abs(Math.sin(phase*3.7))*14:15;
   ellipse(ctx,0,8,25,8,'#00000050');
@@ -83,7 +83,14 @@ export function drawCharacterElite(ctx,{x,y,scale=1,color='#65c4db',rig='block',
   const hw=wobble*Math.sin(phase*1.8);
   ctx.fillStyle='#20232c';ctx.beginPath();ctx.arc(hw,-117+breath,33,Math.PI,0);ctx.lineTo(27+hw,-130+breath);ctx.quadraticCurveTo(-5+hw,-158,-31+hw,-124+breath);ctx.closePath();ctx.fill();
   // Eyes — surprise: wide circular (or closed when blink > 0.55)
-  if(blink>0.55){
+  if(typeof expression==='object'){
+    const e=blendExpression(expression,expression,1),ey=-111+breath;
+    for(const sign of [-1,1]){
+      ellipse(ctx,sign*12+gaze.x*3,ey+gaze.y*2,4*e.pupil,Math.max(.4,5*e.eyeOpen*(1-blink)),'#17202d');
+      stroke(ctx,[sign*20,ey-10-e.browOuter*5-e.browHeight*4],[sign*6,ey-10-e.browInner*7-e.browHeight*4],2.2,'#27313d');
+    }
+    ellipse(ctx,0,-93+breath,7*e.mouthWidth,Math.max(.6,8*e.mouthOpen),'#6f3c48');
+  } else if(blink>0.55){
     const eyeY=-110+breath;
     stroke(ctx,[-18,eyeY],[-6,eyeY],2.5,'#17202d');
     stroke(ctx,[6,eyeY],[18,eyeY],2.5,'#17202d');
@@ -213,6 +220,7 @@ export function drawFigure(ctx, {
   gaze = { x: 0, y: 0 },
   blink = null,
   pose = 'stand',
+  poseWeights = null,
   phase = 0,
   rimSide = 'right',
   rimColor = '#d8ecff',
@@ -229,7 +237,10 @@ export function drawFigure(ctx, {
       scale: height / 145,
       color: dressColor || '#65c4db',
       rig,
-      expression: typeof expression === 'string' ? expression : 'neutral',
+      expression,
+      poseWeights,
+      gaze,
+      blink: blink??0,
       phase,
       pose: pose === 'walk' ? 'walk' : 'idle',
       rim: rimColor,
@@ -251,15 +262,15 @@ export function drawFigure(ctx, {
   // Breathing & pose kinematics
   const br = breathe(t, 0.26);
   const breathY = br * h * 0.006;
-  const isWalk = pose === 'walk';
-  const isFlinch = pose === 'flinch';
-  const isLook = pose === 'look';
+  const isWalk = poseWeights ? poseWeights.walk||0 : Number(pose === 'walk');
+  const isFlinch = poseWeights ? poseWeights.flinch||0 : Number(pose === 'flinch');
+  const isLook = poseWeights ? poseWeights.look||0 : Number(pose === 'look');
 
   const walkCycle = isWalk ? t * 5.2 : 0;
-  const stride = isWalk ? Math.sin(walkCycle) : 0;
-  const weightBob = isWalk ? Math.abs(Math.cos(walkCycle)) * h * 0.016 : 0;
-  const flinchAmt = isFlinch ? spring(Math.max(0, t % 2.5), { from: 0, to: 1, stiffness: 150, damping: 11 }) : 0;
-  const lookAmt = isLook ? spring(Math.max(0, t), { from: 0, to: 1, stiffness: 90, damping: 14 }) : 0;
+  const stride = isWalk * Math.sin(walkCycle);
+  const weightBob = isWalk * Math.abs(Math.cos(walkCycle)) * h * 0.016;
+  const flinchAmt = isFlinch * spring(Math.max(0, t % 2.5), { from: 0, to: 1, stiffness: 150, damping: 11 });
+  const lookAmt = isLook * spring(Math.max(0, t), { from: 0, to: 1, stiffness: 90, damping: 14 });
 
   // Lagged secondary motion for dress/coat hem and head follow
   const hemSway = follow(

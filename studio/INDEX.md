@@ -129,7 +129,7 @@ No media generated during initial setup. When adding a template, update this ind
 | `studio/lib/project.mjs` | `PROJECTS`, `ROOT`, `STUDIO`, `enforceDataOnly`, `findWordTimestamp`, `loadProject`, `mkdir`, `projectPath`, `readJSON`, `resolveLineSource`, `resolveProjectShots`, `resolveShotCues`, `sha` |
 | `studio/lib/props.mjs` | `drawDigitalClock` |
 | `studio/lib/quality.mjs` | `measureMotion`, `verifyFilm` |
-| `studio/lib/recipe.mjs` | `EASINGS`, `FX`, `PROPS`, `RECIPE_REGISTRIES`, `RIGS`, `SETS`, `drawRecipe`, `mergeRecipe`, `normalizeRecipe`, `resolveKeys`, `resolveRecipe`, `worldPosition` |
+| `studio/lib/recipe.mjs` | `EASINGS`, `FX`, `PROPS`, `RECIPE_REGISTRIES`, `RIGS`, `SETS`, `drawRecipe`, `mergeRecipe`, `normalizeRecipe`, `resolveActor`, `resolveKeys`, `resolveRecipe`, `worldPosition` |
 | `studio/lib/runner.mjs` | `browserExecutable`, `dimensions`, `engineHash`, `invoke`, `pythonExecutable`, `render`, `sheet`, `smoke`, `withBrowser`, `withBrowserPool` |
 | `studio/lib/scenery.mjs` | `computeWindowLayout`, `drawAtmosphere`, `drawBlurred`, `drawNightExterior`, `drawRoomInterior`, `drawVignette`, `groundDepthPosition` |
 | `studio/lib/styles.mjs` | `STYLES`, `STYLE_GRADE` |

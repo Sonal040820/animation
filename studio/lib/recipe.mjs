@@ -1,7 +1,7 @@
 // Browser-safe, data-only shot composition. No project code is evaluated.
 import {clamp, ellipse, rounded, bitmapText} from './core.mjs';
 import {groundDepthPosition, drawNightExterior, drawRoomInterior, drawAtmosphere, drawVignette} from './scenery.mjs';
-import {drawFigure, EXPRESSIONS} from './characters.mjs';
+import {drawFigure, EXPRESSIONS, blendExpression} from './characters.mjs';
 import {drawDigitalClock} from './props.mjs';
 import {HORROR_TEMPLATES} from './horror.mjs';
 
@@ -78,7 +78,7 @@ function actorValues(a){
   if(a.expression!==undefined)known(a.expression,{...EXPRESSIONS,happy:true},'expression');
   if(a.look!==undefined){if(!Array.isArray(a.look)||a.look.length!==2)throw Error('look must be [x,y]');a.look.forEach(v=>finite(v,'look',-1,1));}
   if(a.blink!==undefined)finite(a.blink,'blink',0,1);
-  if(a.talk!==undefined)finite(a.talk,'talk',0,1);
+  if(a.talk!==undefined){if(typeof a.talk==='number')finite(a.talk,'talk',0,1);else{fields(a.talk,['amplitude','fps'],'talk');finite(a.talk.fps,'talk.fps',1,240);if(!Array.isArray(a.talk.amplitude)||!a.talk.amplitude.length)throw Error('talk.amplitude needs samples');a.talk.amplitude.forEach(v=>finite(v,'amplitude',0,1));}}
   if(a.blend!==undefined)finite(a.blend,'blend',0,2);
   if(a.color!==undefined&&(!/^#[0-9a-f]{6}$/i.test(a.color)))throw Error('color must be #rrggbb');
 }
@@ -118,7 +118,20 @@ export function mergeRecipe(base,patch){
   const result=structuredClone(base);for(const [k,v] of Object.entries(patch||{})){if(['__proto__','constructor','prototype'].includes(k))throw Error('Unsafe data key');result[k]=v&&typeof v==='object'&&!Array.isArray(v)&&result[k]&&typeof result[k]==='object'&&!Array.isArray(result[k])?mergeRecipe(result[k],v):structuredClone(v);}return result;
 }
 export function resolveRecipe(recipe,t=0){
-  return {set:recipe.set,actors:recipe.actors.map(a=>resolveKeys(a,a.keys,t).state),props:recipe.props.map(p=>resolveKeys(p,p.keys,t).state),fx:recipe.fx.map(f=>resolveKeys(f,f.keys,t).state),camera:resolveKeys({x:0,y:0,zoom:1,rotation:0,blur:0},recipe.camera?.keys,t).state,cues:recipe.cues};
+  return {set:recipe.set,actors:recipe.actors.map(a=>resolveActor(a,t)),props:recipe.props.map(p=>resolveKeys(p,p.keys,t).state),fx:recipe.fx.map(f=>resolveKeys(f,f.keys,t).state),camera:resolveKeys({x:0,y:0,zoom:1,rotation:0,blur:0},recipe.camera?.keys,t).state,cues:recipe.cues};
+}
+export function resolveActor(actor,t){
+  const state=resolveKeys(actor,actor.keys,t).state;
+  const channel=(field,initial,convert)=>{
+    let from=convert(initial),to=from,start=0,duration=0,easing='linear';
+    const sample=at=>interpolate(from,to,duration?EASINGS[easing].draw(clamp((at-start)/duration,0,1)):1);
+    for(const key of actor.keys){if(key.t>t)break;if(key[field]===undefined)continue;from=sample(key.t);to=convert(key[field]);start=key.t;duration=key.t===0?0:(key.blend??actor.blend??.15);easing=key.easing||'inOut';}
+    return sample(t);
+  };
+  state.expression=channel('expression',actor.expression,v=>blendExpression(v,v,1));
+  state.poseWeights=channel('pose',actor.pose,v=>Object.fromEntries(poses.map(p=>[p,p===v?1:0])));
+  if(state.talk!==undefined){const a=state.talk;state.expression.mouthOpen=typeof a==='number'?a:(a.amplitude[Math.floor(t*a.fps)]??0);}
+  return state;
 }
 export function drawRecipe(ctx,w,h,s,t,recipe,context={}){
   const r=resolveRecipe(recipe,t),cam=r.camera;
@@ -126,6 +139,6 @@ export function drawRecipe(ctx,w,h,s,t,recipe,context={}){
   ctx.save();ctx.translate(w/2+cam.x*w,h/2+cam.y*h);ctx.rotate(cam.rotation);ctx.scale(cam.zoom,cam.zoom);ctx.translate(-w/2,-h/2);if(cam.blur)ctx.filter=`blur(${cam.blur*w/720}px)`;
   SETS[r.set.preset].draw(ctx,w,h,s,t,{...r.set.params,duration:context.duration,seed:r.set.params.seed??context.seed,cues:context.cues});
   const items=[...r.actors.map(a=>({...a,actor:true})),...r.props].sort((a,b)=>a.pos.depth-b.pos.depth||(a.layer||0)-(b.layer||0));
-  for(const item of items){const p=worldPosition(item.pos,item.scale);ctx.save();if(item.actor){drawFigure(ctx,{x:p.x*w,y:p.y*h,height:.28*p.scale*h,rig:item.rig,pose:item.pose,expression:item.expression,gaze:{x:item.look?.[0]||0,y:item.look?.[1]||0},blink:item.blink,phase:t,dressColor:item.color});}else{ctx.translate(p.x*w,p.y*h);PROPS[item.type].draw(ctx,.28*p.scale*w,.18*p.scale*h,s,t,item.state);}ctx.restore();}
+  for(const item of items){const p=worldPosition(item.pos,item.scale);ctx.save();if(item.actor){let blink=item.blink;for(const cue of context.cues||[]){if(cue.action==='blink'&&(!cue.actor||cue.actor===item.id)){const dt=t-cue.localTime,d=cue.duration||.16;if(dt>=0&&dt<d)blink=Math.sin(Math.PI*dt/d);}}drawFigure(ctx,{x:p.x*w,y:p.y*h,height:.28*p.scale*h,rig:item.rig,pose:item.pose,poseWeights:item.poseWeights,expression:item.expression,gaze:{x:item.look?.[0]||0,y:item.look?.[1]||0},blink,phase:t,dressColor:item.color});}else{ctx.translate(p.x*w,p.y*h);PROPS[item.type].draw(ctx,.28*p.scale*w,.18*p.scale*h,s,t,item.state);}ctx.restore();}
   for(const f of r.fx){ctx.save();FX[f.type].draw(ctx,w,h,s,t,f.params);ctx.restore();}ctx.restore();
 }
