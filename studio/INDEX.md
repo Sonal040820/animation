@@ -125,6 +125,7 @@ No media generated during initial setup. When adding a template, update this ind
 | `studio/lib/learning.mjs` | `CLI_COMMANDS`, `USAGE_FILE`, `buildAutoIndexSection`, `learnPlannerRules`, `promoteVideo`, `syncIndex`, `updateTemplateUsage` |
 | `studio/lib/motion.mjs` | `CAMERA_MOVES`, `blinkAmount`, `breathe`, `cameraTransform`, `easeInOutCubic`, `easeOutBack`, `follow`, `smoothNoise`, `spring` |
 | `studio/lib/planner.mjs` | `PLANNER_RULES_FILE`, `guessEmotion`, `loadPlannerRules`, `matchShotRule`, `normalizeDisplayText`, `planProject`, `planScript` |
+| `studio/lib/presets.mjs` | `PRESETS`, `presetRecipe`, `recipeShot` |
 | `studio/lib/project.mjs` | `PROJECTS`, `ROOT`, `STUDIO`, `enforceDataOnly`, `findWordTimestamp`, `loadProject`, `mkdir`, `projectPath`, `readJSON`, `resolveLineSource`, `resolveProjectShots`, `resolveShotCues`, `sha` |
 | `studio/lib/props.mjs` | `drawDigitalClock` |
 | `studio/lib/quality.mjs` | `measureMotion`, `verifyFilm` |
@@ -174,6 +175,23 @@ No media generated during initial setup. When adding a template, update this ind
 | sets | corridor | {"figure":false,"blur":false,"light":"cold"} | {} |
 | sets | stairwell | {"wet":false,"figure":false} | {} |
 | sets | void | {} | {} |
+| sets | preset:wide-establishing | {} | {"scene":"fence-moon","moon":true,"clouds":true,"fence":true,"tree":true} |
+| sets | preset:window-view | {} | {"interior":true,"girl":{"visible":true,"depth":0.78,"x":0.72,"scale":0.9},"clock":{"time":"11:59","x":0.275},"narrator":{"visible":true}} |
+| sets | preset:character-medium | {} | {"rig":"silhouette","expression":"scared","backdrop":"room-blur"} |
+| sets | preset:giant-face | {} | {"rig":"silhouette","expression":"surprise","backdrop":"room-blur","blinkAt":[0.35]} |
+| sets | preset:insert-macro-clock | {} | {"time":"11:59","kind":"digital","backdrop":"room-blur"} |
+| sets | preset:figure-exterior | {} | {"variant":"girl","pose":"stand","expression":"blank-stare"} |
+| sets | preset:empty-yard | {} | {"moon":true,"clouds":true,"fence":true,"tree":true} |
+| sets | preset:data-card | {} | {"text":"THE CLOCK","value":"11:59"} |
+| sets | preset:title-card | {} | {"text":"NIGHT"} |
+| sets | preset:intercom-macro | {} | {"display":"2:17","signal":true} |
+| sets | preset:empty-hallway | {} | {"figure":true,"blur":true} |
+| sets | preset:door-close | {} | {"knocks":3,"angle":0.05} |
+| sets | preset:mirror-double | {} | {"emotion":"scared","double":true} |
+| sets | preset:bedroom-shadow | {} | {"knocks":3,"light":"flicker"} |
+| sets | preset:stairwell | {} | {"wet":true,"figure":true} |
+| sets | preset:door-peephole | {} | {"figure":true} |
+| sets | preset:keyhole-view | {} | {"figure":true,"smile":true} |
 | props | clock | {"time":"11:59","color":"#ff4d4d","glow":1} | {"time":"3:00"} |
 | props | moon | {"color":"#d8e4f0"} | {} |
 | props | sill | {"color":"#354354"} | {} |

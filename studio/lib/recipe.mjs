@@ -55,7 +55,7 @@ function known(value,registry,label){
 }
 function fields(v,allowed,label){object(v,label);for(const k of Object.keys(v))known(k,Object.fromEntries(allowed.map(x=>[x,true])),`${label} field`);}
 function finite(v,label,min=-Infinity,max=Infinity){if(typeof v!=='number'||!Number.isFinite(v)||v<min||v>max)throw Error(`${label} must be finite in [${min}, ${max}]`);}
-function params(v,meta,label){object(v,label);for(const [k,val] of Object.entries(v)){known(k,meta.params,label);const spec=meta.params[k];if(spec.type==='number')finite(val,`${label}.${k}`,spec.min,spec.max);else if(typeof val!==spec.type)throw Error(`${label}.${k} must be ${spec.type}`);}}
+function params(v,meta,label){object(v,label);for(const [k,val] of Object.entries(v)){known(k,meta.params,label);const spec=meta.params[k];if(spec.type==='number')finite(val,`${label}.${k}`,spec.min,spec.max);else if(spec.type==='enum'){known(val,Object.fromEntries(spec.values.map(x=>[x,true])),`${label}.${k}`);}else if(!spec.type.split('|').includes(Array.isArray(val)?'array':typeof val)||val===null)throw Error(`${label}.${k} must be ${spec.type}`);}}
 function keys(list,allowed,check,label){
   if(!Array.isArray(list))throw Error(`${label} must be an array`);
   let last=-1;
@@ -120,11 +120,11 @@ export function mergeRecipe(base,patch){
 export function resolveRecipe(recipe,t=0){
   return {set:recipe.set,actors:recipe.actors.map(a=>resolveKeys(a,a.keys,t).state),props:recipe.props.map(p=>resolveKeys(p,p.keys,t).state),fx:recipe.fx.map(f=>resolveKeys(f,f.keys,t).state),camera:resolveKeys({x:0,y:0,zoom:1,rotation:0,blur:0},recipe.camera?.keys,t).state,cues:recipe.cues};
 }
-export function drawRecipe(ctx,w,h,s,t,recipe){
+export function drawRecipe(ctx,w,h,s,t,recipe,context={}){
   const r=resolveRecipe(recipe,t),cam=r.camera;
   if(recipe.camera?.shake){const q=recipe.camera.shake,env=q.amount*Math.exp(-(q.decay??5)*t);cam.x+=Math.sin(t*49)*env;cam.y+=Math.cos(t*43)*env;}
   ctx.save();ctx.translate(w/2+cam.x*w,h/2+cam.y*h);ctx.rotate(cam.rotation);ctx.scale(cam.zoom,cam.zoom);ctx.translate(-w/2,-h/2);if(cam.blur)ctx.filter=`blur(${cam.blur*w/720}px)`;
-  SETS[r.set.preset].draw(ctx,w,h,s,t,r.set.params);
+  SETS[r.set.preset].draw(ctx,w,h,s,t,{...r.set.params,duration:context.duration,seed:r.set.params.seed??context.seed,cues:context.cues});
   const items=[...r.actors.map(a=>({...a,actor:true})),...r.props].sort((a,b)=>a.pos.depth-b.pos.depth||(a.layer||0)-(b.layer||0));
   for(const item of items){const p=worldPosition(item.pos,item.scale);ctx.save();if(item.actor){drawFigure(ctx,{x:p.x*w,y:p.y*h,height:.28*p.scale*h,rig:item.rig,pose:item.pose,expression:item.expression,gaze:{x:item.look?.[0]||0,y:item.look?.[1]||0},blink:item.blink,phase:t,dressColor:item.color});}else{ctx.translate(p.x*w,p.y*h);PROPS[item.type].draw(ctx,.28*p.scale*w,.18*p.scale*h,s,t,item.state);}ctx.restore();}
   for(const f of r.fx){ctx.save();FX[f.type].draw(ctx,w,h,s,t,f.params);ctx.restore();}ctx.restore();

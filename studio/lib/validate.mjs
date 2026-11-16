@@ -11,6 +11,7 @@ import {avatarRigChoices} from './characters.mjs';
 import {SFX_TYPES,AMBIENCE_TYPES} from './audio.mjs';
 import {computeWindowLayout} from './scenery.mjs';
 import {normalizeRecipe} from './recipe.mjs';
+import {recipeShot} from './presets.mjs';
 
 const LIB=path.dirname(fileURLToPath(import.meta.url));
 
@@ -256,7 +257,8 @@ export function validateProject(projectRef){
   }
 
   for(let i=0;i<resolvedShots.length;i++){
-    const shot=resolvedShots[i];
+    let shot=resolvedShots[i];
+    try{shot=recipeShot(shot);}catch(e){errors.push({code:'INVALID_PRESET',shot:shot.id,message:e.message});}
     const sid=shot.id||('shot_'+i);
 
     // 1. Template check

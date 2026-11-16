@@ -17,7 +17,8 @@ import {
   buildNightCityScene, buildHorrorRoomScene
 } from './three-scene.mjs';
 import { TEMPLATE_META } from './template-meta.mjs';
-import {normalizeRecipe, drawRecipe} from './recipe.mjs';
+import {normalizeRecipe, drawRecipe, SETS} from './recipe.mjs';
+import {PRESETS,recipeShot} from './presets.mjs';
 
 export { TEMPLATE_META };
 
@@ -488,6 +489,10 @@ const TEMPLATES = {
   ...HORROR_TEMPLATES
 };
 
+for(const [id,meta] of Object.entries(PRESETS)){
+  SETS[`preset:${id}`]={...meta,draw:TEMPLATES[id]};
+}
+
 function drawEyelidBlinkTransition(ctx, w, h, closeAmt) {
   const c = clamp(closeAmt, 0, 1);
   if (c <= 0.01) return;
@@ -518,6 +523,7 @@ function drawEyelidBlinkTransition(ctx, w, h, closeAmt) {
 }
 
 export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
+  shot=recipeShot(shot);
   const ctx = canvas.getContext('2d', { alpha: false });
   const w = canvas.width, h = canvas.height;
   const s = style(config.style || 'midnight');
@@ -574,7 +580,7 @@ export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
     viewport(ctx, w, h, seconds, camKind);
   }
 
-  const tplFn = shot.recipe ? (c,w,h,s,t)=>drawRecipe(c,w,h,s,t,normalizeRecipe(shot.recipe)) : TEMPLATES[shot.template];
+  const tplFn = shot.recipe ? (c,w,h,s,t,p)=>drawRecipe(c,w,h,s,t,normalizeRecipe(shot.recipe),p) : TEMPLATES[shot.template];
   if (!tplFn) throw new Error('Unknown template ' + shot.template);
   const tplParams = {
     ...(shot.params || {}),
@@ -686,6 +692,7 @@ export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
 }
 
 export function assertShot(shot) {
+  shot=recipeShot(shot);
   if (shot.recipe) normalizeRecipe(shot.recipe);
   else if (!TEMPLATE_NAMES.includes(shot.template)) throw new Error('Unknown template ' + shot.template);
   if (!Number.isFinite(shot.start) || !Number.isFinite(shot.duration) || shot.duration <= 0) {

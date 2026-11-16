@@ -6,6 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {assertShot} from './templates.mjs';
 import {STYLES} from './styles.mjs';
 import {avatarRigChoices} from './characters.mjs';
+import {recipeShot} from './presets.mjs';
 
 export const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 export const PROJECTS=path.join(ROOT,'projects');
@@ -240,7 +241,7 @@ export function loadProject(p){
   const config=readJSON(path.join(dir,'config.json'));
   if(!Array.isArray(manifest.shots)||!manifest.shots.length)throw new Error('Empty manifest');
   const lineSource=resolveLineSource(dir);
-  let shots=resolveProjectShots(manifest.shots,lineSource,config);
+  let shots=resolveProjectShots(manifest.shots,lineSource,config).map(recipeShot);
   const wordsFile=path.join(dir,'timeline','words.json');
   const words=fs.existsSync(wordsFile)?(readJSON(wordsFile).words||[]):[];
   shots=resolveShotCues(shots,words,lineSource.lines);
