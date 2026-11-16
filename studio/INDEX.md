@@ -97,6 +97,8 @@ No media generated during initial setup. When adding a template, update this ind
 
 | Command | Arguments | Summary |
 |---|---|---|
+| `explain` | `--project projects/<slug> --shot sNN [--at seconds]` | Print normalized recipe, measured cue anchors and optional sampled frame |
+| `recipe-new` | `--preset window-view` | Print recipe skeleton plus parameter schemas/defaults and timing annotations |
 | `doctor` | `[--force]` | Capability check, version fingerprint, writes studio/environment.json |
 | `smoke` | `—` | Render one static low-res frame per template in parallel browser pool |
 | `check` | `—` | Enforce data-only rule across studio projects (reject unpromoted code) |

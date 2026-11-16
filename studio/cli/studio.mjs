@@ -13,6 +13,8 @@ import {validateProject} from '../lib/validate.mjs';
 import {planProject} from '../lib/planner.mjs';
 import {computeWindowLayout} from '../lib/scenery.mjs';
 import {TEMPLATE_NAMES} from '../lib/templates.mjs';
+import {presetRecipe,PRESETS} from '../lib/presets.mjs';
+import {normalizeRecipe,resolveRecipe} from '../lib/recipe.mjs';
 
 const argv=process.argv.slice(2),command=argv.shift();
 const opts={};
@@ -265,6 +267,18 @@ async function golden(){
 }
 
 async function main(){
+  if(command==='recipe-new'){
+    const id=String(opts.preset||'window-view');
+    const recipe=presetRecipe(id);
+    recipe.set.params=Object.fromEntries(Object.entries(PRESETS[id].params).filter(([,v])=>v.default!==undefined).map(([k,v])=>[k,v.default]));
+    return output({recipe,annotations:{coordinates:'x: 0..1; depth: 0 far .. 1 near; feet above caption safe zone',keys:'Shot-relative seconds, linear/in/out/inOut/hold; pose/expression blends start at key time (default .15s)',params:PRESETS[id].params}});
+  }
+  if(command==='explain'){
+    const p=loadProject(projectArg),shot=p.manifest.shots.find(s=>s.id===opts.shot);
+    if(!shot)throw Error('Unknown shot '+opts.shot);
+    const recipe=normalizeRecipe(shot.recipe||presetRecipe(shot.template,{},shot.params));
+    return output({shot:shot.id,start:shot.start,duration:shot.duration,recipe,resolvedCues:shot.resolvedCues||[],...(opts.at!==undefined?{frame:resolveRecipe(recipe,Number(opts.at))}:{})});
+  }
   if(command==='doctor')return await doctor();
   if(command==='smoke')return output(await smoke());
   if(command==='check')return scan();

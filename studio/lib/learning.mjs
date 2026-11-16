@@ -11,6 +11,8 @@ const LIB=path.dirname(fileURLToPath(import.meta.url));
 export const USAGE_FILE=path.join(LIB,'usage.json');
 
 export const CLI_COMMANDS=Object.freeze([
+  {command:'explain',args:'--project projects/<slug> --shot sNN [--at seconds]',summary:'Print normalized recipe, measured cue anchors and optional sampled frame'},
+  {command:'recipe-new',args:'--preset window-view',summary:'Print recipe skeleton plus parameter schemas/defaults and timing annotations'},
   {command:'doctor',args:'[--force]',summary:'Capability check, version fingerprint, writes studio/environment.json'},
   {command:'smoke',args:'',summary:'Render one static low-res frame per template in parallel browser pool'},
   {command:'check',args:'',summary:'Enforce data-only rule across studio projects (reject unpromoted code)'},

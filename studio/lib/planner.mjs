@@ -245,6 +245,8 @@ export function planProject(projectRef,{force=false}={}){
   const scriptText=fs.readFileSync(scriptFile,'utf8');
   const slug=path.basename(dir);
   const {dialogue,manifest,needs_new_code,auto_planned}=planScript(scriptText,{slug,voice:config.voice||'af_heart',existingDialogue});
+  // Persist composable presets; retain planScript's legacy result for callers.
+  manifest.shots=manifest.shots.map(({template,params,...shot})=>({...shot,preset:template,overrides:{set:{params}}}));
   fs.writeFileSync(dialogueFile,JSON.stringify(dialogue,null,2)+'\n');
   fs.writeFileSync(manifestFile,JSON.stringify(manifest,null,2)+'\n');
   const timelineDir=path.join(dir,'timeline');
@@ -263,6 +265,8 @@ export function planProject(projectRef,{force=false}={}){
       line:s.line,
       lines:s.lines,
       template:s.template,
+      preset:s.preset,
+      overrides:s.overrides,
       camera:s.camera,
       transition:s.transition||'cut',
       params:s.params
