@@ -1,0 +1,139 @@
+name: Horror 60s - original narrated film
+on:
+  push:
+    paths:
+      - 'projects/the-wrong-side/approved-sheet.sha256'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: original-horror-60-film
+  cancel-in-progress: false
+jobs:
+  film:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'
+          cache: npm
+          cache-dependency-path: studio/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.7'
+          cache: pip
+          cache-dependency-path: studio/requirements-voice.txt
+      - name: Install local tools without GPU or cloud AI
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng libsndfile1
+          cd studio
+          npm ci --ignore-scripts --no-audit --no-fund
+          npx --no-install playwright install --with-deps chromium
+      - uses: actions/cache@v4
+        with:
+          path: |
+            studio/.cache/kokoro
+            ~/.cache/ms-playwright
+          key: horror60-kokoro-model-files-v1.1-${{ runner.os }}-v1
+      - name: Check contracts, align dialogue and re-render reviewed static sheet
+        run: |
+          set -euo pipefail
+          node --test studio/tests/*.test.mjs
+          node studio/cli/studio.mjs check
+          node studio/cli/studio.mjs align --project projects/the-wrong-side
+          node studio/cli/studio.mjs sheet --project projects/the-wrong-side --quality preview
+      - name: Require human-reviewed, unchanged static contact sheet
+        run: |
+          set -euo pipefail
+          test -s projects/the-wrong-side/approved-sheet.sha256
+          actual="$(sha256sum studio/out/the-wrong-side/contact-sheet.png|cut -d' ' -f1)"
+          expected="$(tr -d '\r\n ' < projects/the-wrong-side/approved-sheet.sha256)"
+          [[ "$expected" =~ ^[0-9a-f]{64}$ ]] || { echo "INVALID_SHEET_APPROVAL"; exit 1; }
+          [[ "$actual" == "$expected" ]] || { echo "REVIEWED_SHEET_HASH_MISMATCH"; exit 1; }
+          echo "CREATIVE_STORYBOARD_REVIEW_ACCEPTED"
+      - name: Create 60-second three-voice narration with honest fallback
+        timeout-minutes: 30
+        run: |
+          set -euo pipefail
+          python3 -m pip install -r studio/requirements-voice.txt
+          if python3 studio/cli/voice_scene.py --project projects/the-wrong-side; then
+            echo "KOKORO_VOICES_SUCCESS"
+          else
+            echo "Kokoro unavailable; switching to offline espeak fallback"
+            python3 studio/cli/voice_scene.py --project projects/the-wrong-side --fallback
+          fi
+          test -s projects/the-wrong-side/timeline/voice.wav
+          python3 - <<'PY'
+          import json,wave
+          p='projects/the-wrong-side/timeline/voice-report.json'
+          j=json.load(open(p))
+          assert j['phrases']==19 and j['full_timeline_wav']
+          with wave.open('projects/the-wrong-side/timeline/voice.wav') as f:
+              assert abs(f.getnframes()/f.getframerate()-60)<.02
+          print('SPOKEN_DIALOGUE_PRESENT:',j['provider'])
+          PY
+      - name: First deliver playable rough draft
+        timeout-minutes: 55
+        run: |
+          set -euo pipefail
+          node studio/cli/studio.mjs render --project projects/the-wrong-side --quality draft
+          node studio/cli/studio.mjs mix --project projects/the-wrong-side
+          node studio/cli/studio.mjs verify --project projects/the-wrong-side --quality draft
+          cp studio/out/the-wrong-side/final.mp4 studio/out/the-wrong-side/draft.mp4
+          echo "LEVEL_ONE_DRAFT_PASS"
+      - name: Upload draft before higher-quality rendering
+        uses: actions/upload-artifact@v4
+        with:
+          name: the-wrong-side-60s-draft
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            studio/out/the-wrong-side/draft.mp4
+            studio/out/the-wrong-side/contact-sheet.png
+            projects/the-wrong-side/timeline/voice-report.json
+      - name: Final 720p animated film with score, dialogue, SFX and verification
+        timeout-minutes: 85
+        run: |
+          set -euo pipefail
+          node studio/cli/studio.mjs render --project projects/the-wrong-side --quality standard
+          node studio/cli/studio.mjs mix --project projects/the-wrong-side
+          node studio/cli/studio.mjs verify --project projects/the-wrong-side --quality standard
+          node studio/cli/studio.mjs promote --project projects/the-wrong-side
+          test -s studio/out/the-wrong-side/final.mp4
+          echo "SIXTY_SECOND_HORROR_FILM_ACCEPTED"
+      - name: Upload final MP4, storyboard, timed narration and learning metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: the-wrong-side-60s-final
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            studio/out/the-wrong-side/final.mp4
+            studio/out/the-wrong-side/draft.mp4
+            studio/out/the-wrong-side/contact-sheet.png
+            studio/out/the-wrong-side/verification.json
+            studio/out/the-wrong-side/render-stats.json
+            studio/out/the-wrong-side/promotion.json
+            projects/the-wrong-side/timeline/voice-report.json
+            projects/the-wrong-side/timeline/words.json
+            projects/the-wrong-side/screenplay.md
+            studio/COST.md
+            studio/LESSONS.md
+            studio/STATUS.md
+      - name: Save durable lessons and measured costs in Git
+        if: success()
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add studio/COST.md studio/LESSONS.md studio/STATUS.md studio/INDEX.md
+          if ! git diff --cached --quiet; then
+            git commit -m "learn(studio): measured original 60s psychological horror production [skip ci]"
+            git push origin HEAD:main || echo "Unable to push; learning saved in artifact"
+          fi
