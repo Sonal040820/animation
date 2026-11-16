@@ -5,7 +5,8 @@ import {HORROR_TEMPLATES} from './horror.mjs';
 import {STYLE_GRADE} from './styles.mjs';
 export const TEMPLATE_NAMES=Object.freeze([
   'wide-establishing','window-view','character-medium','giant-face',
-  'insert-macro-clock','data-card','3d-orbit','title-card'
+  'insert-macro-clock','data-card','3d-orbit','title-card',
+  ...Object.keys(HORROR_TEMPLATES)
 ]);
 function building(ctx,w,h,s,t){
   ctx.fillStyle=s.wall;
@@ -82,7 +83,8 @@ const TEMPLATES={
  'insert-macro-clock':(ctx,w,h,s,t,p)=>clock(ctx,w,h,s,t,p),
  'data-card':(ctx,w,h,s,t,p)=>card(ctx,w,h,s,t,p),
  '3d-orbit':(ctx,w,h,s,t,p)=>orbit(ctx,w,h,s,t),
- 'title-card':(ctx,w,h,s,t,p)=>title(ctx,w,h,s,t,p)
+ 'title-card':(ctx,w,h,s,t,p)=>title(ctx,w,h,s,t,p),
+  ...HORROR_TEMPLATES
 };
 export function drawStudioFrame(canvas,shot,config,seconds=0,words=[]){
   const ctx=canvas.getContext('2d',{alpha:false});
