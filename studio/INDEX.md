@@ -119,7 +119,7 @@ No media generated during initial setup. When adding a template, update this ind
 | `studio/lib/planner.mjs` | `PLANNER_RULES_FILE`, `guessEmotion`, `loadPlannerRules`, `matchShotRule`, `normalizeDisplayText`, `planProject`, `planScript` |
 | `studio/lib/project.mjs` | `PROJECTS`, `ROOT`, `STUDIO`, `enforceDataOnly`, `loadProject`, `mkdir`, `projectPath`, `readJSON`, `resolveLineSource`, `resolveProjectShots`, `sha` |
 | `studio/lib/props.mjs` | `drawDigitalClock` |
-| `studio/lib/quality.mjs` | `verifyFilm` |
+| `studio/lib/quality.mjs` | `measureMotion`, `verifyFilm` |
 | `studio/lib/runner.mjs` | `browserExecutable`, `dimensions`, `engineHash`, `invoke`, `pythonExecutable`, `render`, `sheet`, `smoke`, `withBrowser`, `withBrowserPool` |
 | `studio/lib/scenery.mjs` | `computeWindowLayout`, `drawAtmosphere`, `drawBlurred`, `drawNightExterior`, `drawRoomInterior`, `drawVignette`, `groundDepthPosition` |
 | `studio/lib/styles.mjs` | `STYLES`, `STYLE_GRADE` |

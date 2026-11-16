@@ -60,6 +60,60 @@ function measureLoudnessFallback(file){
   return {integrated_lufs:null,true_peak:null};
 }
 
+export function measureMotion(file,shots=[],fps=24){
+  const W=72,H=128,frameBytes=W*H;
+  const res=spawnSync('ffmpeg',['-hide_banner','-loglevel','error','-i',file,'-vf',`scale=${W}:${H}:flags=area,format=gray`,'-f','rawvideo','-'],{
+    encoding:'buffer',
+    maxBuffer:128*1024*1024,
+    timeout:60000
+  });
+  if(res.status!==0||!res.stdout||res.stdout.length<frameBytes*2){
+    throw new Error('Unable to extract 72x128 grayscale frames for motion verification');
+  }
+  const buf=res.stdout;
+  const frameCount=Math.floor(buf.length/frameBytes);
+  const pairDiffs=new Float64Array(Math.max(0,frameCount-1));
+  let totalSum=0;
+  for(let f=0;f<frameCount-1;f++){
+    const aOff=f*frameBytes;
+    const bOff=(f+1)*frameBytes;
+    let sum=0;
+    for(let p=0;p<frameBytes;p++){
+      sum+=Math.abs(buf[bOff+p]-buf[aOff+p]);
+    }
+    const mad=sum/frameBytes;
+    pairDiffs[f]=mad;
+    totalSum+=mad;
+  }
+  const clipMean=pairDiffs.length?+(totalSum/pairDiffs.length).toFixed(4):0;
+  const perShot=[];
+  let minShotMean=Infinity;
+  for(const shot of shots){
+    const sIdx=Math.max(0,Math.min(frameCount-1,Math.round((Number(shot.start)||0)*fps)));
+    const eIdx=Math.max(sIdx+1,Math.min(frameCount,Math.round(((Number(shot.start)||0)+(Number(shot.duration)||1))*fps)));
+    const pairs=[];
+    for(let f=sIdx;f<eIdx-1&&f<pairDiffs.length;f++)pairs.push(pairDiffs[f]);
+    const mean=pairs.length?+(pairs.reduce((a,b)=>a+b,0)/pairs.length).toFixed(4):clipMean;
+    if(mean<minShotMean)minShotMean=mean;
+    perShot.push({
+      id:shot.id,
+      template:shot.template,
+      start:shot.start,
+      duration:shot.duration,
+      frames:eIdx-sIdx,
+      mean_diff:mean
+    });
+  }
+  return {
+    width:W,
+    height:H,
+    frames:frameCount,
+    clip_mean:clipMean,
+    min_shot_mean:Number.isFinite(minShotMean)?minShotMean:clipMean,
+    per_shot:perShot
+  };
+}
+
 export function verifyFilm(projectRef,project,quality,opts={}){
   const file=path.join(project.out,'final.mp4');
   if(!fs.existsSync(file))throw new Error('Missing final.mp4');
@@ -168,6 +222,21 @@ export function verifyFilm(projectRef,project,quality,opts={}){
   }catch{warnings.push('Frame analysis unavailable')}
 
   const fps=parseFrameRate(video.avg_frame_rate)||parseFrameRate(video.r_frame_rate);
+  const minShotThreshold=Number.isFinite(Number(project.config?.motion?.min_shot_mean??project.config?.min_shot_motion))
+    ?Number(project.config?.motion?.min_shot_mean??project.config?.min_shot_motion)
+    :0.5;
+  const minClipThreshold=Number.isFinite(Number(project.config?.motion?.min_clip_mean??project.config?.min_clip_motion))
+    ?Number(project.config?.motion?.min_clip_mean??project.config?.min_clip_motion)
+    :1.5;
+  const motion=measureMotion(file,project.manifest?.shots||[],fps||quality?.fps||24);
+  if(motion.clip_mean<minClipThreshold){
+    throw new Error(`Low clip motion: measured mean ${motion.clip_mean} < threshold ${minClipThreshold}`);
+  }
+  const lowShots=motion.per_shot.filter(s=>s.frames>=2&&s.mean_diff<minShotThreshold);
+  if(lowShots.length){
+    throw new Error(`Low shot motion in ${lowShots.map(s=>`${s.id}(${s.mean_diff})`).join(', ')} < threshold ${minShotThreshold}`);
+  }
+
   const facts={
     schema_version:1,
     slug:path.basename(project.dir),
@@ -193,6 +262,10 @@ export function verifyFilm(projectRef,project,quality,opts={}){
     voice_provider:linesJson?.provider||voiceReport?.provider||null,
     integrated_lufs:integratedLufs,
     true_peak:truePeak,
+    motion:{
+      ...motion,
+      thresholds:{min_shot_mean:minShotThreshold,min_clip_mean:minClipThreshold}
+    },
     black_detections:blackDetections,
     freeze_detections:freezeDetections,
     caption_vs_voice:captionVsVoice,
@@ -213,6 +286,11 @@ export function verifyFilm(projectRef,project,quality,opts={}){
     audio:true,
     voice_present:voicePresent,
     integrated_lufs:integratedLufs,
+    motion:{
+      clip_mean:motion.clip_mean,
+      min_shot_mean:motion.min_shot_mean,
+      thresholds:{min_shot_mean:minShotThreshold,min_clip_mean:minClipThreshold}
+    },
     caption_vs_voice:captionVsVoice,
     warnings
   };

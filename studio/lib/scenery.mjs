@@ -210,7 +210,7 @@ export function drawNightExterior(ctx, w, h, t = 0, {
     ctx.save();
     for (let i = 0; i < fBands.length; i++) {
       const b = fBands[i];
-      const sway = Math.sin(t * 0.22 + i * 0.9) * (w * 0.022) + Math.cos(t * 0.11 * b.spd) * (w * 0.015);
+      const sway = Math.sin(t * 0.45 + i * 0.9) * (w * 0.036) + (t * b.spd * w * 0.008) % (w * 0.14);
       ctx.globalAlpha = b.a;
       ellipse(ctx, b.x * w + sway + px * 0.35, b.y * h + py * 0.22, b.rx * w, b.ry * h, b.col);
     }
@@ -425,8 +425,8 @@ export function drawRoomInterior(ctx, w, h, t = 0, {
 
     // Drifting top window cloud bands
     ctx.save();
-    ctx.globalAlpha = 0.22;
-    const cDrift = Math.sin(t * 0.2) * (ww * 0.03);
+    ctx.globalAlpha = 0.25;
+    const cDrift = Math.sin(t * 0.48) * (ww * 0.065);
     ellipse(ctx, wx + ww * 0.35 + cDrift, wy + wh * 0.05, ww * 0.36, wh * 0.022, '#4c6d8e');
     ellipse(ctx, wx + ww * 0.62 - cDrift, wy + wh * 0.085, ww * 0.42, wh * 0.024, '#365575');
     ctx.restore();
@@ -674,13 +674,13 @@ export function drawAtmosphere(ctx, w, h, t = 0, {
   if (fogAlpha > 0.005) {
     ctx.save();
     for (let i = 0; i < 3; i++) {
-      const fx = w * (0.25 + i * 0.25) + Math.sin(t * (0.22 + i * 0.07) + i * 2) * (w * 0.08);
-      const fy = h * (0.32 + i * 0.22) + Math.cos(t * 0.18 + i) * (h * 0.03);
-      const fr = Math.max(w, h) * 0.45;
+      const fx = w * (0.25 + i * 0.25) + Math.sin(t * (0.55 + i * 0.14) + i * 2) * (w * 0.12);
+      const fy = h * (0.32 + i * 0.22) + Math.cos(t * 0.42 + i) * (h * 0.05);
+      const fr = Math.max(w, h) * 0.48;
       const g = ctx.createRadialGradient(fx, fy, fr * 0.05, fx, fy, fr);
       g.addColorStop(0, color);
       g.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.globalAlpha = fogAlpha * 0.32;
+      ctx.globalAlpha = fogAlpha * 0.42;
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
     }
@@ -696,12 +696,12 @@ export function drawAtmosphere(ctx, w, h, t = 0, {
     for (let i = 0; i < count; i++) {
       const bx = rnd() * w;
       const by = rnd() * h;
-      const r = 1.1 + rnd() * 2.1;
-      const spdX = 6 + rnd() * 10;
-      const spdY = 4 + rnd() * 8;
-      const mx = (bx + Math.sin(t * 0.55 + i * 1.7) * 14 + t * spdX) % w;
-      const my = (by + Math.cos(t * 0.45 + i * 2.3) * 10 - t * spdY % h + h) % h;
-      const pulse = 0.18 + 0.28 * (0.5 + 0.5 * Math.sin(t * 1.3 + i * 3.1));
+      const r = 1.4 + rnd() * 2.6;
+      const spdX = 14 + rnd() * 22;
+      const spdY = 10 + rnd() * 18;
+      const mx = (bx + Math.sin(t * 0.85 + i * 1.7) * 18 + t * spdX) % w;
+      const my = (by + Math.cos(t * 0.72 + i * 2.3) * 14 - t * spdY % h + h) % h;
+      const pulse = 0.24 + 0.34 * (0.5 + 0.5 * Math.sin(t * 2.1 + i * 3.1));
       ctx.globalAlpha = pulse;
       ctx.beginPath();
       ctx.arc((mx + w) % w, my, r, 0, Math.PI * 2);

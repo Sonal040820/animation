@@ -96,22 +96,23 @@ export function drawDigitalClock(ctx, {
   const left = cx - w * 0.5;
   const top = cy - h * 0.5;
 
+  const pulseWave = 0.5 + 0.5 * Math.sin(t * 5.2);
   const flickerMod = flicker > 0
     ? clamp(1 - flicker * 0.45 * Math.abs(smoothNoise(73, t * 18)), 0.35, 1)
-    : (0.97 + 0.03 * Math.sin(t * 4.2));
+    : (0.78 + 0.22 * pulseWave);
   const effGlow = clamp(glow, 0, 2) * flickerMod;
 
   ctx.save();
 
-  // Ambient red spill glow behind and underneath the clock body
+  // Ambient red spill glow behind and underneath the clock body (pulses continuously)
   if (effGlow > 0.01) {
     ctx.save();
-    const spillR = w * 0.72;
+    const spillR = w * (0.68 + 0.14 * pulseWave);
     const gSpill = ctx.createRadialGradient(cx, cy + h * 0.28, w * 0.04, cx, cy + h * 0.15, spillR);
     gSpill.addColorStop(0, color);
     gSpill.addColorStop(0.45, color);
     gSpill.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.globalAlpha = clamp(0.28 * effGlow, 0, 0.65);
+    ctx.globalAlpha = clamp((0.24 + 0.12 * pulseWave) * effGlow, 0, 0.72);
     ctx.fillStyle = gSpill;
     ctx.fillRect(cx - spillR, cy - spillR, spillR * 2, spillR * 2);
     ctx.restore();

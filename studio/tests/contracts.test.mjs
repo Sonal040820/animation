@@ -11,7 +11,7 @@ import {enforceDataOnly,loadProject,resolveProjectShots,STUDIO} from '../lib/pro
 import {validateProject} from '../lib/validate.mjs';
 import {syncIndex} from '../lib/learning.mjs';
 import {engineHash} from '../lib/runner.mjs';
-import {verifyFilm} from '../lib/quality.mjs';
+import {verifyFilm,measureMotion} from '../lib/quality.mjs';
 import {planScript,normalizeDisplayText} from '../lib/planner.mjs';
 import {computeWindowLayout,groundDepthPosition} from '../lib/scenery.mjs';
 import {withBrowser} from '../lib/runner.mjs';
@@ -268,5 +268,32 @@ test('window-view depth helper & s2 girl bounding box inside pane and < 25% of p
     assert.ok(v.errors.some(e=>e.code==='WINDOW_PLACEMENT_HEIGHT'||e.code==='WINDOW_PLACEMENT_FEET'));
   }finally{
     fs.rmSync(tmpProj,{recursive:true,force:true});
+  }
+});
+
+test('measureMotion computes 72x128 grayscale MAD and verifyFilm fails below configurable threshold',()=>{
+  const tmpDir=fs.mkdtempSync(path.join(os.tmpdir(),'studio-motion-check-'));
+  try{
+    const projDir=path.join(tmpDir,'proj');
+    const outDir=path.join(tmpDir,'out');
+    fs.mkdirSync(path.join(projDir,'timeline'),{recursive:true});
+    fs.mkdirSync(outDir,{recursive:true});
+    const mp4=path.join(outDir,'final.mp4');
+    execFileSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-f','lavfi','-i','color=c=black:s=270x480:r=12:d=1','-f','lavfi','-i','anullsrc=r=48000:cl=stereo','-t','1','-c:v','libx264','-pix_fmt','yuv420p','-c:a','aac',mp4]);
+    const m=measureMotion(mp4,[{id:'s01',template:'wide-establishing',start:0,duration:1}],12);
+    assert.equal(m.width,72);
+    assert.equal(m.height,128);
+    assert.equal(m.clip_mean,0);
+    const fakeProject={
+      dir:projDir,out:outDir,duration:1,
+      manifest:{shots:[{id:'s01',template:'wide-establishing',start:0,duration:1}]},
+      config:{motion:{min_shot_mean:0.5,min_clip_mean:1.5}}
+    };
+    assert.throws(
+      ()=>verifyFilm('projects/midnight-horror-elite',fakeProject,{width:270,height:480,fps:12},{allowSilent:true}),
+      /Low clip motion/i
+    );
+  }finally{
+    fs.rmSync(tmpDir,{recursive:true,force:true});
   }
 });

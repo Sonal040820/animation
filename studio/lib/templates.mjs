@@ -507,12 +507,21 @@ export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
   drawBackground(ctx, w, h, s, seconds, seed);
 
   ctx.save();
-  const camKind = shot.camera || 'push';
+  const rawCam = shot.camera || 'push';
+  const camKind = rawCam === 'static' ? 'drift' : rawCam;
+  const isMacroTemplate = /^(insert-macro-clock|intercom-macro|data-card|title-card)$/.test(shot.template || '');
+  const defaultIntensity = isMacroTemplate ? 1.45 : 1.15;
+  const effIntensity = Number.isFinite(Number(shot.cameraIntensity))
+    ? Number(shot.cameraIntensity)
+    : defaultIntensity;
+  const transName = shot.transition || shot.params?.transition || 'cut';
+  const flashDecay = transName === 'flash' ? 6.5 : 0;
   let camBlur = 0;
   if (CAMERA_MOVES.includes(camKind)) {
     const cam = cameraTransform(camKind, seconds, dur, {
-      intensity: shot.cameraIntensity ?? 1,
-      seed
+      intensity: effIntensity,
+      seed,
+      flashDecay
     });
     const scale = w / 720;
     ctx.translate(w * 0.5 + (cam.x || 0) * scale, h * 0.5 + (cam.y || 0) * scale);

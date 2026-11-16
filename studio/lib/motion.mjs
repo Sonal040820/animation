@@ -146,7 +146,7 @@ export const CAMERA_MOVES = Object.freeze([
 
 // Stateless camera transform returning named fields {x, y, zoom, rotation, blur}.
 // Never returns a bare array.
-export function cameraTransform(kind = 'push', t = 0, duration = 3, { intensity = 1, seed = 1 } = {}) {
+export function cameraTransform(kind = 'push', t = 0, duration = 3, { intensity = 1, seed = 1, flashDecay = 0 } = {}) {
   const dur = Math.max(0.1, Number.isFinite(duration) && duration > 0 ? duration : 3);
   const p = clamp(t / dur, 0, 1);
   const ep = easeInOutCubic(p);
@@ -161,22 +161,22 @@ export function cameraTransform(kind = 'push', t = 0, duration = 3, { intensity 
 
   switch (kind) {
     case 'push':
-      zoom = 1 + 0.085 * ep * k;
-      x = smoothNoise(s, t * 0.45) * 2.5 * k;
-      y = smoothNoise(s + 17, t * 0.4) * 2.0 * k;
-      rotation = Math.sin(t * 0.35) * 0.008 * k;
+      zoom = 1 + 0.125 * ep * k;
+      x = smoothNoise(s, t * 0.65) * 4.5 * k;
+      y = smoothNoise(s + 17, t * 0.55) * 3.5 * k;
+      rotation = Math.sin(t * 0.45) * 0.011 * k;
       break;
     case 'creep':
-      zoom = 1 + 0.055 * p * k;
-      x = smoothNoise(s + 3, t * 0.32) * 2.0 * k;
-      y = smoothNoise(s + 19, t * 0.28) * 1.8 * k;
-      rotation = Math.sin(t * 0.28) * 0.006 * k;
+      zoom = 1 + 0.095 * p * k;
+      x = smoothNoise(s + 3, t * 0.55) * 4.0 * k;
+      y = smoothNoise(s + 19, t * 0.48) * 3.2 * k;
+      rotation = Math.sin(t * 0.42) * 0.009 * k;
       break;
     case 'pull':
-      zoom = 1.01 + 0.085 * (1 - ep) * k;
-      x = smoothNoise(s, t * 0.4) * 2.0 * k;
-      y = smoothNoise(s + 11, t * 0.35) * 1.5 * k;
-      rotation = Math.sin(t * 0.3) * 0.006 * k;
+      zoom = 1.01 + 0.135 * (1 - ep) * k;
+      x = smoothNoise(s, t * 0.6) * 4.0 * k;
+      y = smoothNoise(s + 11, t * 0.52) * 3.0 * k;
+      rotation = Math.sin(t * 0.45) * 0.01 * k;
       break;
     case 'pan-left':
       zoom = 1 + 0.075 * Math.max(1, k);
@@ -224,13 +224,15 @@ export function cameraTransform(kind = 'push', t = 0, duration = 3, { intensity 
       y = Math.cos(t * 0.35 + s) * 4 * k;
       rotation = Math.sin(t * 0.3 + s) * 0.009 * k;
       break;
-    case 'shake':
-      zoom = 1 + 0.055 * Math.max(1, k);
-      x = (smoothNoise(s + 501, t * 14) * 7 + Math.sin(t * 37 + s) * 2.5) * k;
-      y = (smoothNoise(s + 601, t * 13) * 6 + Math.cos(t * 41 + s) * 2.5) * k;
-      rotation = smoothNoise(s + 701, t * 11) * 0.022 * k;
-      blur = Math.abs(smoothNoise(s + 801, t * 10)) * 1.2 * k;
+    case 'shake': {
+      const decayEnv = flashDecay > 0 ? Math.exp(-t * flashDecay) : 1;
+      zoom = 1 + 0.075 * Math.max(1, k) + 0.04 * decayEnv * k;
+      x = (smoothNoise(s + 501, t * 18) * 11 + Math.sin(t * 43 + s) * 4.5) * k * (0.35 + 0.65 * decayEnv);
+      y = (smoothNoise(s + 601, t * 17) * 9 + Math.cos(t * 47 + s) * 4.0) * k * (0.35 + 0.65 * decayEnv);
+      rotation = smoothNoise(s + 701, t * 14) * 0.028 * k * (0.35 + 0.65 * decayEnv);
+      blur = Math.abs(smoothNoise(s + 801, t * 12)) * 1.4 * k * decayEnv;
       break;
+    }
     case 'dolly-zoom':
       zoom = 1 + 0.14 * ep * k;
       x = smoothNoise(s + 51, t * 0.6) * 2 * k;
@@ -244,6 +246,15 @@ export function cameraTransform(kind = 'push', t = 0, duration = 3, { intensity 
       y = smoothNoise(s + 9, t * 0.3) * 1.2 * k;
       rotation = Math.sin(t * 0.25) * 0.004 * k;
       break;
+  }
+
+  // Optional decaying impact shake overlay (e.g. triggered by a 'flash' shot transition)
+  if (flashDecay > 0 && kind !== 'shake') {
+    const decayEnv = Math.exp(-t * flashDecay);
+    x += Math.sin(t * 48 + s) * 10 * k * decayEnv;
+    y += Math.cos(t * 43 + s) * 8 * k * decayEnv;
+    rotation += Math.sin(t * 39 + s) * 0.022 * k * decayEnv;
+    zoom += 0.03 * decayEnv * k;
   }
 
   return { x, y, zoom, rotation, blur };
