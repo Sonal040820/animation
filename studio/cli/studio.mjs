@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
-import {ROOT,STUDIO,sha,readJSON,mkdir,projectPath,loadProject,enforceDataOnly} from '../lib/project.mjs';
+import {ROOT,STUDIO,sha,readJSON,mkdir,projectPath,loadProject,enforceDataOnly,findWordTimestamp} from '../lib/project.mjs';
 import {browserExecutable,pythonExecutable,withBrowser,invoke,smoke,sheet,render,dimensions} from '../lib/runner.mjs';
 import {phrases,saveWords,alignDialogue,alignMeasured} from '../lib/timing.mjs';
 import {mix} from '../lib/audio.mjs';
@@ -11,6 +11,7 @@ import {verifyFilm} from '../lib/quality.mjs';
 import {promoteVideo,syncIndex} from '../lib/learning.mjs';
 import {validateProject} from '../lib/validate.mjs';
 import {planProject} from '../lib/planner.mjs';
+import {computeWindowLayout} from '../lib/scenery.mjs';
 import {TEMPLATE_NAMES} from '../lib/templates.mjs';
 
 const argv=process.argv.slice(2),command=argv.shift();
@@ -186,6 +187,83 @@ async function promote(){
   return output(await promoteVideo(p,{tokens:opts.tokens}));
 }
 
+async function golden(){
+  const ref=projectArg||'projects/golden-1159';
+  const validation=validateProject(ref);
+  const p=loadProject(ref);
+  const outDir=path.join(STUDIO,'out',path.basename(p.dir));
+  const sheetRes=await sheet(ref,'draft');
+  const wordsPath=path.join(p.dir,'timeline','words.json');
+  const wordsData=fs.existsSync(wordsPath)?readJSON(wordsPath):{words:[]};
+  const factsPath=path.join(outDir,'facts.json');
+  const facts=fs.existsSync(factsPath)?readJSON(factsPath):null;
+  const statsPath=path.join(outDir,'render-stats.json');
+  const stats=fs.existsSync(statsPath)?readJSON(statsPath):null;
+  const shots=p.manifest.shots;
+
+  const expectedTemplates=['wide-establishing','window-view','figure-exterior','insert-macro-clock','giant-face','insert-macro-clock','window-view'];
+  const actualTemplates=shots.map(s=>s.template);
+  const expectedCaptions=['NIGHT.','I SAW','A LITTLE','GIRL OUTSIDE','MY WINDOW.','STARING RIGHT','AT ME.','THE CLOCK','SAID 11:59.','I BLINKED.','12:01.','SHE WAS','GONE.'];
+  const actualCaptions=(wordsData.words||[]).map(w=>String(w.text||'').trim().toUpperCase());
+
+  const s02=shots[1];
+  const s02Layout=s02?computeWindowLayout(720,1280,{girl:s02.params?.girl}):null;
+  const s02Inside=Boolean(s02Layout?.girl?.visible&&
+    s02Layout.girl.box.left>=s02Layout.pane.x+s02Layout.pane.frameThick*0.5&&
+    s02Layout.girl.box.right<=s02Layout.pane.x+s02Layout.pane.w-s02Layout.pane.frameThick*0.5&&
+    s02Layout.girl.box.top>=s02Layout.pane.y+s02Layout.pane.frameThick*0.5&&
+    s02Layout.girl.box.bottom<=s02Layout.pane.sillTopY-s02Layout.pane.frameThick*0.5);
+  const s02Small=Boolean(s02Layout?.girl&&s02Layout.girl.height<s02Layout.pane.h*0.25);
+
+  const s05=shots[4];
+  const blinkedWord=findWordTimestamp(wordsData.words||[],'blinked',s05?.start||0,(s05?.start||0)+(s05?.duration||2));
+  const blinkCue=(s05?.resolvedCues||[]).find(c=>c.action==='blink');
+  const blinkDelta=blinkedWord&&blinkCue?Math.abs(blinkCue.at-blinkedWord.start):Infinity;
+
+  const s06=shots[5];
+  const s06Ok=Boolean(s06&&s06.transition==='flash'&&String(s06.params?.time)==='12:01');
+
+  const clipMean=facts?.motion?.clip_mean??0;
+  const minShotMean=facts?.motion?.min_shot_mean??0;
+  const motionOk=clipMean>=2.0&&minShotMean>=0.8;
+
+  const streams=facts?.streams||[];
+  const hasH264=streams.some(st=>st.codec_name==='h264');
+  const hasAac=streams.some(st=>st.codec_name==='aac');
+  const dur=Number(facts?.duration||0);
+  const mediaOk=Boolean(facts&&facts.resolution==='720x1280'&&facts.fps===24&&hasH264&&hasAac&&dur>=10.4&&dur<=11.0);
+
+  const unexpectedBlack=(facts?.black_detections||[]).filter(b=>{
+    const lastShot=shots.at(-1);
+    const fadeStart=(lastShot?.start||0)+(lastShot?.duration||0)-(Number(lastShot?.fadeOut)||0)-0.2;
+    return b.start<fadeStart;
+  });
+  const voiceBlackOk=Boolean(facts&&facts.voice_present===true&&unexpectedBlack.length===0);
+
+  const codeViolations=enforceDataOnly();
+  const baselineSeconds=581.1;
+  const afterSeconds=Number(stats?.totalRenderSeconds||0);
+  const renderTimeOk=afterSeconds>0&&afterSeconds<=baselineSeconds*1.2;
+
+  const checks=[
+    {name:'7 shots & storyboard templates/order',pass:JSON.stringify(actualTemplates)===JSON.stringify(expectedTemplates),measured:{count:shots.length,templates:actualTemplates}},
+    {name:'caption groups match display text sequence',pass:JSON.stringify(actualCaptions)===JSON.stringify(expectedCaptions),measured:{count:actualCaptions.length,captions:actualCaptions}},
+    {name:'s6 flash transition & 12:01 clock',pass:s06Ok,measured:{transition:s06?.transition,transitionDuration:s06?.transitionDuration,time:s06?.params?.time}},
+    {name:'s2 girl inside pane & < 25% height',pass:s02Inside&&s02Small,measured:s02Layout?.girl?{height:Math.round(s02Layout.girl.height),paneHeight:Math.round(s02Layout.pane.h),pct:+(100*s02Layout.girl.height/s02Layout.pane.h).toFixed(1),inside:s02Inside}:null},
+    {name:'blink starts within 0.1s of "blinked"',pass:blinkDelta<=0.1,measured:{wordStart:blinkedWord?.start,cueAt:blinkCue?.at,delta:Number.isFinite(blinkDelta)?+blinkDelta.toFixed(4):null}},
+    {name:'motion clip >= 2.0 & min shot >= 0.8',pass:motionOk,measured:facts?.motion||null},
+    {name:'720x1280 24fps H.264+AAC 10.4-11.0s',pass:mediaOk,measured:facts?{resolution:facts.resolution,fps:facts.fps,duration:facts.duration,h264:hasH264,aac:hasAac}:null},
+    {name:'voice present & no unexpected black',pass:voiceBlackOk,measured:{voice_present:facts?.voice_present,unexpected_black:unexpectedBlack}},
+    {name:'validate & data-only check',pass:validation.valid&&codeViolations.length===0,measured:{valid:validation.valid,errors:validation.errors,codeViolations}},
+    {name:'render seconds <= 1.2x baseline (581.1s)',pass:renderTimeOk,measured:{before_seconds:baselineSeconds,after_seconds:afterSeconds?+afterSeconds.toFixed(1):null}}
+  ];
+
+  const allPass=checks.every(c=>c.pass);
+  const report={status:allPass?'pass':'fail',project:ref,contact_sheet:sheetRes.out,checks};
+  output(report);
+  if(!allPass)process.exitCode=1;
+}
+
 async function main(){
   if(command==='doctor')return await doctor();
   if(command==='smoke')return output(await smoke());
@@ -210,7 +288,8 @@ async function main(){
   if(command==='render')return output(await render(projectArg,quality));
   if(command==='mix'){const p=project();return output(await mix(p,p.duration))}
   if(command==='verify'){const p=project();return output(verifyFilm(projectArg,p,dimensions(quality),opts))}
+  if(command==='golden')return await golden();
   if(command==='promote')return await promote();
-  throw new Error('Command must be doctor, smoke, check, plan, validate, index, new-project, make-voice, align, sheet, render, mix, verify, promote');
+  throw new Error('Command must be doctor, smoke, check, plan, validate, index, new-project, make-voice, align, sheet, render, mix, verify, golden, promote');
 }
 main().catch(e=>{console.error('STUDIO_ERROR: '+e.message);process.exitCode=1});

@@ -166,22 +166,22 @@ export function cameraTransform(kind = 'push', t = 0, duration = 3, { intensity 
 
   switch (kind) {
     case 'push':
-      zoom = 1 + 0.125 * ep * k;
-      x = smoothNoise(s, t * 0.65) * 4.5 * k;
-      y = smoothNoise(s + 17, t * 0.55) * 3.5 * k;
-      rotation = Math.sin(t * 0.45) * 0.011 * k;
+      zoom = 1 + 0.155 * ep * k;
+      x = smoothNoise(s, t * 0.72) * 5.8 * k;
+      y = smoothNoise(s + 17, t * 0.62) * 4.6 * k;
+      rotation = Math.sin(t * 0.52) * 0.013 * k;
       break;
     case 'creep':
-      zoom = 1 + 0.095 * p * k;
-      x = smoothNoise(s + 3, t * 0.55) * 4.0 * k;
-      y = smoothNoise(s + 19, t * 0.48) * 3.2 * k;
-      rotation = Math.sin(t * 0.42) * 0.009 * k;
+      zoom = 1 + 0.115 * p * k;
+      x = smoothNoise(s + 3, t * 0.62) * 5.0 * k;
+      y = smoothNoise(s + 19, t * 0.54) * 4.0 * k;
+      rotation = Math.sin(t * 0.48) * 0.011 * k;
       break;
     case 'pull':
-      zoom = 1.01 + 0.135 * (1 - ep) * k;
-      x = smoothNoise(s, t * 0.6) * 4.0 * k;
-      y = smoothNoise(s + 11, t * 0.52) * 3.0 * k;
-      rotation = Math.sin(t * 0.45) * 0.01 * k;
+      zoom = 1.01 + 0.175 * (1 - ep) * k;
+      x = smoothNoise(s, t * 0.68) * 5.6 * k;
+      y = smoothNoise(s + 11, t * 0.58) * 4.4 * k;
+      rotation = Math.sin(t * 0.50) * 0.012 * k;
       break;
     case 'pan-left':
       zoom = 1 + 0.075 * Math.max(1, k);

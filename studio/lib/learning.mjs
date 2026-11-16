@@ -23,6 +23,7 @@ export const CLI_COMMANDS=Object.freeze([
   {command:'render',args:'--project projects/<slug> [--quality draft|preview|standard|high]',summary:'Validate and render frames in parallel page pool with engine-hash cache and render-log.jsonl'},
   {command:'mix',args:'--project projects/<slug>',summary:'Synthesize original score/ambience/SFX, duck under voice, loudnorm to -14 LUFS, write audio-report.json'},
   {command:'verify',args:'--project projects/<slug> [--quality standard] [--allow-silent]',summary:'Probe final.mp4, verify voice/captions/loudness/black/freeze, write measured facts.json'},
+  {command:'golden',args:'[--project projects/golden-1159]',summary:'Validate, render contact sheet, and check all Phase 1 golden acceptance criteria against measured artifacts'},
   {command:'promote',args:'--project projects/<slug>',summary:'Increment usage.json, learn rules into planner-rules.json, regenerate INDEX.md, log measured COST/LESSONS/STATUS'}
 ]);
 

@@ -1,5 +1,9 @@
 # Durable lessons (newest first)
 
+- 2026-11-16T18:29:37.918Z / golden-1159: verified 7 shots, 100% template reuse, 100% auto (7/7) / 0% hand-edited, 460.9 render seconds, 0 fully cached shots, voice=kokoro-onnx-0.6.1-int8; First measured production run.
+- 2026-11-16 / golden-1159 `locator.screenshot` timeout: `node studio/cli/studio.mjs render --project projects/golden-1159 --quality standard` threw `locator.screenshot: Timeout 29985ms exceeded` ("waiting for element to be stable") under 4-page parallel CPU load. Root cause: Playwright DOM locator screenshot polls compositor stability. Fix: capture PNG directly via `document.getElementById('screen').toDataURL('image/png')` inside `page.evaluate` in `studio/lib/runner.mjs`. Render time dropped from 581.1s (`midnight-horror-elite`) to 460.9s (`golden-1159`).
+- 2026-11-16 / golden-1159 `s07` low motion gate: `verify` caught `s07` (`window-view`, empty dark interior + `fadeOut`) at `0.7235` mean frame diff (`< 0.8` threshold). Root cause: 75% dark interior wall + fade-to-black attenuated 72x128 grayscale pixel deltas. Fix: strengthened `pull`/`push` zoom/pan range in `studio/lib/motion.mjs`, macro `cameraIntensity` (`1.55`), and `window-view` atmosphere dust/fog in `studio/lib/templates.mjs`, bringing `s07` to `0.8024` and whole-clip mean to `2.9205` (10/10 golden checks PASS).
+
 - 2026-11-16T17:12:49.886Z / midnight-horror-elite: verified 6 shots, 100% template reuse, 67% auto (4/6) / 33% hand-edited, 581.1 render seconds, 0 fully cached shots, voice=kokoro-onnx-0.6.1-int8; First measured production run.
 
 - 2026-11-16T15:23:11.817Z / midnight-horror-elite: verified 8 shots, 100% templates, 186.0 render seconds, 0 fully cached shots; Previous reuse 100% => 100%; render seconds 398.1 => 186.0. No unreported errors are assumed.

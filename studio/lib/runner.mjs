@@ -94,8 +94,11 @@ export async function withBrowser(task){
 }
 
 async function capture(page,shot,config,t,words,file){
-  await page.evaluate(({shot,config,t,words})=>window.renderStudioFrame(shot,config,t,words),{shot,config,t,words});
-  const image=await page.locator('#screen').screenshot({type:'png'});
+  const b64=await page.evaluate(({shot,config,t,words})=>{
+    window.renderStudioFrame(shot,config,t,words);
+    return document.getElementById('screen').toDataURL('image/png').slice('data:image/png;base64,'.length);
+  },{shot,config,t,words});
+  const image=Buffer.from(b64,'base64');
   mkdir(path.dirname(file));
   fs.writeFileSync(file,image);
   if(image.length<400)throw new Error('Empty screenshot '+file);

@@ -348,8 +348,8 @@ const TEMPLATES = {
 
     drawAtmosphere(ctx, w, h, t, {
       seed: (p?.seed || 1) + 29,
-      dust: w < 300 ? 6 : 16,
-      fog: 0.06,
+      dust: w < 300 ? 8 : 24,
+      fog: 0.09,
       color: s.fog
     });
   },
@@ -530,7 +530,7 @@ export function drawStudioFrame(canvas, shot, config, seconds = 0, words = []) {
   const rawCam = shot.camera || 'push';
   const camKind = rawCam === 'static' ? 'drift' : rawCam;
   const isMacroTemplate = /^(insert-macro-clock|intercom-macro|data-card|title-card)$/.test(shot.template || '');
-  const defaultIntensity = isMacroTemplate ? 1.45 : 1.15;
+  const defaultIntensity = isMacroTemplate ? 1.55 : 1.18;
   const effIntensity = Number.isFinite(Number(shot.cameraIntensity))
     ? Number(shot.cameraIntensity)
     : defaultIntensity;

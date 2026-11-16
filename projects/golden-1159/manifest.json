@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "slug": "golden-1159",
+  "status": "planned",
+  "shots": [
+    {
+      "id": "s01",
+      "template": "wide-establishing",
+      "line": "l1",
+      "camera": "push",
+      "cameraIntensity": 1,
+      "seed": 2001,
+      "params": {
+        "scene": "fence-moon"
+      },
+      "sfx": [],
+      "ambience": "night-wind",
+      "fadeIn": 0.25
+    },
+    {
+      "id": "s02",
+      "template": "window-view",
+      "line": "l2",
+      "camera": "push",
+      "cameraIntensity": 1,
+      "seed": 2002,
+      "params": {
+        "interior": true,
+        "girl": {
+          "visible": true,
+          "depth": 0.78,
+          "x": 0.72,
+          "scale": 0.9
+        },
+        "clock": {
+          "time": "11:59",
+          "x": 0.275
+        },
+        "narrator": {
+          "visible": true,
+          "x": 0.135,
+          "scale": 1,
+          "dim": 0.85
+        }
+      },
+      "sfx": [
+        {
+          "type": "breath",
+          "offset": 0.2
+        }
+      ],
+      "ambience": "room-tone"
+    },
+    {
+      "id": "s03",
+      "template": "figure-exterior",
+      "line": "l3",
+      "camera": "creep",
+      "cameraIntensity": 1,
+      "seed": 2003,
+      "params": {
+        "variant": "girl",
+        "pose": "stand",
+        "expression": "blank-stare"
+      },
+      "sfx": [
+        {
+          "type": "heartbeat",
+          "offset": 0.2
+        }
+      ],
+      "ambience": "night-wind"
+    },
+    {
+      "id": "s04",
+      "template": "insert-macro-clock",
+      "line": "l4",
+      "camera": "push",
+      "cameraIntensity": 1.35,
+      "seed": 2004,
+      "params": {
+        "time": "11:59",
+        "kind": "digital",
+        "backdrop": "room-blur"
+      },
+      "sfx": [
+        {
+          "type": "heartbeat",
+          "offset": 0.15
+        },
+        {
+          "type": "tick",
+          "offset": 0.35
+        }
+      ],
+      "ambience": "clock-tick-loop"
+    },
+    {
+      "id": "s05",
+      "template": "giant-face",
+      "line": "l5",
+      "camera": "push",
+      "cameraIntensity": 1,
+      "seed": 2005,
+      "params": {
+        "rig": "silhouette",
+        "expression": "surprise",
+        "backdrop": "room-blur"
+      },
+      "sfx": [
+        {
+          "type": "blink-swish",
+          "offset": 0.25
+        }
+      ],
+      "cues": [
+        {
+          "at_word": "blinked",
+          "action": "blink",
+          "duration": 0.3
+        }
+      ],
+      "ambience": "room-tone"
+    },
+    {
+      "id": "s06",
+      "template": "insert-macro-clock",
+      "line": "l6",
+      "camera": "shake",
+      "cameraIntensity": 1.35,
+      "seed": 2006,
+      "params": {
+        "time": "12:01",
+        "kind": "digital",
+        "backdrop": "room-blur"
+      },
+      "sfx": [
+        {
+          "type": "stinger",
+          "offset": 0
+        }
+      ],
+      "transition": "flash",
+      "transitionDuration": 0.22,
+      "ambience": "clock-tick-loop"
+    },
+    {
+      "id": "s07",
+      "template": "window-view",
+      "line": "l7",
+      "camera": "pull",
+      "cameraIntensity": 1,
+      "seed": 2007,
+      "params": {
+        "interior": true,
+        "girl": false,
+        "clock": "12:01",
+        "narrator": true
+      },
+      "sfx": [
+        {
+          "type": "impact",
+          "offset": 0.15
+        }
+      ],
+      "ambience": "night-wind",
+      "fadeOut": 0.65
+    }
+  ]
+}

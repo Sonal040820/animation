@@ -10,3 +10,5 @@ Log every authorized video render with shot count, template-only percentage, pla
 Approximately 40 CPU-hours/month is the requested planning budget, not a verified entitlement. Static tests are not logged as videos.
 
 | midnight-horror-elite | 6 | 100% | 67% auto (4/6) / 33% hand-edited | 581.1 | 0 | kokoro-onnx-0.6.1-int8 |
+
+| golden-1159 | 7 | 100% | 100% auto (7/7) / 0% hand-edited | 460.9 | 0 | kokoro-onnx-0.6.1-int8 |
