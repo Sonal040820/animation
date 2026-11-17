@@ -146,6 +146,7 @@ No media generated during initial setup. When adding a template, update this ind
 | `studio/lib/runner.mjs` | `browserExecutable`, `dimensions`, `engineHash`, `invoke`, `pythonExecutable`, `render`, `sheet`, `smoke`, `withBrowser`, `withBrowserPool` |
 | `studio/lib/scenery.mjs` | `computeWindowLayout`, `drawAtmosphere`, `drawBlurred`, `drawNightExterior`, `drawRoomInterior`, `drawVignette`, `groundDepthPosition` |
 | `studio/lib/styles.mjs` | `STYLES`, `STYLE_GRADE` |
+| `studio/lib/tech-thriller.mjs` | `TECH_VIEWS`, `drawTechThriller` |
 | `studio/lib/template-meta.mjs` | `TEMPLATE_META`, `TRANSITION_VALUES` |
 | `studio/lib/templates.mjs` | `TEMPLATE_META`, `TEMPLATE_NAMES`, `TRANSITIONS`, `assertShot`, `drawStudioFrame` |
 | `studio/lib/three-scene.mjs` | `buildHorrorRoomScene`, `buildNightCityScene`, `buildParticleVoidScene`, `renderThreeFrame` |
@@ -184,6 +185,7 @@ No media generated during initial setup. When adding a template, update this ind
 
 | Registry | ID | Params and defaults | Example |
 |---|---|---|---|
+| sets | tech-thriller | {"view":"server","title":"PROMETHEUS"} | {"view":"eye"} |
 | sets | three-room | {"openStart":1,"openDuration":1.2,"open":1,"cameraX":0,"push":0.4,"light":2,"wall":"#334558","floor":"#657385","door":"#e5b76c","background":"#26394b"} | {"openStart":1,"open":1} |
 | sets | apartment-thriller | {"view":"foyer","title":"","message":[]} | {"view":"phone","message":["A new message."]} |
 | sets | cinematic-doorway | {"openStart":1.05,"openDuration":1.45} | {} |

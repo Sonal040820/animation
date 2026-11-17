@@ -9,6 +9,7 @@ import {APARTMENT_VIEWS,drawApartment} from './apartment.mjs';
 import catalog from './registry/catalog.json' with {type:'json'};
 import {declarationEntry} from './declarative.mjs';
 import {drawThreeRoom} from './three-stage.mjs';
+import {drawTechThriller,TECH_VIEWS} from './tech-thriller.mjs';
 import {HUMAN_LOOKS,HUMAN_ACTIONS} from './human.mjs';
 
 const number=(value=0,min=-Infinity,max=Infinity)=>({type:'number',default:value,min,max});
@@ -20,6 +21,7 @@ export const EASINGS=Object.freeze({
   inOut:entry({},t=>t*t*(3-2*t)), hold:entry({},()=>0)
 });
 export const SETS={
+  'tech-thriller':entry({view:{type:'enum',values:TECH_VIEWS,default:'server'},title:string('PROMETHEUS')},drawTechThriller,{view:'eye'}),
   'three-room':entry({openStart:number(1,0,60),openDuration:number(1.2,.1,60),open:number(1,0,1),cameraX:number(0,-2,2),push:number(.4,0,2),light:number(2,0,5),wall:string('#334558'),floor:string('#657385'),door:string('#e5b76c'),background:string('#26394b')},drawThreeRoom,{openStart:1,open:1}),
   'apartment-thriller':entry({
     view:{type:'enum',values:APARTMENT_VIEWS,default:'foyer'},

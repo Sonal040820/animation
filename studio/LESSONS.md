@@ -39,4 +39,8 @@ Date | Video | Exact failure symptom | Failed command | Root cause | Fix / fallb
 
 ## Path A integration lesson — 2026-11-17
 
+Visual revision lesson: simple anatomy and clear staging matter more than extra particles. A circle face and single stroke hand read as placeholders in a dramatic close-up. Give close-ups facial planes, hair, eyelids, a readable palm/finger silhouette and a directional light source. Use a recognizable globe for climate data and layered silhouettes for city depth. Preserve the approved audio stream when iterating visuals so timing and sound quality stay stable.
+
+OVERCLOCKED production adds a reusable tech-thriller set and local audio-take importer. ElevenLabs catalog/estimate checks succeeded, while real generation partially failed because of shared free-tier availability and one provider access rejection. Reuse successful takes and use the authorized local fallback for missing speech/music. See AUDIO_WORKFLOW.md and projects/overclocked/PRODUCTION.json for the measured workflow and source IDs.
+
 Actual Three.js is now part of the shared player; legacy three-scene.mjs remains Canvas perspective drawing. Keep discovery attached to live registries and give agents a short routing document instead of requiring a repo-wide read. Prefer reusable pose/expression beats and simple stage geometry. Validate silent video independently of audio. H.264 yuv420p requires even dimensions: preview is now 432x768. Two-bone reach targets must be clamped and staged; Canvas actors do not automatically interact with or hide behind Three.js objects.

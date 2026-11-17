@@ -1,0 +1,9 @@
+# Generated audio in Path A
+
+Generate speech and effects through the connected ElevenLabs plugin when authorized. Read the plugin skill and discover available models/voices. Record generation IDs and errors. A successful catalog or estimate does not prove generation will succeed. The shared free queue may reject individual requests, and a take may fail after it starts. Reuse completed takes and apply the authorized local fallback to missing material.
+
+Download completed audio to project assets/audio. Record an audio-import.json mapping dialogue line IDs to file and provider. Generate fallback line WAVs with make-voice, then run python studio/cli/import_voice.py projects/<slug>. This rebuilds timeline/voice.wav and measured line metadata. Run align afterwards, then render, mix and verify. Import is repeatable from original takes and does not spend provider credits.
+
+Optional config audio.ambienceFile is a project-relative ambience track. audio.ambienceFadeStart controls its two-second fade. The mixer loops it at low gain beneath the original synthesized score, then ducks the bed under dialogue. Inspect short samples for loop seams. For OVERCLOCKED, music synthesis and timed effects remained local after the ElevenLabs music request failed.
+
+Learnings from OVERCLOCKED: set provider durations explicitly when the tool supports them, since a natural-language duration may still return a one-second effect. Check actual downloaded duration. Preserve fixed trailer slots by fitting only overlong takes. Retain a single stable voice per speaker when possible and disclose fallback changes. Audio import timestamps drive captions, but current caption word alignment is approximate. Never report quoted generation cost as reconciled billing. Exact task token totals require a task-specific meter, and unrelated session totals cannot substitute for it.

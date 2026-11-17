@@ -343,11 +343,25 @@ export function mix(project, duration) {
   const score = project?.config?.score || undefined;
   const mood = score?.mood || project?.config?.mood || 'dread';
 
-  const bed = synthOriginalAudio(project.out, resolvedDuration, cues, {
+  let bed = synthOriginalAudio(project.out, resolvedDuration, cues, {
     mood,
     ambienceSpans,
     score
   });
+
+  // Reuse imported ambience as a local, timed layer on the original score.
+  const imported = project.config?.audio?.ambienceFile;
+  if (imported) {
+    const source = path.resolve(project.dir, imported);
+    if (!source.startsWith(project.dir + path.sep)) throw Error('Ambience must be inside project');
+    const layered = path.join(project.out, 'layered-bed.wav');
+    const fadeStart = Number(project.config.audio.ambienceFadeStart ?? Math.max(0,resolvedDuration-2));
+    if (!Number.isFinite(fadeStart) || fadeStart < 0) throw Error('Invalid ambience fade start');
+    invoke('ffmpeg', ['-v','error','-y','-i',bed,'-stream_loop','-1','-i',source,
+      '-filter_complex',`[1:a]volume=0.06,afade=t=out:st=${fadeStart}:d=2[amb];[0:a][amb]amix=inputs=2:duration=first:normalize=0[out]`,
+      '-map','[out]','-t',String(resolvedDuration),layered]);
+    bed = layered;
+  }
 
   const video = path.join(project.out, 'video_silent.mp4');
   if (!fs.existsSync(video)) throw new Error('Render silent video before mixing');

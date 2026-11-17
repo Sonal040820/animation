@@ -1,0 +1,274 @@
+{
+  "schema_version": 2,
+  "slug": "overclocked",
+  "shots": [
+    {
+      "id": "s1",
+      "start": 0,
+      "duration": 4,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "server"
+          }
+        }
+      },
+      "sfx": []
+    },
+    {
+      "id": "s2",
+      "start": 4,
+      "duration": 2,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "network"
+          }
+        }
+      },
+      "sfx": []
+    },
+    {
+      "id": "s3",
+      "start": 6,
+      "duration": 2,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "city"
+          }
+        }
+      },
+      "sfx": []
+    },
+    {
+      "id": "s4",
+      "start": 8,
+      "duration": 6,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "key"
+          }
+        }
+      },
+      "sfx": [
+        {
+          "type": "subbass",
+          "offset": 5
+        },
+        {
+          "type": "click",
+          "offset": 5
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "start": 14,
+      "duration": 2.5,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "protein"
+          }
+        }
+      },
+      "sfx": []
+    },
+    {
+      "id": "s6",
+      "start": 16.5,
+      "duration": 2.5,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "climate"
+          }
+        }
+      },
+      "sfx": []
+    },
+    {
+      "id": "s7",
+      "start": 19,
+      "duration": 3,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "awakening"
+          }
+        }
+      },
+      "sfx": []
+    },
+    {
+      "id": "s8",
+      "start": 22,
+      "duration": 5,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "eye"
+          }
+        }
+      },
+      "sfx": []
+    },
+    {
+      "id": "s9",
+      "start": 27,
+      "duration": 4,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "street"
+          }
+        }
+      },
+      "sfx": []
+    },
+    {
+      "id": "s10",
+      "start": 31,
+      "duration": 7,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "contact"
+          }
+        }
+      },
+      "sfx": []
+    },
+    {
+      "id": "s11",
+      "start": 38,
+      "duration": 1,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "black"
+          }
+        }
+      },
+      "sfx": [
+        {
+          "type": "heartbeat",
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "id": "s12",
+      "start": 39,
+      "duration": 6.5,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "cornea"
+          }
+        }
+      },
+      "sfx": [
+        {
+          "type": "heartbeat",
+          "offset": 0
+        },
+        {
+          "type": "heartbeat",
+          "offset": 0.6
+        },
+        {
+          "type": "heartbeat",
+          "offset": 1.35
+        },
+        {
+          "type": "heartbeat",
+          "offset": 2.3
+        },
+        {
+          "type": "heartbeat",
+          "offset": 3.5
+        },
+        {
+          "type": "tick",
+          "offset": 4.5
+        },
+        {
+          "type": "tick",
+          "offset": 4.9
+        },
+        {
+          "type": "tick",
+          "offset": 5.3
+        },
+        {
+          "type": "tick",
+          "offset": 5.7
+        },
+        {
+          "type": "tick",
+          "offset": 6.1
+        }
+      ]
+    },
+    {
+      "id": "s13",
+      "start": 45.5,
+      "duration": 4.5,
+      "camera": "static",
+      "cameraIntensity": 0,
+      "recipe": {
+        "set": {
+          "preset": "tech-thriller",
+          "params": {
+            "view": "title"
+          }
+        }
+      },
+      "sfx": [
+        {
+          "type": "lowboom",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}

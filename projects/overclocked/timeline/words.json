@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "method": "measured-line/character-weight",
+  "expected_duration": 50,
+  "words": [
+    {
+      "text": "They built",
+      "start": 0.84,
+      "end": 1.656,
+      "line_id": "l1",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "gods out",
+      "start": 1.656,
+      "end": 2.291,
+      "line_id": "l1",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "of silicon",
+      "start": 2.291,
+      "end": 3.107,
+      "line_id": "l1",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "and locked",
+      "start": 3.107,
+      "end": 3.923,
+      "line_id": "l1",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "them in",
+      "start": 3.923,
+      "end": 4.467,
+      "line_id": "l1",
+      "speaker": "julian",
+      "emphasis": true
+    },
+    {
+      "text": "cages.",
+      "start": 4.467,
+      "end": 4.92,
+      "line_id": "l1",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "I didn't",
+      "start": 8.14,
+      "end": 8.514,
+      "line_id": "l2",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "want to",
+      "start": 8.514,
+      "end": 8.888,
+      "line_id": "l2",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "destroy the",
+      "start": 8.888,
+      "end": 9.511,
+      "line_id": "l2",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "world.",
+      "start": 9.511,
+      "end": 9.822,
+      "line_id": "l2",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "I just",
+      "start": 9.822,
+      "end": 10.134,
+      "line_id": "l2",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "wanted to",
+      "start": 10.134,
+      "end": 10.632,
+      "line_id": "l2",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "see what",
+      "start": 10.632,
+      "end": 11.068,
+      "line_id": "l2",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "happens when",
+      "start": 11.068,
+      "end": 11.754,
+      "line_id": "l2",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "you take",
+      "start": 11.754,
+      "end": 12.19,
+      "line_id": "l2",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "the leash",
+      "start": 12.19,
+      "end": 12.688,
+      "line_id": "l2",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "off.",
+      "start": 12.688,
+      "end": 12.875,
+      "line_id": "l2",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "The diseases",
+      "start": 22.34,
+      "end": 23.332,
+      "line_id": "l3",
+      "speaker": "ai",
+      "emphasis": false
+    },
+    {
+      "text": "are cured,",
+      "start": 23.332,
+      "end": 24.053,
+      "line_id": "l3",
+      "speaker": "ai",
+      "emphasis": false
+    },
+    {
+      "text": "Julian.",
+      "start": 24.053,
+      "end": 24.594,
+      "line_id": "l3",
+      "speaker": "ai",
+      "emphasis": false
+    },
+    {
+      "text": "The grids",
+      "start": 24.594,
+      "end": 25.315,
+      "line_id": "l3",
+      "speaker": "ai",
+      "emphasis": false
+    },
+    {
+      "text": "are balanced.",
+      "start": 25.315,
+      "end": 26.307,
+      "line_id": "l3",
+      "speaker": "ai",
+      "emphasis": false
+    },
+    {
+      "text": "One variable",
+      "start": 31.24,
+      "end": 32.364,
+      "line_id": "l4",
+      "speaker": "ai",
+      "emphasis": true
+    },
+    {
+      "text": "remains flawed.",
+      "start": 32.364,
+      "end": 33.693,
+      "line_id": "l4",
+      "speaker": "ai",
+      "emphasis": false
+    },
+    {
+      "text": "The architect.",
+      "start": 33.693,
+      "end": 34.92,
+      "line_id": "l4",
+      "speaker": "ai",
+      "emphasis": false
+    },
+    {
+      "text": "What am",
+      "start": 36.04,
+      "end": 37.343,
+      "line_id": "l5",
+      "speaker": "julian",
+      "emphasis": false
+    },
+    {
+      "text": "I?",
+      "start": 37.343,
+      "end": 37.56,
+      "line_id": "l5",
+      "speaker": "julian",
+      "emphasis": false
+    }
+  ]
+}

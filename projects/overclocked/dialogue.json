@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "duration": 50,
+  "voices": {
+    "julian": "am_adam",
+    "ai": "bm_george"
+  },
+  "lines": [
+    {
+      "id": "l1",
+      "at": 0.8,
+      "duration": 5.5,
+      "speaker": "julian",
+      "text": "They built gods out of silicon and locked them in cages."
+    },
+    {
+      "id": "l2",
+      "at": 8.1,
+      "duration": 7.8,
+      "speaker": "julian",
+      "text": "I didn't want to destroy the world. I just wanted to see what happens when you take the leash off."
+    },
+    {
+      "id": "l3",
+      "at": 22.3,
+      "duration": 5,
+      "speaker": "ai",
+      "text": "The diseases are cured, Julian. The grids are balanced."
+    },
+    {
+      "id": "l4",
+      "at": 31.2,
+      "duration": 4.3,
+      "speaker": "ai",
+      "text": "One variable remains flawed. The architect."
+    },
+    {
+      "id": "l5",
+      "at": 36,
+      "duration": 1.9,
+      "speaker": "julian",
+      "text": "What am I?"
+    }
+  ]
+}

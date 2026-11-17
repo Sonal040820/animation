@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "pipeline": "A",
+  "studio": "original-short-video-studio",
+  "aspect": "9:16",
+  "style": "midnight",
+  "rig": "silhouette",
+  "fps": 24,
+  "resolution": "720p",
+  "audio": {
+    "peakCeilingDb": -3,
+    "ambienceFile": "assets/audio/server.mp3",
+    "ambienceFadeStart": 36
+  },
+  "motion": {
+    "min_clip_mean": 0,
+    "min_shot_mean": 0
+  },
+  "score": {
+    "mood": "tension",
+    "silenceWindows": [
+      {
+        "start": 38,
+        "end": 45.5,
+        "gain": 0.16
+      }
+    ],
+    "tailFadeSeconds": 1.8
+  }
+}

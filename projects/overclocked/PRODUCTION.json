@@ -1,0 +1,110 @@
+{
+  "provider": "ElevenLabs MCP",
+  "flow_id": "VuNnk9Wma8rQ1SPkkpt9",
+  "selected": {
+    "l1": "2y7PUUtVSooIdUfesSQp",
+    "l4": "Ob3niudUBWhAGIEhiMXa",
+    "l5": "vA5bad3p8TIKqYr4zidZ",
+    "server": "a0RLgStvO3MW3DO8gXfn"
+  },
+  "fallback": {
+    "l2": "Kokoro ONNX",
+    "l3": "Kokoro ONNX",
+    "music": "studio original synthesized tension score",
+    "effects": "studio synthesized subbass, heartbeat, ticks"
+  },
+  "results": [
+    {
+      "id": "xZbqaPB0PNo2U0GkEcKj",
+      "status": "failed",
+      "model_id": "eleven_v4",
+      "error_message": "Unusual activity has been detected on your account, so Free Tier access has been disabled. This can be triggered by using a proxy or VPN, or by creating multiple free accounts. Please upgrade to a paid subscription to continue.",
+      "quotedPrice": {
+        "credits": 66,
+        "price_cents": 0.66,
+        "cost_fiat_currency": "usd"
+      }
+    },
+    {
+      "id": "2y7PUUtVSooIdUfesSQp",
+      "status": "completed",
+      "model_id": "eleven_v4",
+      "duration_secs": 4.08,
+      "quotedPrice": {
+        "credits": 66,
+        "price_cents": 0.66,
+        "cost_fiat_currency": "usd"
+      }
+    },
+    {
+      "id": "Ob3niudUBWhAGIEhiMXa",
+      "status": "completed",
+      "model_id": "eleven_v4",
+      "duration_secs": 3.68,
+      "quotedPrice": {
+        "credits": 50,
+        "price_cents": 0.5,
+        "cost_fiat_currency": "usd"
+      }
+    },
+    {
+      "id": "vA5bad3p8TIKqYr4zidZ",
+      "status": "completed",
+      "model_id": "eleven_v4",
+      "duration_secs": 1.52,
+      "quotedPrice": {
+        "credits": 23,
+        "price_cents": 0.22999999999999998,
+        "cost_fiat_currency": "usd"
+      }
+    },
+    {
+      "id": "Y2SgZFrKz0EfobS6XIeL",
+      "status": "completed",
+      "model_id": "eleven_v4",
+      "duration_secs": 1.52,
+      "quotedPrice": {
+        "credits": 23,
+        "price_cents": 0.22999999999999998,
+        "cost_fiat_currency": "usd"
+      }
+    },
+    {
+      "id": "a0RLgStvO3MW3DO8gXfn",
+      "status": "completed",
+      "model_id": "eleven_text_to_sound_v2",
+      "duration_secs": 1,
+      "quotedPrice": {
+        "credits": 16.666666666666664,
+        "price_cents": 0.16666666666666666,
+        "cost_fiat_currency": "usd"
+      }
+    },
+    {
+      "id": "X1zHI1AntRneWqHtOllx",
+      "status": "completed",
+      "model_id": "eleven_text_to_sound_v2",
+      "duration_secs": 1,
+      "quotedPrice": {
+        "credits": 16.666666666666664,
+        "price_cents": 0.16666666666666666,
+        "cost_fiat_currency": "usd"
+      }
+    },
+    {
+      "id": "xNfn8XI7fyIiwQ59TSoB",
+      "status": "completed",
+      "model_id": "eleven_text_to_sound_v2",
+      "duration_secs": 1,
+      "quotedPrice": {
+        "credits": 16.666666666666664,
+        "price_cents": 0.16666666666666666,
+        "cost_fiat_currency": "usd"
+      }
+    }
+  ],
+  "tokenUsage": {
+    "exact": null,
+    "reason": "No active goal meter or current-task token telemetry exposed; available local rollout does not contain this task."
+  }
+}

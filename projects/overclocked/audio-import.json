@@ -1,0 +1,5 @@
+{
+  "l1":{"file":"assets/audio/l1.mp3","provider":"elevenlabs-v4"},
+  "l4":{"file":"assets/audio/l4.mp3","provider":"elevenlabs-v4"},
+  "l5":{"file":"assets/audio/l5.mp3","provider":"elevenlabs-v4"}
+}

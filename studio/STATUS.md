@@ -1,5 +1,11 @@
 # Short-video studio status
 
+## OVERCLOCKED trailer — 2026-11-17
+
+Rendered projects/overclocked to studio/out/overclocked/final.mp4. Measured duration 50.000 seconds, 720x1280, 24fps, H.264 video with AAC sound. 1200 frames, 13 shots, 27 caption groups inside measured speech intervals. Audio measured -16.44 LUFS and -2.96 dBTP. Full final-file decode and studio verification passed. 39 tests passed. Render report records 72.057 cumulative shot-render seconds.
+
+Three spoken lines and server ambience use completed ElevenLabs assets. Two lines use Kokoro fallback and music/effect timing use original local synthesis after partial provider failures. See projects/overclocked/PRODUCTION.json and AUDIO_WORKFLOW.md. Final text remains PROMETHEUS as scripted. Inspected representative rendered frames and storyboard. Automated black detection flags the 38–39 second cut and sparse title card; repeated-frame detection includes the deliberately frozen street, low-motion eye and title hold. These warnings remain visible in facts.json. Human listening review remains useful for the mixed-provider voice continuity. Exact task-token telemetry was unavailable.
+
 ## Integrated Path A foundation — 2026-11-17
 
 Path A now includes pinned Three.js 0.187.0 as a required local player dependency alongside Canvas2D. The shared `three-room` set provides dimensional staging and a timed door; new projects use it by default. Root routing and studio/START_HERE.md give agents one entry point. Live assets/asset-inspect/asset-preview commands cover registered assets, human appearances and actions. Silhouette humans support actor-relative hand targets with two-bone IK. B/C configs are rejected by the Path A CLI.

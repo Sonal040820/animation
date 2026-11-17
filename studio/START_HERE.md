@@ -18,6 +18,8 @@ Use Node 22 and the Chromium/FFmpeg prerequisites described in the existing setu
 
 ## Author and verify
 
+For requested sound production, read [AUDIO_WORKFLOW.md](AUDIO_WORKFLOW.md) for generated-take imports, local fallback, timing, mixing and reuse. The OVERCLOCKED project demonstrates this workflow.
+
 ```powershell
 node studio/cli/studio.mjs new-project --project projects/my-film --script "A traveler notices a door opening." --seconds 6
 node studio/cli/studio.mjs validate --project projects/my-film

@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "provider": "mixed-local-takes",
+  "voice_present": true,
+  "duration": 50,
+  "lines": [
+    {
+      "id": "l1",
+      "at": 0.8,
+      "duration": 5.5,
+      "speaker": "julian",
+      "text": "They built gods out of silicon and locked them in cages.",
+      "start": 0.84,
+      "end": 4.92,
+      "spoken_seconds": 4.08,
+      "provider": "elevenlabs-v4"
+    },
+    {
+      "id": "l2",
+      "at": 8.1,
+      "duration": 7.8,
+      "speaker": "julian",
+      "text": "I didn't want to destroy the world. I just wanted to see what happens when you take the leash off.",
+      "start": 8.14,
+      "end": 12.875291666666667,
+      "spoken_seconds": 4.735291666666667,
+      "provider": "kokoro-onnx"
+    },
+    {
+      "id": "l3",
+      "at": 22.3,
+      "duration": 5,
+      "speaker": "ai",
+      "text": "The diseases are cured, Julian. The grids are balanced.",
+      "start": 22.34,
+      "end": 26.307291666666668,
+      "spoken_seconds": 3.9672916666666667,
+      "provider": "kokoro-onnx"
+    },
+    {
+      "id": "l4",
+      "at": 31.2,
+      "duration": 4.3,
+      "speaker": "ai",
+      "text": "One variable remains flawed. The architect.",
+      "start": 31.24,
+      "end": 34.92,
+      "spoken_seconds": 3.68,
+      "provider": "elevenlabs-v4"
+    },
+    {
+      "id": "l5",
+      "at": 36,
+      "duration": 1.9,
+      "speaker": "julian",
+      "text": "What am I?",
+      "start": 36.04,
+      "end": 37.56,
+      "spoken_seconds": 1.52,
+      "provider": "elevenlabs-v4"
+    }
+  ]
+}
