@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "provider": "kokoro-onnx-0.6.1-int8",
+  "voice_present": true,
+  "duration": 9.4267,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "narrator",
+      "spoken": "Three a.m.",
+      "display": "3:00 AM.",
+      "text": "3:00 AM.",
+      "emotion": "ominous",
+      "start": 0.05,
+      "end": 1.6455,
+      "spoken_seconds": 1.5955
+    },
+    {
+      "id": "l2",
+      "speaker": "narrator",
+      "spoken": "A knock at the door.",
+      "display": "A knock at the door.",
+      "text": "A knock at the door.",
+      "emotion": "ominous",
+      "start": 1.8755,
+      "end": 3.2357,
+      "spoken_seconds": 1.3602
+    },
+    {
+      "id": "l3",
+      "speaker": "narrator",
+      "spoken": "I opened it.",
+      "display": "I opened it.",
+      "text": "I opened it.",
+      "emotion": "ominous",
+      "start": 3.4657,
+      "end": 4.6647,
+      "spoken_seconds": 1.199
+    },
+    {
+      "id": "l4",
+      "speaker": "narrator",
+      "spoken": "Nobody there.",
+      "display": "Nobody there.",
+      "text": "Nobody there.",
+      "emotion": "ominous",
+      "start": 4.8947,
+      "end": 6.0885,
+      "spoken_seconds": 1.1938
+    },
+    {
+      "id": "l5",
+      "speaker": "narrator",
+      "spoken": "Only wet footprints,",
+      "display": "Only wet footprints,",
+      "text": "Only wet footprints,",
+      "emotion": "ominous",
+      "start": 6.3185,
+      "end": 7.7093,
+      "spoken_seconds": 1.3908
+    },
+    {
+      "id": "l6",
+      "speaker": "narrator",
+      "spoken": "leading inside.",
+      "display": "leading inside.",
+      "text": "leading inside.",
+      "emotion": "ominous",
+      "start": 7.9393,
+      "end": 9.2467,
+      "spoken_seconds": 1.3074
+    }
+  ]
+}

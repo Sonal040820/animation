@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "studio": "original-short-video-studio",
+  "aspect": "9:16",
+  "style": "midnight",
+  "rig": "silhouette",
+  "resolution": "720p",
+  "fps": 24,
+  "audio": {"peakCeilingDb": -3},
+  "motion": {"min_clip_mean": 0.4, "min_shot_mean": 0}
+}

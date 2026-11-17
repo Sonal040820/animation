@@ -1,0 +1,1 @@
+{"schema_version":2,"slug":"doorway-visual-study","shots":[{"id":"door-opening","start":0,"duration":4,"camera":"push","cameraIntensity":0.12,"recipe":{"set":{"preset":"cinematic-doorway","params":{"openStart":1.05,"openDuration":1.45}}}}]}

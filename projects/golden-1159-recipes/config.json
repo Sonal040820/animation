@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "studio": "original-short-video-studio",
+  "aspect": "9:16",
+  "resolution": "720p",
+  "fps": 24,
+  "style": "midnight",
+  "rig": "block",
+  "voice": "af_heart",
+  "tail": 0.85,
+  "motion": {
+    "min_shot_mean": 0.8,
+    "min_clip_mean": 2.0
+  }
+}

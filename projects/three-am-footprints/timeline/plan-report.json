@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "slug": "three-am-footprints",
+  "planned_at": "2026-11-16T18:50:53.521Z",
+  "lines_count": 6,
+  "shots_count": 6,
+  "auto_planned": [
+    {
+      "shot": "s03",
+      "line": "l3",
+      "rule_id": "rule-door-close",
+      "template": "door-close",
+      "short_after_time": false
+    },
+    {
+      "shot": "s06",
+      "line": "l6",
+      "rule_id": "rule-stairwell",
+      "template": "stairwell",
+      "short_after_time": false
+    }
+  ],
+  "rules_needed": [
+    {
+      "line": "l1",
+      "text": "Three a.",
+      "reason": "No rule in planner-rules.json matched this sentence"
+    },
+    {
+      "line": "l2",
+      "text": "m.",
+      "reason": "No rule in planner-rules.json matched this sentence"
+    },
+    {
+      "line": "l4",
+      "text": "I opened it.",
+      "reason": "No rule in planner-rules.json matched this sentence"
+    },
+    {
+      "line": "l5",
+      "text": "Nobody there.",
+      "reason": "No rule in planner-rules.json matched this sentence"
+    }
+  ],
+  "needs_new_code": [
+    {
+      "line": "l1",
+      "text": "Three a.",
+      "reason": "No rule in planner-rules.json matched this sentence"
+    },
+    {
+      "line": "l2",
+      "text": "m.",
+      "reason": "No rule in planner-rules.json matched this sentence"
+    },
+    {
+      "line": "l4",
+      "text": "I opened it.",
+      "reason": "No rule in planner-rules.json matched this sentence"
+    },
+    {
+      "line": "l5",
+      "text": "Nobody there.",
+      "reason": "No rule in planner-rules.json matched this sentence"
+    }
+  ],
+  "planned_shots": [
+    {
+      "id": "s01",
+      "line": "l1",
+      "preset": "character-medium",
+      "overrides": {
+        "set": {
+          "params": {
+            "rig": "block",
+            "expression": "scared"
+          }
+        }
+      },
+      "camera": "push",
+      "transition": "cut"
+    },
+    {
+      "id": "s02",
+      "line": "l2",
+      "preset": "character-medium",
+      "overrides": {
+        "set": {
+          "params": {
+            "rig": "block",
+            "expression": "scared"
+          }
+        }
+      },
+      "camera": "push",
+      "transition": "cut"
+    },
+    {
+      "id": "s03",
+      "line": "l3",
+      "preset": "door-close",
+      "overrides": {
+        "set": {
+          "params": {
+            "knocks": 3,
+            "angle": 0.05
+          }
+        }
+      },
+      "camera": "push",
+      "transition": "cut"
+    },
+    {
+      "id": "s04",
+      "line": "l4",
+      "preset": "character-medium",
+      "overrides": {
+        "set": {
+          "params": {
+            "rig": "block",
+            "expression": "scared"
+          }
+        }
+      },
+      "camera": "push",
+      "transition": "cut"
+    },
+    {
+      "id": "s05",
+      "line": "l5",
+      "preset": "character-medium",
+      "overrides": {
+        "set": {
+          "params": {
+            "rig": "block",
+            "expression": "scared"
+          }
+        }
+      },
+      "camera": "push",
+      "transition": "cut"
+    },
+    {
+      "id": "s06",
+      "line": "l6",
+      "preset": "stairwell",
+      "overrides": {
+        "set": {
+          "params": {
+            "wet": true,
+            "figure": true
+          }
+        }
+      },
+      "camera": "creep",
+      "transition": "cut"
+    }
+  ]
+}

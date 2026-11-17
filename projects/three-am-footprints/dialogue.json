@@ -1,0 +1,63 @@
+{
+  "schema_version": 3,
+  "voices": {
+    "narrator": "af_heart"
+  },
+  "default_speaker": "narrator",
+  "lines": [
+    {
+      "id": "l1",
+      "spoken": "Three a.m.",
+      "display": "3:00 AM.",
+      "emotion": "ominous",
+      "speed": 1.05,
+      "pause_before": 0.05,
+      "pause_after": 0.18
+    },
+    {
+      "id": "l2",
+      "spoken": "A knock at the door.",
+      "display": "A knock at the door.",
+      "emotion": "ominous",
+      "speed": 1.05,
+      "pause_before": 0.05,
+      "pause_after": 0.18
+    },
+    {
+      "id": "l3",
+      "spoken": "I opened it.",
+      "display": "I opened it.",
+      "emotion": "ominous",
+      "speed": 1.05,
+      "pause_before": 0.05,
+      "pause_after": 0.18
+    },
+    {
+      "id": "l4",
+      "spoken": "Nobody there.",
+      "display": "Nobody there.",
+      "emotion": "ominous",
+      "speed": 1.05,
+      "pause_before": 0.05,
+      "pause_after": 0.18
+    },
+    {
+      "id": "l5",
+      "spoken": "Only wet footprints,",
+      "display": "Only wet footprints,",
+      "emotion": "ominous",
+      "speed": 1.05,
+      "pause_before": 0.05,
+      "pause_after": 0.18
+    },
+    {
+      "id": "l6",
+      "spoken": "leading inside.",
+      "display": "leading inside.",
+      "emotion": "ominous",
+      "speed": 1.05,
+      "pause_before": 0.05,
+      "pause_after": 0.18
+    }
+  ]
+}

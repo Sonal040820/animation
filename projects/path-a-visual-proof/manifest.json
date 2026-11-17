@@ -1,0 +1,13 @@
+{
+  "schema_version":2,
+  "slug":"path-a-visual-proof",
+  "shots":[
+    {"id":"notice","start":0,"duration":4,"camera":"static","cameraIntensity":0,
+      "recipe":{"set":{"preset":"three-room","params":{"openStart":1,"openDuration":1.2,"push":0.5}},
+        "actors":[{"id":"lead","rig":"silhouette","appearance":"traveler","pos":{"x":0.4,"depth":0.65},"scale":1.35,"action":"notice-recoil"}]}},
+    {"id":"reach","start":4,"duration":3,"camera":"static","cameraIntensity":0,
+      "recipe":{"set":{"preset":"three-room","params":{"open":0,"push":0}},
+        "actors":[{"id":"lead","rig":"silhouette","appearance":"child","pos":{"x":0.45,"depth":0.65},"scale":1.35,"hand":[0,-0.42],
+          "keys":[{"t":0,"expression":"neutral"},{"t":1,"hand":[0.25,-0.6],"expression":"surprise","easing":"inOut"},{"t":1.6,"hand":[0.25,-0.6]},{"t":2.6,"hand":[0,-0.42],"expression":"relieved","easing":"inOut"}]}]}}
+  ]
+}

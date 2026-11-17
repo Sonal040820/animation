@@ -26,6 +26,7 @@ export const AMBIENCE_TYPES = [
 ];
 
 export const SFX_TYPES = [
+  'phone-buzz',
   'tick',
   'impact',
   'whoosh',
@@ -179,6 +180,10 @@ function synthSfxSample(type, d, rnd) {
       return 0.13 * Math.exp(-d * 25) * Math.sin(TAU * 71 * d);
     case 'rain':
       return (rnd() * 2 - 1) * 0.021 * Math.exp(-d * 0.8);
+    case 'phone-buzz': {
+      const envelope=Math.max(0,Math.sin(TAU*5.7*d)) * Math.exp(-d*4.7);
+      return d<.65 ? envelope*(.19*Math.sin(TAU*118*d)+.047*Math.sin(TAU*236*d)) : 0;
+    }
     case 'latch':
       return 0.20 * Math.exp(-d * 46) * (rnd() * 2 - 1) + 0.095 * Math.exp(-d * 14) * Math.sin(TAU * 980 * d);
     case 'heartbeat':
@@ -395,11 +400,15 @@ export function mix(project, duration) {
   }
 
   // Pass 2: Render final.mp4 with two-pass loudnorm
+  const peakCeiling = project.config?.audio?.peakCeilingDb;
+  const peakLimiter = Number.isFinite(peakCeiling) && peakCeiling >= -12 && peakCeiling <= -1
+    ? `,aresample=192000,alimiter=limit=${(10 ** (peakCeiling / 20)).toFixed(6)}:level=0:latency=1`
+    : '';
   const pass2Args = ['-hide_banner', '-loglevel', 'error', '-y', '-i', video, '-i', bed];
   if (voicePresent) pass2Args.push('-i', voice);
   pass2Args.push(
     '-filter_complex',
-    `${preMixChain},${loudnormFilter}[out]`,
+    `${preMixChain},${loudnormFilter}${peakLimiter}[out]`,
     '-map',
     '0:v',
     '-map',

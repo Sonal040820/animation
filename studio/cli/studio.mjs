@@ -16,6 +16,8 @@ import {TEMPLATE_NAMES} from '../lib/templates.mjs';
 import {presetRecipe,PRESETS} from '../lib/presets.mjs';
 import {normalizeRecipe,resolveRecipe} from '../lib/recipe.mjs';
 import {promoteRegistry} from '../lib/registry-promotion.mjs';
+import {assetCatalog,inspectAsset,assetRecipe} from '../lib/assets.mjs';
+import {verifyVisual} from '../lib/visual-check.mjs';
 
 const argv=process.argv.slice(2),command=argv.shift();
 const opts={};
@@ -49,6 +51,7 @@ async function doctor(){
     pythonBin,
     python:pythonVer,
     playwright:pkg.dependencies.playwright,
+    three:pkg.dependencies.three,
     ffmpeg,
     ffprobe,
     browserBinVersion
@@ -65,10 +68,12 @@ async function doctor(){
       const el=document.createElement('canvas');el.width=16;el.height=16;
       const c=el.getContext('2d');if(!c)throw new Error('Canvas2D missing');
       c.fillStyle='#f00';c.fillRect(0,0,16,16);
-      return {canvas2d:c.getImageData(1,1,1,1).data[0]===255,offscreenCanvas:typeof OffscreenCanvas==='function'};
+      const gl=document.createElement('canvas').getContext('webgl2');
+      const webgl2=Boolean(gl);gl?.getExtension('WEBGL_lose_context')?.loseContext();
+      return {canvas2d:c.getImageData(1,1,1,1).data[0]===255,webgl2,offscreenCanvas:typeof OffscreenCanvas==='function'};
     });
   });
-  if(!checks.canvas2d||ffmpeg==='missing'||ffprobe==='missing')throw new Error('Required renderer capability missing');
+  if(!checks.canvas2d||!checks.webgl2||ffmpeg==='missing'||ffprobe==='missing')throw new Error('Required Path A renderer capability missing (Canvas2D, WebGL2, FFmpeg)');
   const env={
     schema_version:1,
     status:'verified',
@@ -85,7 +90,7 @@ async function doctor(){
     browserSource:browserPath.includes('ms-playwright')?'playwright-pinned':'preinstalled',
     browserOverrideBoolean:Boolean(process.env.CHROMIUM_PATH),
     checks,
-    renderer:'Canvas2D+Chromium+ffmpeg',
+    renderer:'Three.js+Canvas2D+Chromium+ffmpeg',
     voice:'optional Kokoro ONNX; models not downloaded during setup',
     checked_at:new Date().toISOString()
   };
@@ -104,21 +109,21 @@ function newProject(){
   if(seconds<6||seconds>30)throw new Error('Duration must be 6..30 seconds');
   let cursor=0;const shots=parts.map((p,i)=>{
     const duration=i===parts.length-1?seconds-cursor:seconds/parts.length;
-    const obj={id:'shot-'+String(i+1).padStart(2,'0'),template:TEMPLATE_NAMES[i%TEMPLATE_NAMES.length],
-      start:+cursor.toFixed(3),duration:+duration.toFixed(3),camera:'push',
-      seed:110+i,params:{text:p.slice(0,25),expression:'neutral'}};
+    const obj={id:'shot-'+String(i+1).padStart(2,'0'),
+      start:+cursor.toFixed(3),duration:+duration.toFixed(3),camera:'static',cameraIntensity:0,
+      recipe:{set:{preset:'three-room',params:{open:0}},actors:[{id:'lead',rig:'silhouette',appearance:'traveler',pos:{x:.4,depth:.65},expression:'neutral'}]}};
     cursor+=duration;return obj;
   });
-  fs.writeFileSync(path.join(dir,'manifest.json'),JSON.stringify({schema_version:1,slug:path.basename(dir),shots},null,2)+'\n');
-  fs.writeFileSync(path.join(dir,'config.json'),JSON.stringify({schema_version:1,aspect:'9:16',studio:'original-short-video-studio',
-    resolution:'720p',fps:24,style:opts.style||'midnight',rig:'block',voice:'am_adam'},null,2)+'\n');
+  fs.writeFileSync(path.join(dir,'manifest.json'),JSON.stringify({schema_version:2,slug:path.basename(dir),shots},null,2)+'\n');
+  fs.writeFileSync(path.join(dir,'config.json'),JSON.stringify({schema_version:1,pipeline:'A',aspect:'9:16',studio:'original-short-video-studio',
+    resolution:'720p',fps:24,style:opts.style||'midnight',rig:'silhouette'},null,2)+'\n');
   output({created:path.relative(ROOT,dir),shots:shots.length,rendered:false});
 }
 
 function project(){const p=loadProject(projectArg);return {...p,out:path.join(STUDIO,'out',path.basename(p.dir))}}
 
 function align(){
-  const p=project();
+  const p=loadProject(projectArg,{deferWordCues:true});
   const linesPath=path.join(p.dir,'timeline','lines.json');
   const dataPath=path.join(p.dir,'dialogue.json');
   mkdir(path.join(p.dir,'timeline'));
@@ -269,6 +274,16 @@ async function golden(){
 }
 
 async function main(){
+  if(command==='assets')return output(assetCatalog(String(opts.query||'')).map(({example,...item})=>item));
+  if(command==='asset-inspect')return output(inspectAsset(String(opts.id||'')));
+  if(command==='asset-preview'){
+    const id=String(opts.id||''),recipe=assetRecipe(id),size=dimensions('draft');
+    const at=Number(opts.at??2);if(!Number.isFinite(at)||at<0)throw Error('--at must be a nonnegative time');
+    const out=path.join(STUDIO,'out','asset-previews',id.replace(/[^a-z0-9-]/gi,'_')+'.png');mkdir(path.dirname(out));
+    const b64=await withBrowser(page=>page.evaluate(({recipe,size,at,id})=>{window.renderStudioFrame({id:'preview',start:0,duration:4,camera:'static',cameraIntensity:0,recipe},{...size,style:id.startsWith('styles/')?id.slice(7):'midnight'},at,[]);return document.getElementById('screen').toDataURL().split(',')[1];},{recipe,size,at,id}));
+    fs.writeFileSync(out,Buffer.from(b64,'base64'));return output({id,at,out});
+  }
+  if(command==='verify-visual'){const result=verifyVisual(projectArg,quality);output(result);if(result.status!=='pass')process.exitCode=1;return;}
   if(command==='recipe-new'){
     const id=String(opts.preset||'window-view');
     const recipe=presetRecipe(id);

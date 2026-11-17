@@ -1,0 +1,12 @@
+{
+  "story_engine_baseline": "eb38ed9",
+  "new_registry_entries": [
+    "wet-footprint",
+    "entry-room"
+  ],
+  "new_story_engine_lines": 3,
+  "planned_final_shots": 0,
+  "hand_edited_final_shots": 6,
+  "note": "Initial automatic plan retained in timeline/plan-report.json; all six final recipes manually directed.",
+  "engine_fix": "Defer word cue resolution while creating the first alignment timeline."
+}

@@ -1,0 +1,394 @@
+{
+  "schema_version": 2,
+  "slug": "three-am-footprints",
+  "shots": [
+    {
+      "id": "s01",
+      "line": "l1",
+      "seed": 3100,
+      "camera": "push",
+      "cameraIntensity": 1.2,
+      "ambience": "room-tone",
+      "recipe": {
+        "set": {
+          "preset": "preset:insert-macro-clock",
+          "params": {
+            "time": "3:00",
+            "kind": "digital",
+            "backdrop": "room-blur"
+          }
+        },
+        "actors": [],
+        "props": [],
+        "fx": [
+          {
+            "type": "dust",
+            "params": {
+              "amount": 12
+            }
+          },
+          {
+            "type": "fog",
+            "params": {
+              "amount": 0.07
+            }
+          }
+        ],
+        "cues": []
+      }
+    },
+    {
+      "id": "s02",
+      "line": "l2",
+      "seed": 3101,
+      "camera": "push",
+      "cameraIntensity": 1.2,
+      "ambience": "room-tone",
+      "recipe": {
+        "set": {
+          "preset": "entry-room"
+        },
+        "actors": [],
+        "props": [
+          {
+            "type": "door",
+            "pos": {
+              "x": 0.5,
+              "depth": 0.65
+            },
+            "scale": 1.7,
+            "state": {
+              "open": 0
+            }
+          }
+        ],
+        "fx": [
+          {
+            "type": "dust",
+            "params": {
+              "amount": 12
+            }
+          },
+          {
+            "type": "fog",
+            "params": {
+              "amount": 0.07
+            }
+          }
+        ],
+        "cues": [
+          {
+            "at_word": "knock",
+            "sfx": "knock",
+            "action": "shake"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s03",
+      "line": "l3",
+      "seed": 3102,
+      "camera": "push",
+      "cameraIntensity": 1.2,
+      "ambience": "room-tone",
+      "recipe": {
+        "set": {
+          "preset": "entry-room"
+        },
+        "actors": [
+          {
+            "id": "witness",
+            "rig": "silhouette",
+            "color": "#365a73",
+            "pos": {
+              "x": 0.76,
+              "depth": 0.68
+            },
+            "scale": 1,
+            "keys": [
+              {
+                "t": 0,
+                "pose": "stand",
+                "expression": "neutral",
+                "look": [
+                  -1,
+                  0
+                ]
+              },
+              {
+                "t": 0.7,
+                "pose": "flinch",
+                "expression": "scared",
+                "blend": 0.15
+              }
+            ]
+          }
+        ],
+        "props": [
+          {
+            "type": "door",
+            "pos": {
+              "x": 0.38,
+              "depth": 0.5
+            },
+            "scale": 1.6,
+            "state": {
+              "open": 0
+            },
+            "keys": [
+              {
+                "t": 0,
+                "state": {
+                  "open": 0
+                }
+              },
+              {
+                "t": 1,
+                "state": {
+                  "open": 0.88
+                },
+                "easing": "out"
+              }
+            ]
+          }
+        ],
+        "fx": [
+          {
+            "type": "dust",
+            "params": {
+              "amount": 12
+            }
+          },
+          {
+            "type": "fog",
+            "params": {
+              "amount": 0.07
+            }
+          }
+        ],
+        "cues": []
+      }
+    },
+    {
+      "id": "s04",
+      "line": "l4",
+      "seed": 3103,
+      "camera": "push",
+      "cameraIntensity": 1.2,
+      "ambience": "room-tone",
+      "recipe": {
+        "set": {
+          "preset": "corridor",
+          "params": {
+            "figure": false,
+            "blur": false,
+            "light": "cold"
+          }
+        },
+        "actors": [],
+        "props": [],
+        "fx": [
+          {
+            "type": "dust",
+            "params": {
+              "amount": 12
+            }
+          },
+          {
+            "type": "fog",
+            "params": {
+              "amount": 0.07
+            }
+          }
+        ],
+        "cues": []
+      },
+      "transition": "flash",
+      "transitionDuration": 0.18
+    },
+    {
+      "id": "s05",
+      "line": "l5",
+      "seed": 3104,
+      "camera": "creep",
+      "cameraIntensity": 1.2,
+      "ambience": "room-tone",
+      "recipe": {
+        "set": {
+          "preset": "entry-room"
+        },
+        "actors": [],
+        "props": [
+          {
+            "type": "wet-footprint",
+            "pos": {
+              "x": 0.45,
+              "depth": 0.18
+            },
+            "scale": 0.4375
+          },
+          {
+            "type": "wet-footprint",
+            "pos": {
+              "x": 0.5700000000000001,
+              "depth": 0.33999999999999997
+            },
+            "scale": 0.5375
+          },
+          {
+            "type": "wet-footprint",
+            "pos": {
+              "x": 0.45,
+              "depth": 0.5
+            },
+            "scale": 0.6375
+          },
+          {
+            "type": "wet-footprint",
+            "pos": {
+              "x": 0.5700000000000001,
+              "depth": 0.6599999999999999
+            },
+            "scale": 0.7374999999999999
+          }
+        ],
+        "fx": [
+          {
+            "type": "dust",
+            "params": {
+              "amount": 12
+            }
+          },
+          {
+            "type": "fog",
+            "params": {
+              "amount": 0.07
+            }
+          }
+        ],
+        "cues": [],
+        "camera": {
+          "keys": [
+            {
+              "t": 0,
+              "y": 0,
+              "zoom": 1
+            },
+            {
+              "t": 1.8,
+              "y": -0.025,
+              "zoom": 1.16,
+              "easing": "inOut"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "s06",
+      "line": "l6",
+      "seed": 3105,
+      "camera": "push",
+      "cameraIntensity": 1.2,
+      "ambience": "room-tone",
+      "recipe": {
+        "set": {
+          "preset": "entry-room"
+        },
+        "actors": [
+          {
+            "id": "witness",
+            "rig": "silhouette",
+            "color": "#365a73",
+            "pos": {
+              "x": 0.76,
+              "depth": 0.6
+            },
+            "scale": 1,
+            "keys": [
+              {
+                "t": 0,
+                "expression": "scared",
+                "pose": "stand"
+              },
+              {
+                "t": 0.45,
+                "expression": "terrified",
+                "pose": "flinch",
+                "look": [
+                  -0.5,
+                  0.7
+                ]
+              }
+            ]
+          }
+        ],
+        "props": [
+          {
+            "type": "wet-footprint",
+            "pos": {
+              "x": 0.45,
+              "depth": 0.18
+            },
+            "scale": 0.4375
+          },
+          {
+            "type": "wet-footprint",
+            "pos": {
+              "x": 0.5700000000000001,
+              "depth": 0.33999999999999997
+            },
+            "scale": 0.5375
+          },
+          {
+            "type": "wet-footprint",
+            "pos": {
+              "x": 0.45,
+              "depth": 0.5
+            },
+            "scale": 0.6375
+          },
+          {
+            "type": "wet-footprint",
+            "pos": {
+              "x": 0.5700000000000001,
+              "depth": 0.6599999999999999
+            },
+            "scale": 0.7374999999999999
+          },
+          {
+            "type": "wet-footprint",
+            "pos": {
+              "x": 0.45,
+              "depth": 0.8200000000000001
+            },
+            "scale": 0.8374999999999999
+          }
+        ],
+        "fx": [
+          {
+            "type": "dust",
+            "params": {
+              "amount": 12
+            }
+          },
+          {
+            "type": "fog",
+            "params": {
+              "amount": 0.07
+            }
+          }
+        ],
+        "cues": [
+          {
+            "at_word": "inside",
+            "action": "flash",
+            "sfx": "sting"
+          }
+        ]
+      },
+      "fadeOut": 0.4
+    }
+  ]
+}

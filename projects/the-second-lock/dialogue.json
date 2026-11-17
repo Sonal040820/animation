@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "duration": 50,
+  "voices": {"elena":"af_heart"},
+  "lines": [
+    {"id":"l1","at":4.7,"duration":2.5,"speaker":"elena","text":"Made it. I made it."},
+    {"id":"l2","at":15.1,"duration":2.5,"speaker":"elena","text":"I didn't make the bed."},
+    {"id":"l3","at":25.5,"duration":2.2,"speaker":"elena","text":"Who's in here?!"},
+    {"id":"l4","at":46.75,"duration":1.9,"speaker":"elena","text":"That's not me."}
+  ]
+}

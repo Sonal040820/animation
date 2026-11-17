@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "method": "measured-line/character-weight",
+  "expected_duration": 50,
+  "words": [
+    {
+      "text": "Made it.",
+      "start": 4.76,
+      "end": 5.513,
+      "line_id": "l1",
+      "speaker": "elena",
+      "emphasis": false
+    },
+    {
+      "text": "I made",
+      "start": 5.513,
+      "end": 6.14,
+      "line_id": "l1",
+      "speaker": "elena",
+      "emphasis": false
+    },
+    {
+      "text": "it.",
+      "start": 6.14,
+      "end": 6.391,
+      "line_id": "l1",
+      "speaker": "elena",
+      "emphasis": false
+    },
+    {
+      "text": "I didn't",
+      "start": 15.16,
+      "end": 15.657,
+      "line_id": "l2",
+      "speaker": "elena",
+      "emphasis": false
+    },
+    {
+      "text": "make the",
+      "start": 15.657,
+      "end": 16.237,
+      "line_id": "l2",
+      "speaker": "elena",
+      "emphasis": false
+    },
+    {
+      "text": "bed.",
+      "start": 16.237,
+      "end": 16.486,
+      "line_id": "l2",
+      "speaker": "elena",
+      "emphasis": false
+    },
+    {
+      "text": "Who's in",
+      "start": 25.56,
+      "end": 26.248,
+      "line_id": "l3",
+      "speaker": "elena",
+      "emphasis": true
+    },
+    {
+      "text": "here?!",
+      "start": 26.248,
+      "end": 26.707,
+      "line_id": "l3",
+      "speaker": "elena",
+      "emphasis": false
+    },
+    {
+      "text": "That's not",
+      "start": 46.81,
+      "end": 47.704,
+      "line_id": "l4",
+      "speaker": "elena",
+      "emphasis": false
+    },
+    {
+      "text": "me.",
+      "start": 47.704,
+      "end": 47.928,
+      "line_id": "l4",
+      "speaker": "elena",
+      "emphasis": false
+    }
+  ]
+}

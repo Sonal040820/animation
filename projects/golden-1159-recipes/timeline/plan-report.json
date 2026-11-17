@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "slug": "golden-1159",
+  "planned_at": "2026-11-16T17:55:55.133Z",
+  "lines_count": 7,
+  "shots_count": 7,
+  "auto_planned": [
+    {
+      "shot": "s01",
+      "line": "l1",
+      "rule_id": "rule-night-establishing",
+      "template": "wide-establishing",
+      "short_after_time": false
+    },
+    {
+      "shot": "s02",
+      "line": "l2",
+      "rule_id": "rule-window-interior",
+      "template": "window-view",
+      "short_after_time": false
+    },
+    {
+      "shot": "s03",
+      "line": "l3",
+      "rule_id": "rule-staring-figure-exterior",
+      "template": "figure-exterior",
+      "short_after_time": false
+    },
+    {
+      "shot": "s04",
+      "line": "l4",
+      "rule_id": "rule-clock-macro",
+      "template": "insert-macro-clock",
+      "short_after_time": false
+    },
+    {
+      "shot": "s05",
+      "line": "l5",
+      "rule_id": "rule-blink-closeup",
+      "template": "giant-face",
+      "short_after_time": true
+    },
+    {
+      "shot": "s06",
+      "line": "l6",
+      "rule_id": "rule-clock-after-midnight",
+      "template": "insert-macro-clock",
+      "short_after_time": false
+    },
+    {
+      "shot": "s07",
+      "line": "l7",
+      "rule_id": "rule-gone-vanish",
+      "template": "window-view",
+      "short_after_time": true
+    }
+  ],
+  "rules_needed": [],
+  "needs_new_code": [],
+  "planned_shots": [
+    {
+      "id": "s01",
+      "line": "l1",
+      "template": "wide-establishing",
+      "camera": "push",
+      "transition": "cut",
+      "params": {
+        "scene": "fence-moon"
+      }
+    },
+    {
+      "id": "s02",
+      "line": "l2",
+      "template": "window-view",
+      "camera": "push",
+      "transition": "cut",
+      "params": {
+        "interior": true,
+        "girl": {
+          "visible": true,
+          "depth": 0.78,
+          "x": 0.72,
+          "scale": 0.9
+        },
+        "clock": {
+          "time": "11:59",
+          "x": 0.275
+        },
+        "narrator": {
+          "visible": true,
+          "x": 0.135,
+          "scale": 1,
+          "dim": 0.85
+        }
+      }
+    },
+    {
+      "id": "s03",
+      "line": "l3",
+      "template": "figure-exterior",
+      "camera": "creep",
+      "transition": "cut",
+      "params": {
+        "variant": "girl",
+        "pose": "stand",
+        "expression": "blank-stare"
+      }
+    },
+    {
+      "id": "s04",
+      "line": "l4",
+      "template": "insert-macro-clock",
+      "camera": "push",
+      "transition": "cut",
+      "params": {
+        "time": "11:59",
+        "kind": "digital",
+        "backdrop": "room-blur"
+      }
+    },
+    {
+      "id": "s05",
+      "line": "l5",
+      "template": "giant-face",
+      "camera": "push",
+      "transition": "cut",
+      "params": {
+        "rig": "silhouette",
+        "expression": "surprise",
+        "backdrop": "room-blur"
+      }
+    },
+    {
+      "id": "s06",
+      "line": "l6",
+      "template": "insert-macro-clock",
+      "camera": "shake",
+      "transition": "flash",
+      "params": {
+        "time": "12:01",
+        "kind": "digital",
+        "backdrop": "room-blur"
+      }
+    },
+    {
+      "id": "s07",
+      "line": "l7",
+      "template": "window-view",
+      "camera": "pull",
+      "transition": "cut",
+      "params": {
+        "interior": true,
+        "girl": false,
+        "clock": "12:01",
+        "narrator": true
+      }
+    }
+  ]
+}

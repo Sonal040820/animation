@@ -1,6 +1,16 @@
 # Agent contract for this repository
 
-This project uses HyperFrames 0.9.52 and the official upstream skill contract. Read these FIRST for every new film:
+## Choose the pipeline first
+
+- **Path A (default): Three.js + Canvas2D studio.** Read [studio/START_HERE.md](studio/START_HERE.md), then [studio/AGENTS.md](studio/AGENTS.md). Three.js is integral to this path, not a separate optional path. Start there when the user says “Path A” or “Canvas2D”.
+- **Path B: HyperFrames.** The HyperFrames rules below apply only to Path B.
+- **Path C: Blender.** Read the Blender section below only for Path C.
+
+Do not make a new film until the requested scope authorizes it. Focus on readable action, expressive poses and minimal staging; sound is deferred unless requested. Existing projects retain their renderer. Do not migrate films implicitly.
+
+## Path B contract
+
+Path B uses HyperFrames 0.9.52 and the official upstream skill contract. Read these FIRST for a new Path B film:
 - https://github.com/heygen-com/hyperframes/blob/main/skills/hyperframes/SKILL.md
 - https://github.com/heygen-com/hyperframes/blob/main/skills/hyperframes-cli/SKILL.md
 - https://github.com/heygen-com/hyperframes/blob/main/skills/hyperframes-registry/SKILL.md

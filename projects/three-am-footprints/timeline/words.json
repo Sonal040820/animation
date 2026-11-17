@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "method": "measured-line/character-weight",
+  "expected_duration": 9.427,
+  "words": [
+    {
+      "text": "3:00 AM.",
+      "start": 0.05,
+      "end": 1.645,
+      "line_id": "l1",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "A knock",
+      "start": 1.875,
+      "end": 2.42,
+      "line_id": "l2",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "at the",
+      "start": 2.42,
+      "end": 2.873,
+      "line_id": "l2",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "door.",
+      "start": 2.873,
+      "end": 3.236,
+      "line_id": "l2",
+      "speaker": "narrator",
+      "emphasis": true
+    },
+    {
+      "text": "I opened",
+      "start": 3.466,
+      "end": 4.398,
+      "line_id": "l3",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "it.",
+      "start": 4.398,
+      "end": 4.665,
+      "line_id": "l3",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "Nobody there.",
+      "start": 4.895,
+      "end": 6.088,
+      "line_id": "l4",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "Only wet",
+      "start": 6.319,
+      "end": 6.891,
+      "line_id": "l5",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "footprints,",
+      "start": 6.891,
+      "end": 7.709,
+      "line_id": "l5",
+      "speaker": "narrator",
+      "emphasis": false
+    },
+    {
+      "text": "leading inside.",
+      "start": 7.939,
+      "end": 9.247,
+      "line_id": "l6",
+      "speaker": "narrator",
+      "emphasis": false
+    }
+  ]
+}

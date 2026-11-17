@@ -12,6 +12,7 @@ import {SFX_TYPES,AMBIENCE_TYPES} from './audio.mjs';
 import {computeWindowLayout} from './scenery.mjs';
 import {normalizeRecipe} from './recipe.mjs';
 import {recipeShot} from './presets.mjs';
+import {assertPipeline} from './pipeline.mjs';
 
 const LIB=path.dirname(fileURLToPath(import.meta.url));
 
@@ -183,6 +184,7 @@ export function validateProject(projectRef){
 
   const manifest=readJSON(manifestFile);
   const config=readJSON(configFile);
+  try{assertPipeline(config);}catch(e){errors.push({code:'WRONG_PIPELINE',message:e.message});}
   const templateMeta=getTemplateMeta();
   const validTemplates= [...new Set([...TEMPLATE_NAMES,...Object.keys(templateMeta)])];
   const validSfx=getValidSfx();

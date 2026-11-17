@@ -1,5 +1,5 @@
 // Deterministic Chromium capture, parallel page pool, engine-hash caching, and labelled contact sheet.
-// Browser is headless software Canvas2D; no GPU, remote model, asset CDN or external fonts.
+// Integrated Three.js/WebGL2 and Canvas2D in headless Chromium; software GPU supported.
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -35,14 +35,15 @@ export function engineHash(libDir=LIB){
   const registryDir=path.join(libDir,'registry');
   const registry=fs.existsSync(registryDir)?fs.readdirSync(registryDir).filter(n=>n.endsWith('.json')).sort().map(n=>n+':'+sha(fs.readFileSync(path.join(registryDir,n)))).join('\n'):'';
   const files=fs.readdirSync(libDir,{withFileTypes:true})
-    .filter(e=>e.isFile()&&/\.(mjs|json)$/i.test(e.name))
+    .filter(e=>e.isFile()&&/\.(mjs|json|html)$/i.test(e.name))
     .map(e=>e.name)
     .sort();
   const combined=files.map(name=>{
     const data=fs.readFileSync(path.join(libDir,name));
     return name+':'+sha(data);
   }).join('\n');
-  return sha(combined+registry);
+  const lock=path.join(libDir,'../package-lock.json');
+  return sha(combined+registry+(fs.existsSync(lock)?sha(fs.readFileSync(lock)):''));
 }
 
 export function browserExecutable(){
@@ -57,8 +58,9 @@ async function server(){
     if(!name||name.includes('..')||!/\.(html|mjs|js|json)$/.test(name)){
       res.writeHead(404);res.end();return;
     }
-    const target=path.resolve(LIB,name);
-    if(!target.startsWith(LIB+path.sep)){res.writeHead(403);res.end();return}
+    const vendor=['vendor/three.module.js','vendor/three.core.js'].includes(name);
+    const target=vendor?path.join(STUDIO,'node_modules/three/build',path.basename(name)):path.resolve(LIB,name);
+    if(!vendor&&!target.startsWith(LIB+path.sep)){res.writeHead(403);res.end();return}
     try{
       const data=fs.readFileSync(target);
       res.writeHead(200,{'Content-Type':contentTypes[path.extname(target)],'Cache-Control':'no-store'});
@@ -76,7 +78,8 @@ export async function withBrowserPool(poolSize,task){
   try{
     browser=await chromium.launch({headless:true,executablePath:browserExecutable(),args:[
       '--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader',
-      '--enable-unsafe-swiftshader','--disable-background-networking'
+      '--enable-unsafe-swiftshader','--disable-background-networking',
+      ...(process.env.STUDIO_SOFTWARE_CANVAS==='1'?['--disable-accelerated-2d-canvas']:[])
     ]});
     const pages=await Promise.all(Array.from({length:count},async ()=>{
       const page=await browser.newPage({viewport:{width:400,height:720},deviceScaleFactor:1});
@@ -108,7 +111,7 @@ async function capture(page,shot,config,t,words,file){
 
 export function dimensions(quality='preview'){
   if(quality==='draft')return {width:270,height:480,fps:12};
-  if(quality==='preview')return {width:405,height:720,fps:24};
+  if(quality==='preview')return {width:432,height:768,fps:24};
   if(quality==='standard')return {width:720,height:1280,fps:24};
   if(quality==='high')return {width:1080,height:1920,fps:24};
   throw new Error('Unknown quality '+quality);
@@ -217,7 +220,7 @@ export async function render(projectRef,quality='preview'){
   const logFile=path.join(out,'render-log.jsonl');
   fs.writeFileSync(logFile,'');
   const words=wordsFor(project);
-  const engHash=engineHash();
+  const engHash=process.env.STUDIO_SOFTWARE_CANVAS==='1'?sha(engineHash()+':software-canvas'):engineHash();
   const stats=[];
   const shots=project.manifest.shots;
   const shotFrameCounts=shots.map(s=>Math.max(1,Math.round(s.duration*size.fps)));

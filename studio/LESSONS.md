@@ -1,5 +1,7 @@
 # Durable lessons (newest first)
 
+- 2026-11-17 / Doorway visual study: the first recipe story's isolated door prop read as floating. A shared hinge model now controls door geometry, moving handle, actor hand target and floor lighting. Establish the wall, threshold and floor before adding atmospheric effects. The current rig still uses a straight reaching arm; a bent elbow and articulated fingers remain visual limitations.
+
 - 2026-11-16T18:29:37.918Z / golden-1159: verified 7 shots, 100% template reuse, 100% auto (7/7) / 0% hand-edited, 460.9 render seconds, 0 fully cached shots, voice=kokoro-onnx-0.6.1-int8; First measured production run.
 - 2026-11-16 / golden-1159 `locator.screenshot` timeout: `node studio/cli/studio.mjs render --project projects/golden-1159 --quality standard` threw `locator.screenshot: Timeout 29985ms exceeded` ("waiting for element to be stable") under 4-page parallel CPU load. Root cause: Playwright DOM locator screenshot polls compositor stability. Fix: capture PNG directly via `document.getElementById('screen').toDataURL('image/png')` inside `page.evaluate` in `studio/lib/runner.mjs`. Render time dropped from 581.1s (`midnight-horror-elite`) to 460.9s (`golden-1159`).
 - 2026-11-16 / golden-1159 `s07` low motion gate: `verify` caught `s07` (`window-view`, empty dark interior + `fadeOut`) at `0.7235` mean frame diff (`< 0.8` threshold). Root cause: 75% dark interior wall + fade-to-black attenuated 72x128 grayscale pixel deltas. Fix: strengthened `pull`/`push` zoom/pan range in `studio/lib/motion.mjs`, macro `cameraIntensity` (`1.55`), and `window-view` atmosphere dust/fog in `studio/lib/templates.mjs`, bringing `s07` to `0.8024` and whole-clip mean to `2.9205` (10/10 golden checks PASS).
@@ -34,3 +36,7 @@ Record exact symptoms, commands, causes, fixes, measured times and tests; never 
 
 ## New entry template
 Date | Video | Exact failure symptom | Failed command | Root cause | Fix / fallback | Test | Measured cost.
+
+## Path A integration lesson — 2026-11-17
+
+Actual Three.js is now part of the shared player; legacy three-scene.mjs remains Canvas perspective drawing. Keep discovery attached to live registries and give agents a short routing document instead of requiring a repo-wide read. Prefer reusable pose/expression beats and simple stage geometry. Validate silent video independently of audio. H.264 yuv420p requires even dimensions: preview is now 432x768. Two-bone reach targets must be clamped and staged; Canvas actors do not automatically interact with or hide behind Three.js objects.

@@ -4,8 +4,12 @@ import {groundDepthPosition, drawNightExterior, drawRoomInterior, drawAtmosphere
 import {drawFigure, EXPRESSIONS, blendExpression} from './characters.mjs';
 import {drawDigitalClock} from './props.mjs';
 import {HORROR_TEMPLATES} from './horror.mjs';
+import {drawDoorway} from './doorway.mjs';
+import {APARTMENT_VIEWS,drawApartment} from './apartment.mjs';
 import catalog from './registry/catalog.json' with {type:'json'};
 import {declarationEntry} from './declarative.mjs';
+import {drawThreeRoom} from './three-stage.mjs';
+import {HUMAN_LOOKS,HUMAN_ACTIONS} from './human.mjs';
 
 const number=(value=0,min=-Infinity,max=Infinity)=>({type:'number',default:value,min,max});
 const bool=(value=false)=>({type:'boolean',default:value});
@@ -16,6 +20,13 @@ export const EASINGS=Object.freeze({
   inOut:entry({},t=>t*t*(3-2*t)), hold:entry({},()=>0)
 });
 export const SETS={
+  'three-room':entry({openStart:number(1,0,60),openDuration:number(1.2,.1,60),open:number(1,0,1),cameraX:number(0,-2,2),push:number(.4,0,2),light:number(2,0,5),wall:string('#334558'),floor:string('#657385'),door:string('#e5b76c'),background:string('#26394b')},drawThreeRoom,{openStart:1,open:1}),
+  'apartment-thriller':entry({
+    view:{type:'enum',values:APARTMENT_VIEWS,default:'foyer'},
+    title:string(''),
+    message:{type:'array',default:[]}
+  },drawApartment,{view:'phone',message:['A new message.']}),
+  'cinematic-doorway':entry({openStart:number(1.05,0,10),openDuration:number(1.45,.1,10)},drawDoorway),
   yard:entry({seed:number(1),moon:bool(true),clouds:bool(true),fence:bool(true),tree:bool(true),stars:number(80,0,200)},(c,w,h,s,t,p)=>drawNightExterior(c,w,h,t,p)),
   'bedroom-window':entry({seed:number(1),curtains:bool(true),sill:bool(true),lightLevel:number(1,0,2)},(c,w,h,s,t,p)=>drawRoomInterior(c,w,h,t,p)),
   room:entry({lightLevel:number(1,0,2)},(c,w,h,s,t,p)=>drawRoomInterior(c,w,h,t,{...p,window:false,curtains:false,sill:false})),
@@ -50,7 +61,7 @@ for(const [kind,entries] of Object.entries(catalog))for(const [id,data] of Objec
   RECIPE_REGISTRIES[kind][id]=declarationEntry(data);
 }
 const poses=['stand','walk','look','flinch','still','idle','run','fear'];
-const actorFields=['id','rig','color','pos','scale','layer','keys','pose','expression','look','blink','talk','blend'];
+const actorFields=['id','rig','color','pos','scale','layer','keys','pose','expression','look','blink','talk','blend','appearance','action','hand'];
 const propFields=['id','type','pos','scale','layer','state','keys'];
 const cameraFields=['x','y','zoom','rotation','blur'];
 function object(v,label){if(!v||typeof v!=='object'||Array.isArray(v))throw Error(`${label} must be an object`);}
@@ -82,6 +93,9 @@ function placement(item,actor,set){
   if((set==='bedroom-window'||set==='preset:window-view')&&(p.x-width/2<.24||p.x+width/2>.76||p.y-height<.15||p.y>.58))throw Error('Placement overlaps window frame/sill');
 }
 function actorValues(a){
+  if(a.appearance!==undefined)known(a.appearance,HUMAN_LOOKS,'appearance');
+  if(a.action!==undefined)known(a.action,HUMAN_ACTIONS,'action');
+  if(a.hand!==undefined){if(!Array.isArray(a.hand)||a.hand.length!==2)throw Error('hand must be [x,y] in actor heights from feet');a.hand.forEach(v=>finite(v,'hand',-1.5,1.5));}
   if(a.pose!==undefined)known(a.pose,Object.fromEntries(poses.map(x=>[x,true])),'pose');
   if(a.expression!==undefined)known(a.expression,{...EXPRESSIONS,happy:true},'expression');
   if(a.look!==undefined){if(!Array.isArray(a.look)||a.look.length!==2)throw Error('look must be [x,y]');a.look.forEach(v=>finite(v,'look',-1,1));}
@@ -100,7 +114,10 @@ export function normalizeRecipe(input){
   for(const a of r.actors){
     fields(a,actorFields,'actor');if(typeof a.id!=='string'||!a.id||ids.has(a.id))throw Error('Actor id must be unique and nonempty');ids.add(a.id);
     a.rig??='silhouette';known(a.rig,RIGS,'rig');a.pos??={x:.5,depth:.5};a.scale??=1;a.pose??='stand';a.expression??='neutral';a.color??='#8fb4e6';a.keys??=[];
-    actorValues(a);placement(a,true,r.set.preset);keys(a.keys,actorFields.filter(x=>!['id','rig','keys'].includes(x)),k=>{actorValues(k);placement({...a,...k},true,r.set.preset);},'actor.keys');
+    actorValues(a);
+    if(a.rig!=='silhouette'&&(a.appearance!==undefined||a.hand!==undefined||a.keys.some(k=>k.hand!==undefined)))throw Error('appearance and hand targets require the silhouette human rig');
+    if(a.action){if(a.keys.length)throw Error('Use action OR keys; copy action keys to customize');a.keys=structuredClone(HUMAN_ACTIONS[a.action]);delete a.action;}
+    placement(a,true,r.set.preset);keys(a.keys,actorFields.filter(x=>!['id','rig','keys','action','appearance'].includes(x)),k=>{actorValues(k);placement({...a,...k},true,r.set.preset);},'actor.keys');
   }
   for(const p of r.props){
     fields(p,propFields,'prop');known(p.type,PROPS,'prop');p.pos??={x:.5,depth:.5};p.scale??=1;p.state={...PROPS[p.type].defaults,...p.state};p.keys??=[];
@@ -147,6 +164,15 @@ export function drawRecipe(ctx,w,h,s,t,recipe,context={}){
   ctx.save();ctx.translate(w/2+cam.x*w,h/2+cam.y*h);ctx.rotate(cam.rotation);ctx.scale(cam.zoom,cam.zoom);ctx.translate(-w/2,-h/2);if(cam.blur)ctx.filter=`blur(${cam.blur*w/720}px)`;
   SETS[r.set.preset].draw(ctx,w,h,s,t,{...r.set.params,duration:context.duration,seed:r.set.params.seed??context.seed,cues:context.cues});
   const items=[...r.actors.map(a=>({...a,actor:true})),...r.props].sort((a,b)=>a.pos.depth-b.pos.depth||(a.layer||0)-(b.layer||0));
-  for(const item of items){const p=worldPosition(item.pos,item.scale,r.set.preset);ctx.save();if(item.actor){let blink=item.blink;for(const cue of context.cues||[]){if(cue.action==='blink'&&(!cue.actor||cue.actor===item.id)){const dt=t-cue.localTime,d=cue.duration||.16;if(dt>=0&&dt<d)blink=Math.sin(Math.PI*dt/d);}}drawFigure(ctx,{x:p.x*w,y:p.y*h,height:.28*p.scale*h,rig:item.rig,pose:item.pose,poseWeights:item.poseWeights,expression:item.expression,gaze:{x:item.look?.[0]||0,y:item.look?.[1]||0},blink,phase:t,dressColor:item.color});}else{ctx.translate(p.x*w,p.y*h);PROPS[item.type].draw(ctx,.28*p.scale*w,.18*p.scale*h,s,t,item.state);}ctx.restore();}
+  for(const item of items){
+    const p=worldPosition(item.pos,item.scale,r.set.preset);ctx.save();
+    if(item.actor){
+      let blink=item.blink;
+      for(const cue of context.cues||[]){if(cue.action==='blink'&&(!cue.actor||cue.actor===item.id)){const dt=t-cue.localTime,d=cue.duration||.16;if(dt>=0&&dt<d)blink=Math.sin(Math.PI*dt/d);}}
+      const height=.28*p.scale*h;
+      drawFigure(ctx,{dressColor:item.color,...HUMAN_LOOKS[item.appearance],x:p.x*w,y:p.y*h,height,rig:item.rig,pose:item.pose,poseWeights:item.poseWeights,expression:item.expression,gaze:{x:item.look?.[0]||0,y:item.look?.[1]||0},blink,phase:t,handTarget:item.hand?{x:p.x*w+item.hand[0]*height,y:p.y*h+item.hand[1]*height}:null});
+    }else{ctx.translate(p.x*w,p.y*h);PROPS[item.type].draw(ctx,.28*p.scale*w,.18*p.scale*h,s,t,item.state);}
+    ctx.restore();
+  }
   for(const f of r.fx){ctx.save();FX[f.type].draw(ctx,w,h,s,t,f.params);ctx.restore();}ctx.restore();
 }

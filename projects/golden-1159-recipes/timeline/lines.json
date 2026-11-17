@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "provider": "kokoro-onnx-0.6.1-int8",
+  "voice_present": true,
+  "duration": 9.7235,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "narrator",
+      "spoken": "Night.",
+      "display": "Night.",
+      "text": "Night.",
+      "emotion": "ominous",
+      "start": 0.01,
+      "end": 0.8323,
+      "spoken_seconds": 0.8223,
+      "emphasis": [
+        "NIGHT"
+      ]
+    },
+    {
+      "id": "l2",
+      "speaker": "narrator",
+      "spoken": "I saw a little girl outside my window.",
+      "display": "I saw a little girl outside my window.",
+      "text": "I saw a little girl outside my window.",
+      "emotion": "ominous",
+      "start": 0.9223,
+      "end": 3.0603,
+      "spoken_seconds": 2.138,
+      "emphasis": [
+        "GIRL",
+        "OUTSIDE",
+        "WINDOW"
+      ]
+    },
+    {
+      "id": "l3",
+      "speaker": "narrator",
+      "spoken": "Staring right at me.",
+      "display": "Staring right at me.",
+      "text": "Staring right at me.",
+      "emotion": "scared",
+      "start": 3.1503,
+      "end": 4.4472,
+      "spoken_seconds": 1.2968,
+      "emphasis": [
+        "STARING"
+      ]
+    },
+    {
+      "id": "l4",
+      "speaker": "narrator",
+      "spoken": "The clock said eleven fifty nine.",
+      "display": "The clock said 11:59.",
+      "text": "The clock said 11:59.",
+      "emotion": "ominous",
+      "start": 4.5372,
+      "end": 6.345,
+      "spoken_seconds": 1.8078,
+      "emphasis": [
+        "CLOCK",
+        "11:59"
+      ]
+    },
+    {
+      "id": "l5",
+      "speaker": "narrator",
+      "spoken": "I blinked.",
+      "display": "I blinked.",
+      "text": "I blinked.",
+      "emotion": "scared",
+      "start": 6.435,
+      "end": 7.3478,
+      "spoken_seconds": 0.9128,
+      "emphasis": [
+        "BLINKED"
+      ]
+    },
+    {
+      "id": "l6",
+      "speaker": "narrator",
+      "spoken": "Twelve oh one.",
+      "display": "12:01.",
+      "text": "12:01.",
+      "emotion": "tense",
+      "start": 7.4378,
+      "end": 8.3235,
+      "spoken_seconds": 0.8857,
+      "emphasis": [
+        "12:01"
+      ]
+    },
+    {
+      "id": "l7",
+      "speaker": "narrator",
+      "spoken": "She was gone.",
+      "display": "She was gone.",
+      "text": "She was gone.",
+      "emotion": "whisper",
+      "start": 8.3935,
+      "end": 9.6435,
+      "spoken_seconds": 1.25,
+      "emphasis": [
+        "GONE"
+      ]
+    }
+  ]
+}

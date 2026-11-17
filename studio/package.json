@@ -8,7 +8,8 @@
     "node": ">=22.14.0 <23"
   },
   "dependencies": {
-    "playwright": "1.65.1"
+    "playwright": "1.65.1",
+    "three": "0.187.0"
   },
   "scripts": {
     "doctor": "node cli/studio.mjs doctor",

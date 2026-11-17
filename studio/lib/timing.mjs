@@ -8,7 +8,7 @@ export const tokenize=s=>String(s).match(/[^\s]+/g)||[];
 
 export function phrases(script){
   const s=String(script||'').replace(/\s+/g,' ').trim();
-  const items=s.match(/[^.!?]+[.!?]?/g)||[];
+  const items=s.match(/[^.!?]+[.!?]*/g)||[];
   return items.map(x=>x.trim()).filter(Boolean);
 }
 

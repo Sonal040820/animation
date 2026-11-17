@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "provider": "kokoro-onnx-0.6.1-int8",
+  "voice_present": true,
+  "duration": 50.0,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "elena",
+      "text": "Made it. I made it.",
+      "emotion": "neutral",
+      "start": 4.76,
+      "end": 6.391,
+      "spoken_seconds": 1.631
+    },
+    {
+      "id": "l2",
+      "speaker": "elena",
+      "text": "I didn't make the bed.",
+      "emotion": "neutral",
+      "start": 15.16,
+      "end": 16.486,
+      "spoken_seconds": 1.326
+    },
+    {
+      "id": "l3",
+      "speaker": "elena",
+      "text": "Who's in here?!",
+      "emotion": "neutral",
+      "start": 25.56,
+      "end": 26.707,
+      "spoken_seconds": 1.147
+    },
+    {
+      "id": "l4",
+      "speaker": "elena",
+      "text": "That's not me.",
+      "emotion": "neutral",
+      "start": 46.81,
+      "end": 47.928,
+      "spoken_seconds": 1.118
+    }
+  ]
+}

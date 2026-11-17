@@ -1,6 +1,6 @@
 # Studio index — search before writing code
 
-The index is a mandatory durable API memory file. Engine functions live in studio/lib, commands in studio/cli, and projects contain only data.
+Start at [START_HERE.md](START_HERE.md) for Path A routing and commands. This is a generated API reference; use `assets --query` for focused discovery. Engine functions live in studio/lib, commands in studio/cli, and projects contain only data. The legacy `three-*` templates below use Canvas perspective; the `three-room` recipe set uses actual Three.js.
 
 | Component | Signature | Example |
 |---|---|---|
@@ -97,6 +97,10 @@ No media generated during initial setup. When adding a template, update this ind
 
 | Command | Arguments | Summary |
 |---|---|---|
+| `assets` | `[--query term]` | Search live registered assets across Path A |
+| `asset-inspect` | `--id kind/name` | Show asset source, defaults, schema and example |
+| `asset-preview` | `--id kind/name [--at seconds]` | Render an asset preview PNG using the integrated player |
+| `verify-visual` | `--project projects/<slug> [--quality preview]` | Validate silent video codec, dimensions, timing and full frame decode; no audio or minimum motion required |
 | `explain` | `--project projects/<slug> --shot sNN [--at seconds]` | Print normalized recipe, measured cue anchors and optional sampled frame |
 | `recipe-new` | `--preset window-view` | Print recipe skeleton plus parameter schemas/defaults and timing annotations |
 | `doctor` | `[--force]` | Capability check, version fingerprint, writes studio/environment.json |
@@ -119,14 +123,19 @@ No media generated during initial setup. When adding a template, update this ind
 
 | Module | Exported Symbols |
 |---|---|
+| `studio/lib/apartment.mjs` | `APARTMENT_VIEWS`, `drawApartment` |
+| `studio/lib/assets.mjs` | `assetCatalog`, `assetRecipe`, `inspectAsset` |
 | `studio/lib/audio.mjs` | `AMBIENCE_TYPES`, `MUSIC_MOODS`, `SFX_TYPES`, `mix`, `synthOriginalAudio` |
 | `studio/lib/characters.mjs` | `EXPRESSIONS`, `avatarRigChoices`, `blendExpression`, `drawCharacter`, `drawCharacterElite`, `drawFigure`, `drawHead` |
 | `studio/lib/core.mjs` | `STYLES`, `bitmapText`, `caption`, `clamp`, `drawBackground`, `ease`, `ellipse`, `measureVectorText`, `mix`, `noise`, `projection3D`, `pulse`, `rounded`, `spring`, `stroke`, `style`, `vectorText`, `viewport` |
 | `studio/lib/declarative.mjs` | `declarationEntry`, `validateDeclaration` |
+| `studio/lib/doorway.mjs` | `doorwayState`, `drawDoorway` |
 | `studio/lib/font.mjs` | `VECTOR_GLYPHS`, `measureVectorText`, `vectorText` |
 | `studio/lib/horror.mjs` | `HORROR_TEMPLATES`, `bedroomShadow`, `doorClose`, `doorPeephole`, `emptyHallway`, `intercomMacro`, `keyholeView`, `mirrorDouble`, `stairwell` |
+| `studio/lib/human.mjs` | `HUMAN_ACTIONS`, `HUMAN_LOOKS`, `solveTwoBone` |
 | `studio/lib/learning.mjs` | `CLI_COMMANDS`, `USAGE_FILE`, `buildAutoIndexSection`, `learnPlannerRules`, `promoteVideo`, `syncIndex`, `updateTemplateUsage` |
 | `studio/lib/motion.mjs` | `CAMERA_MOVES`, `blinkAmount`, `breathe`, `cameraTransform`, `easeInOutCubic`, `easeOutBack`, `follow`, `smoothNoise`, `spring` |
+| `studio/lib/pipeline.mjs` | `PIPELINES`, `assertPipeline` |
 | `studio/lib/planner.mjs` | `PLANNER_RULES_FILE`, `guessEmotion`, `loadPlannerRules`, `matchShotRule`, `normalizeDisplayText`, `planProject`, `planScript` |
 | `studio/lib/presets.mjs` | `PRESETS`, `presetRecipe`, `recipeShot` |
 | `studio/lib/project.mjs` | `PROJECTS`, `ROOT`, `STUDIO`, `enforceDataOnly`, `findWordTimestamp`, `loadProject`, `mkdir`, `projectPath`, `readJSON`, `resolveLineSource`, `resolveProjectShots`, `resolveShotCues`, `sha` |
@@ -140,8 +149,10 @@ No media generated during initial setup. When adding a template, update this ind
 | `studio/lib/template-meta.mjs` | `TEMPLATE_META`, `TRANSITION_VALUES` |
 | `studio/lib/templates.mjs` | `TEMPLATE_META`, `TEMPLATE_NAMES`, `TRANSITIONS`, `assertShot`, `drawStudioFrame` |
 | `studio/lib/three-scene.mjs` | `buildHorrorRoomScene`, `buildNightCityScene`, `buildParticleVoidScene`, `renderThreeFrame` |
+| `studio/lib/three-stage.mjs` | `disposeThreeStage`, `drawThreeRoom`, `initializeThreeStage` |
 | `studio/lib/timing.mjs` | `alignDialogue`, `alignMeasured`, `alignPhrases`, `phrases`, `saveWords`, `tokenize` |
 | `studio/lib/validate.mjs` | `didYouMean`, `levenshtein`, `validateProject` |
+| `studio/lib/visual-check.mjs` | `verifyVisual` |
 
 ### Template Registry (`TEMPLATE_META` & `usage.json`)
 
@@ -173,12 +184,16 @@ No media generated during initial setup. When adding a template, update this ind
 
 | Registry | ID | Params and defaults | Example |
 |---|---|---|---|
+| sets | three-room | {"openStart":1,"openDuration":1.2,"open":1,"cameraX":0,"push":0.4,"light":2,"wall":"#334558","floor":"#657385","door":"#e5b76c","background":"#26394b"} | {"openStart":1,"open":1} |
+| sets | apartment-thriller | {"view":"foyer","title":"","message":[]} | {"view":"phone","message":["A new message."]} |
+| sets | cinematic-doorway | {"openStart":1.05,"openDuration":1.45} | {} |
 | sets | yard | {"seed":1,"moon":true,"clouds":true,"fence":true,"tree":true,"stars":80} | {} |
 | sets | bedroom-window | {"seed":1,"curtains":true,"sill":true,"lightLevel":1} | {} |
 | sets | room | {"lightLevel":1} | {} |
 | sets | corridor | {"figure":false,"blur":false,"light":"cold"} | {} |
 | sets | stairwell | {"wet":false,"figure":false} | {} |
 | sets | void | {} | {} |
+| sets | entry-room | {} | {} |
 | sets | preset:wide-establishing | {} | {"scene":"fence-moon","moon":true,"clouds":true,"fence":true,"tree":true} |
 | sets | preset:window-view | {} | {"interior":true,"girl":{"visible":true,"depth":0.78,"x":0.72,"scale":0.9},"clock":{"time":"11:59","x":0.275},"narrator":{"visible":true}} |
 | sets | preset:character-medium | {} | {"rig":"silhouette","expression":"scared","backdrop":"room-blur"} |
@@ -205,6 +220,7 @@ No media generated during initial setup. When adding a template, update this ind
 | props | curtains | {"color":"#5d2330","open":0.7} | {} |
 | props | fence | {"color":"#24364b"} | {} |
 | props | tree | {"color":"#0c1826"} | {} |
+| props | wet-footprint | {} | {} |
 | rigs | stick | {} | {"rig":"stick"} |
 | rigs | block | {} | {"rig":"block"} |
 | rigs | silhouette | {} | {"rig":"silhouette"} |

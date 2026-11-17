@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "verified",
-  "fingerprint": "fe05498ba05b57ec76937b53b7a3d5092203f12c87d2e054c90baba0a9780507",
+  "fingerprint": "2b0e4a513e07b131099ded43cbaf8efdc66472a21218cacf060fb81f32457542",
   "platform": "win32",
   "arch": "x64",
   "node": "v22.17.0",
@@ -15,9 +15,10 @@
   "browserOverrideBoolean": false,
   "checks": {
     "canvas2d": true,
+    "webgl2": true,
     "offscreenCanvas": true
   },
-  "renderer": "Canvas2D+Chromium+ffmpeg",
+  "renderer": "Three.js+Canvas2D+Chromium+ffmpeg",
   "voice": "optional Kokoro ONNX; models not downloaded during setup",
-  "checked_at": "2026-11-16T16:54:59.699Z"
+  "checked_at": "2026-11-17T10:16:37.084Z"
 }

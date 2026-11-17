@@ -1,5 +1,15 @@
 # Short-video studio status
 
+## Integrated Path A foundation — 2026-11-17
+
+Path A now includes pinned Three.js 0.187.0 as a required local player dependency alongside Canvas2D. The shared `three-room` set provides dimensional staging and a timed door; new projects use it by default. Root routing and studio/START_HERE.md give agents one entry point. Live assets/asset-inspect/asset-preview commands cover registered assets, human appearances and actions. Silhouette humans support actor-relative hand targets with two-bone IK. B/C configs are rejected by the Path A CLI.
+
+Measured: 39 tests pass, including legacy preset pixel equivalence and actual WebGL2 seek/resize/dispose checks. `projects/path-a-visual-proof` rendered 168 frames / 7 seconds at 432x768, 24fps; full decode and silent visual verification pass. Representative frames were inspected for opening door, expression change and arm bend. Preview dimensions corrected from odd-width 405x720 to encoder-compatible 432x768. This is a reusable foundation demonstration, not a completed new story or completion of the older Phase 2 acceptance work. Actors remain screen-space Canvas overlays; automatic 3D occlusion/contact and a general 3D human rig are not implemented. Sound remains deferred.
+
+## Visual study — 2026-11-17
+
+`projects/doorway-visual-study` adds a four-second, silent Canvas2D doorway proof: framed opening and threshold, perspective floor, opening-dependent cold light spill, warm practical, handle-following character hand and timed recoil. Uses the existing silhouette rig with an optional hand target. 34 tests pass, including legacy preset pixel equivalence. Draft render completed: 48 frames, 270x480 at 12fps, 6.441 measured rendering seconds. This study is separate from the unfinished Phase 2 film acceptance work.
+
 Updated: 2026-11-16
 State: PRODUCTION VERIFIED — first original 60-second film generated and delivered.
 

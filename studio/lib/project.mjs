@@ -7,6 +7,7 @@ import {assertShot} from './templates.mjs';
 import {STYLES} from './styles.mjs';
 import {avatarRigChoices} from './characters.mjs';
 import {recipeShot} from './presets.mjs';
+import {assertPipeline} from './pipeline.mjs';
 
 export const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 export const PROJECTS=path.join(ROOT,'projects');
@@ -236,15 +237,16 @@ export function resolveShotCues(shots,words=[],lines=[]){
   });
 }
 
-export function loadProject(p){
+export function loadProject(p,{deferWordCues=false}={}){
   const dir=projectPath(p),manifest=readJSON(path.join(dir,'manifest.json'));
   const config=readJSON(path.join(dir,'config.json'));
+  assertPipeline(config);
   if(!Array.isArray(manifest.shots)||!manifest.shots.length)throw new Error('Empty manifest');
   const lineSource=resolveLineSource(dir);
   let shots=resolveProjectShots(manifest.shots,lineSource,config).map(recipeShot);
   const wordsFile=path.join(dir,'timeline','words.json');
   const words=fs.existsSync(wordsFile)?(readJSON(wordsFile).words||[]):[];
-  shots=resolveShotCues(shots,words,lineSource.lines);
+  if(!deferWordCues)shots=resolveShotCues(shots,words,lineSource.lines);
   for(let i=0;i<shots.length;i++){
     assertShot(shots[i]);
     if(i&&shots[i].start<shots[i-1].start+shots[i-1].duration-.02)

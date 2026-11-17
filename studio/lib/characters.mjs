@@ -1,6 +1,7 @@
 // Entirely original code-drawn avatar rigs; no Roblox or other proprietary assets.
 import { clamp, mix, ellipse, stroke, rounded } from './core.mjs';
 import { breathe, blinkAmount, follow, smoothNoise, spring } from './motion.mjs';
+import {solveTwoBone} from './human.mjs';
 
 export function drawCharacter(ctx,{x,y,scale=1,color='#65c4db',rig='block',expression='neutral',phase=0,pose='idle',rim='#64e0ec',gender='unspecified'}){
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
@@ -221,6 +222,7 @@ export function drawFigure(ctx, {
   blink = null,
   pose = 'stand',
   poseWeights = null,
+  handTarget = null,
   phase = 0,
   rimSide = 'right',
   rimColor = '#d8ecff',
@@ -395,15 +397,17 @@ export function drawFigure(ctx, {
   // 5. Front arm (tapered silhouette arm from shoulder to hip)
   const armShoulderX = rootX - rSide * h * 0.006;
   const armShoulderY = shoulderY + h * 0.032;
-  const armHandX = rootX - rSide * h * 0.038 - stride * h * 0.035 + hemSway * 0.3;
-  const armHandY = rootY - h * 0.42;
+  const armHandX = handTarget?.x ?? rootX - rSide * h * 0.038 - stride * h * 0.035 + hemSway * 0.3;
+  const armHandY = handTarget?.y ?? rootY - h * 0.42;
   const armW = Math.max(2.5, h * 0.042);
 
-  if (variant === 'girl') {
-    // Thin dress-colored separation halo so the dark arm reads crisply inside the bodice
-    stroke(ctx, [armShoulderX, armShoulderY], [armHandX, armHandY], armW + h * 0.012, effDressColor);
+  const shoulder=[armShoulderX,armShoulderY];
+  const arm=handTarget?solveTwoBone({x:armShoulderX,y:armShoulderY},{x:armHandX,y:armHandY},h*.18,h*.18,rSide):null;
+  const points=arm?[shoulder,[arm.elbow.x,arm.elbow.y],[arm.hand.x,arm.hand.y]]:[shoulder,[armHandX,armHandY]];
+  for(let i=1;i<points.length;i++){
+    if(variant==='girl')stroke(ctx,points[i-1],points[i],armW+h*.012,effDressColor);
+    stroke(ctx,points[i-1],points[i],armW,bodyColor);
   }
-  stroke(ctx, [armShoulderX, armShoulderY], [armHandX, armHandY], armW, bodyColor);
 
   // 6. Head & Face
   const headR = h * 0.112;

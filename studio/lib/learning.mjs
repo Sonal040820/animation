@@ -12,6 +12,10 @@ const LIB=path.dirname(fileURLToPath(import.meta.url));
 export const USAGE_FILE=path.join(LIB,'usage.json');
 
 export const CLI_COMMANDS=Object.freeze([
+  {command:'assets',args:'[--query term]',summary:'Search live registered assets across Path A'},
+  {command:'asset-inspect',args:'--id kind/name',summary:'Show asset source, defaults, schema and example'},
+  {command:'asset-preview',args:'--id kind/name [--at seconds]',summary:'Render an asset preview PNG using the integrated player'},
+  {command:'verify-visual',args:'--project projects/<slug> [--quality preview]',summary:'Validate silent video codec, dimensions, timing and full frame decode; no audio or minimum motion required'},
   {command:'explain',args:'--project projects/<slug> --shot sNN [--at seconds]',summary:'Print normalized recipe, measured cue anchors and optional sampled frame'},
   {command:'recipe-new',args:'--preset window-view',summary:'Print recipe skeleton plus parameter schemas/defaults and timing annotations'},
   {command:'doctor',args:'[--force]',summary:'Capability check, version fingerprint, writes studio/environment.json'},
